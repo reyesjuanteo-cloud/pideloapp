@@ -23,7 +23,7 @@ export function Mapa() {
   const router = useRouter();
   const [centro, setCentro] = useState<[number, number]>(CENTRO_ZONA);
   const [texto, setTexto] = useState("Mueve el mapa para ubicar el pin");
-  const [barrio, setBarrio] = useState("Girardot");
+  const [barrio, setBarrio] = useState("Centro");
   const [ciudad, setCiudad] = useState("Girardot");
   const [buscando, setBuscando] = useState(false);
   const [interactuado, setInteractuado] = useState(false);

@@ -128,5 +128,12 @@ export function MapaBase({
     }
   }, [marcadores]);
 
-  return <div ref={contenedorRef} className={className} />;
+  // MapLibre impone position:relative a su contenedor, lo que anularía clases
+  // como `absolute inset-0`. Por eso el div exterior dimensiona y MapLibre
+  // vive en un hijo que simplemente lo llena.
+  return (
+    <div className={className}>
+      <div ref={contenedorRef} className="h-full w-full" />
+    </div>
+  );
 }
