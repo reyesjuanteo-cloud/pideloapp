@@ -6,6 +6,10 @@ Aplicación en construcción por el equipo PideloApp.
 
 🚧 Proyecto en fase inicial — estamos definiendo el stack y la arquitectura.
 
+## Identidad visual
+
+Toda pantalla, componente o cambio de UI debe seguir la [Guía de estilos](STYLE_GUIDE.md) (colores, tipografías, espaciado, componentes). No definir colores o fuentes sueltas fuera de ese documento.
+
 ## Equipo
 
 - [@reyesjuanteo-cloud](https://github.com/reyesjuanteo-cloud)
