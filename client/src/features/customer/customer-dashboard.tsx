@@ -37,7 +37,8 @@ export function CustomerDashboard() {
 
   const empresasFiltradas = mockEmpresas.filter((e) => {
     if (buscando) {
-      return e.nombre.toLowerCase().includes(busqueda.trim().toLowerCase());
+      const q = busqueda.trim().toLowerCase();
+      return e.nombre.toLowerCase().includes(q) || e.categoria.toLowerCase().includes(q);
     }
     return categoria === "Todos" || e.categoria === categoria;
   });
