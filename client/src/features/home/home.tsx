@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   ChevronDown,
   Clock,
@@ -60,11 +61,14 @@ export function HomeCliente() {
         </div>
       </div>
 
-      {/* Buscador (navega a la búsqueda; aún sin pantalla propia) */}
-      <button className="flex min-h-11 items-center gap-2 rounded-md border border-border bg-surface px-3 text-body font-body text-muted">
+      {/* Buscador: navega a la pantalla de búsqueda */}
+      <Link
+        href="/buscar"
+        className="flex min-h-11 items-center gap-2 rounded-md border border-border bg-surface px-3 text-body font-body text-muted"
+      >
         <Search className="size-4" />
         Busca tiendas o productos
-      </button>
+      </Link>
 
       {/* Diferenciador del producto: va antes de las categorías */}
       <PedidoLibreCard />
@@ -74,12 +78,16 @@ export function HomeCliente() {
         <h2 className="font-display text-h3 font-semibold text-ink">Categorías</h2>
         <div className="grid grid-cols-4 gap-2">
           {categorias.map(({ icono: Icono, label }) => (
-            <button key={label} className="flex flex-col items-center gap-1.5">
+            <Link
+              key={label}
+              href={`/buscar?categoria=${label}`}
+              className="flex flex-col items-center gap-1.5"
+            >
               <span className="flex h-13 w-full items-center justify-center rounded-md border border-border bg-surface text-primary transition-colors duration-300 ease-in-out hover:bg-bg">
                 <Icono className="size-5" />
               </span>
               <span className="text-caption font-body text-muted">{label}</span>
-            </button>
+            </Link>
           ))}
         </div>
       </div>
