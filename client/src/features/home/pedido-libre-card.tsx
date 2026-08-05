@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 const ejemplos = [
@@ -21,7 +22,7 @@ export function PedidoLibreCard() {
   }, []);
 
   return (
-    <div className="rounded-lg bg-primary/10 p-3.5">
+    <Link href="/pedido-libre" className="block rounded-lg bg-primary/10 p-3.5">
       <p className="font-display text-h3 font-semibold text-primary">Pide lo que sea</p>
       <p className="mt-0.5 text-caption font-body text-primary/80">
         Escríbelo y un mensajero lo consigue por ti
@@ -30,6 +31,6 @@ export function PedidoLibreCard() {
         <span className="truncate text-body font-body text-muted">{ejemplos[indice]}</span>
         <ArrowRight className="size-4 shrink-0 text-primary" />
       </div>
-    </div>
+    </Link>
   );
 }

@@ -3,57 +3,69 @@
 import { useState } from "react";
 import { LogOut } from "lucide-react";
 import { logout } from "@/features/auth/actions";
-import { mockPedidosDisponibles } from "./mock-pedidos";
-import { mockHistorialHoy } from "./mock-historial";
+import { actualizarEstado, usePedidos } from "@/features/pedidos/almacen";
+import type { Pedido } from "@/features/pedidos/tipos";
 import { PedidoCard } from "./pedido-card";
 import { AvailabilityToggle } from "./availability-toggle";
 import { EntregaActiva } from "./entrega-activa";
 import { GananciasResumen } from "./ganancias-resumen";
 import { HistorialEntregas } from "./historial-entregas";
-import type { EntregaActiva as EntregaActivaType, EntregaCompletada, PedidoDisponible } from "./types";
+import type {
+  EntregaCompletada,
+  EstadoEntrega,
+  PedidoDisponible,
+} from "./types";
+
+// Adaptadores entre el modelo compartido de pedidos y las vistas del domiciliario.
+function comoDisponible(pedido: Pedido): PedidoDisponible {
+  return {
+    id: pedido.id,
+    codigo: pedido.codigo,
+    comercio: pedido.comercio,
+    zona: pedido.barrio,
+    direccion: pedido.direccion,
+    // Distancia simulada determinista hasta tener geolocalización real.
+    distanciaKm: ((Number(pedido.id) % 30) + 5) / 10,
+    pago: pedido.envio,
+  };
+}
+
+const estadoEntregaPorPedido: Partial<Record<Pedido["estado"], EstadoEntrega>> = {
+  preparando: "recogiendo",
+  en_camino: "en_ruta",
+  llegue: "llegue",
+};
+
+const siguienteEstado: Partial<Record<Pedido["estado"], Pedido["estado"]>> = {
+  preparando: "en_camino",
+  en_camino: "llegue",
+};
 
 export function DriverDashboard() {
   const [available, setAvailable] = useState(true);
-  const [disponibles, setDisponibles] = useState<PedidoDisponible[]>(mockPedidosDisponibles);
-  const [entrega, setEntrega] = useState<EntregaActivaType | null>(null);
-  const [historial, setHistorial] = useState<EntregaCompletada[]>(mockHistorialHoy);
+  const pedidos = usePedidos();
 
-  function aceptarPedido(pedido: PedidoDisponible) {
-    setEntrega({ pedido, estado: "recogiendo" });
-    setDisponibles((prev) => prev.filter((p) => p.id !== pedido.id));
-  }
+  const disponibles = pedidos.filter((p) => p.estado === "buscando");
+  const activo = pedidos.find((p) =>
+    ["preparando", "en_camino", "llegue"].includes(p.estado)
+  );
+  const historial: EntregaCompletada[] = pedidos
+    .filter((p) => p.estado === "entregado")
+    .map((p) => ({
+      id: p.id,
+      codigo: p.codigo,
+      comercio: p.comercio,
+      zona: p.barrio,
+      pago: p.envio,
+      hora: p.horaEntrega ?? p.horaCreacion,
+    }));
 
   function avanzarEntrega() {
-    setEntrega((actual) => {
-      if (!actual) return null;
-      if (actual.estado === "recogiendo") {
-        return { ...actual, estado: "en_ruta" };
-      }
-      if (actual.estado === "en_ruta") {
-        // "Ya llegué" es lo máximo que el domiciliario puede marcar.
-        return { ...actual, estado: "llegue" };
-      }
-      // llegue → entregado: solo lo dispara la confirmación del cliente
-      // (llegará por Supabase realtime). Ningún botón del domiciliario llama esto.
-      const { pedido } = actual;
-      const hora = new Date().toLocaleTimeString("es-CO", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      });
-      setHistorial((prev) => [
-        ...prev,
-        {
-          id: pedido.id,
-          codigo: pedido.codigo,
-          comercio: pedido.comercio,
-          zona: pedido.zona,
-          pago: pedido.pago,
-          hora,
-        },
-      ]);
-      return null;
-    });
+    if (!activo) return;
+    const siguiente = siguienteEstado[activo.estado];
+    // "llegue" → "entregado" no está aquí a propósito: esa transición
+    // la dispara el cliente al confirmar que recibió el pedido.
+    if (siguiente) actualizarEstado(activo.id, siguiente);
   }
 
   return (
@@ -77,7 +89,15 @@ export function DriverDashboard() {
 
       <GananciasResumen historial={historial} />
 
-      {entrega && <EntregaActiva entrega={entrega} onAvanzar={avanzarEntrega} />}
+      {activo && (
+        <EntregaActiva
+          entrega={{
+            pedido: comoDisponible(activo),
+            estado: estadoEntregaPorPedido[activo.estado] ?? "recogiendo",
+          }}
+          onAvanzar={avanzarEntrega}
+        />
+      )}
 
       <h2 className="font-display text-h3 font-semibold text-ink">Pedidos en tu zona</h2>
 
@@ -87,16 +107,17 @@ export function DriverDashboard() {
         </p>
       ) : disponibles.length === 0 ? (
         <p className="rounded-lg border border-border bg-surface p-4 text-body font-body text-muted">
-          Aún no hay pedidos. Cuando los clientes empiecen a pedir, aparecerán aquí.
+          Aún no hay pedidos. Cuando los clientes hagan pedidos, aparecerán aquí al
+          instante.
         </p>
       ) : (
         <div className="flex flex-col gap-3">
           {disponibles.map((pedido) => (
             <PedidoCard
               key={pedido.id}
-              pedido={pedido}
-              deshabilitado={entrega !== null}
-              onAceptar={() => aceptarPedido(pedido)}
+              pedido={comoDisponible(pedido)}
+              deshabilitado={activo !== undefined}
+              onAceptar={() => actualizarEstado(pedido.id, "preparando")}
             />
           ))}
         </div>

@@ -16,6 +16,7 @@ import {
 import { mockComercios } from "@/features/customer/mock-comercios";
 import { leerDireccion } from "@/features/onboarding/direccion";
 import { BottomNav } from "./bottom-nav";
+import { PedidoEnCurso } from "./pedido-en-curso";
 import { PedidoLibreCard } from "./pedido-libre-card";
 
 const categorias = [
@@ -47,18 +48,22 @@ export function HomeCliente() {
           <p className="text-label font-semibold uppercase tracking-wide text-muted font-body">
             Entregar en
           </p>
-          <button className="flex max-w-full items-center gap-1 text-body font-semibold font-body text-ink">
+          <Link
+            href="/mapa"
+            className="flex max-w-full items-center gap-1 text-body font-semibold font-body text-ink"
+          >
             <MapPin className="size-4 shrink-0 text-primary" />
             <span className="truncate">{direccion}</span>
             <ChevronDown className="size-3.5 shrink-0 text-muted" />
-          </button>
+          </Link>
         </div>
-        <div
+        <Link
+          href="/perfil"
           aria-label="Tu perfil"
           className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
         >
           <User className="size-4" />
-        </div>
+        </Link>
       </div>
 
       {/* Buscador: navega a la pantalla de búsqueda */}
@@ -105,8 +110,9 @@ export function HomeCliente() {
         ) : (
           <div className="flex flex-col gap-2">
             {mockComercios.map((comercio) => (
-              <button
+              <Link
                 key={comercio.id}
+                href={`/comercio/${comercio.id}`}
                 className="flex items-center gap-3 rounded-lg border border-border bg-surface p-3 text-left transition-colors duration-300 ease-in-out hover:bg-bg"
               >
                 <span className="flex size-10.5 shrink-0 items-center justify-center rounded-md bg-primary/10 font-display text-h3 font-semibold text-primary">
@@ -124,14 +130,14 @@ export function HomeCliente() {
                     <span>Envío {currency.format(comercio.costoDomicilio)}</span>
                   </p>
                 </div>
-              </button>
+              </Link>
             ))}
           </div>
         )}
       </div>
 
-      {/* Pedido en curso: aparecerá aquí, sticky sobre el nav, cuando exista
-          un pedido activo real (vía Supabase). */}
+      {/* Pedido en curso: sticky sobre el nav inferior */}
+      <PedidoEnCurso />
 
       <BottomNav />
     </div>

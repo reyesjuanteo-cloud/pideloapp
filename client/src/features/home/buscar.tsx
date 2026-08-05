@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Clock, Search } from "lucide-react";
 import { Chip } from "@/components/ui/chip";
 import { mockComercios, categorias } from "@/features/customer/mock-comercios";
@@ -66,8 +67,9 @@ export function Buscar({ categoriaInicial }: { categoriaInicial?: string }) {
       ) : (
         <div className="flex flex-col gap-2">
           {resultados.map((comercio) => (
-            <button
+            <Link
               key={comercio.id}
+              href={`/comercio/${comercio.id}`}
               className="flex items-center gap-3 rounded-lg border border-border bg-surface p-3 text-left transition-colors duration-300 ease-in-out hover:bg-bg"
             >
               <span className="flex size-10.5 shrink-0 items-center justify-center rounded-md bg-primary/10 font-display text-h3 font-semibold text-primary">
@@ -85,7 +87,7 @@ export function Buscar({ categoriaInicial }: { categoriaInicial?: string }) {
                   <span>Envío {currency.format(comercio.costoDomicilio)}</span>
                 </p>
               </div>
-            </button>
+            </Link>
           ))}
         </div>
       )}
