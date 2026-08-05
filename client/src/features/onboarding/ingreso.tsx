@@ -44,8 +44,15 @@ export function Ingreso() {
       </p>
 
       <div className="mt-6 flex flex-col gap-4">
-        <PhoneField digitos={digitos} onChange={setDigitos} error={error} />
-        <Button fullWidth pending={enviando} disabled={!telefonoValido(digitos)} onClick={continuar}>
+        <PhoneField
+          digitos={digitos}
+          onChange={(valor) => {
+            setDigitos(valor);
+            setError(undefined);
+          }}
+          error={error}
+        />
+        <Button fullWidth pending={enviando} disabled={digitos.length < 10} onClick={continuar}>
           Continuar
         </Button>
       </div>
