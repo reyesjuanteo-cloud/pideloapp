@@ -33,10 +33,13 @@ export function CustomerDashboard() {
     );
   }
 
+  const buscando = busqueda.trim().length >= 3;
+
   const empresasFiltradas = mockEmpresas.filter((e) => {
-    const coincideCategoria = categoria === "Todos" || e.categoria === categoria;
-    const coincideBusqueda = e.nombre.toLowerCase().includes(busqueda.toLowerCase());
-    return coincideCategoria && coincideBusqueda;
+    if (buscando) {
+      return e.nombre.toLowerCase().includes(busqueda.trim().toLowerCase());
+    }
+    return categoria === "Todos" || e.categoria === categoria;
   });
 
   return (
@@ -59,20 +62,32 @@ export function CustomerDashboard() {
 
       {pedido && <PedidoTracker pedido={pedido} />}
 
-      <Input
-        label="Buscar"
-        name="busqueda"
-        placeholder="Busca una empresa..."
-        icon={<Search className="size-4" />}
-        value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
-      />
+      <div className="flex flex-col gap-1.5">
+        <Input
+          label="Buscar"
+          name="busqueda"
+          placeholder="Busca una empresa..."
+          icon={<Search className="size-4" />}
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+        />
+        {buscando && (
+          <p className="text-caption font-body text-muted">
+            Buscando &quot;{busqueda.trim()}&quot; en todas las categorías
+          </p>
+        )}
+      </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div
+        className={`flex flex-wrap gap-2 transition-opacity duration-300 ease-in-out ${
+          buscando ? "pointer-events-none opacity-40" : ""
+        }`}
+      >
         {categorias.map((c) => (
           <button
             key={c}
             onClick={() => setCategoria(c)}
+            disabled={buscando}
             className={`rounded-full border px-3 py-1.5 text-caption font-semibold font-body transition-colors duration-300 ease-in-out ${
               categoria === c
                 ? "border-primary bg-primary text-white"
