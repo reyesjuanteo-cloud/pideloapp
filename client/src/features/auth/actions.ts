@@ -1,7 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_USERS, DEMO_SESSION_COOKIE } from "@/features/auth/demo-users";
 
 export type AuthState = { error: string | null };
 
@@ -16,7 +18,29 @@ export async function login(
     return { error: "Completa correo y contraseña." };
   }
 
-  const supabase = await createClient();
+  // ⚠️ TEMPORAL: acceso demo sin Supabase — ver demo-users.ts.
+  const demoUser = DEMO_USERS.find(
+    (u) => u.email === email && u.password === password
+  );
+  if (demoUser) {
+    const cookieStore = await cookies();
+    cookieStore.set(DEMO_SESSION_COOKIE, demoUser.role, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+    });
+    redirect(demoUser.home);
+  }
+
+  let supabase;
+  try {
+    supabase = await createClient();
+  } catch {
+    return {
+      error:
+        "Supabase aún no está configurado. Usa las credenciales demo que aparecen abajo.",
+    };
+  }
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
@@ -25,6 +49,12 @@ export async function login(
 
   // TODO: redirigir según el rol (cliente/empresa/domiciliario) una vez exista esa tabla.
   redirect("/driver/dashboard");
+}
+
+export async function logout(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.delete(DEMO_SESSION_COOKIE);
+  redirect("/login");
 }
 
 export async function signup(

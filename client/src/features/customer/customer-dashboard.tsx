@@ -1,0 +1,109 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { LogOut, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { logout } from "@/features/auth/actions";
+import { categorias, mockEmpresas } from "./mock-empresas";
+import { EmpresaCard } from "./empresa-card";
+import { PedidoTracker } from "./pedido-tracker";
+import type { PedidoActivo } from "./types";
+
+export function CustomerDashboard() {
+  const [busqueda, setBusqueda] = useState("");
+  const [categoria, setCategoria] = useState("Todos");
+  const [pedido, setPedido] = useState<PedidoActivo | null>(null);
+  const contadorPedidos = useRef(5000);
+  const timeouts = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  useEffect(() => {
+    const pendientes = timeouts.current;
+    return () => pendientes.forEach(clearTimeout);
+  }, []);
+
+  function pedir(empresa: string) {
+    contadorPedidos.current += 1;
+    const codigo = `PD-${contadorPedidos.current}`;
+    setPedido({ codigo, empresa, estado: "preparando" });
+
+    // Simulación del avance del pedido — reemplazar por estado real desde Supabase.
+    timeouts.current.push(
+      setTimeout(() => setPedido((p) => (p && { ...p, estado: "en_camino" })), 5000),
+      setTimeout(() => setPedido((p) => (p && { ...p, estado: "entregado" })), 12000)
+    );
+  }
+
+  const empresasFiltradas = mockEmpresas.filter((e) => {
+    const coincideCategoria = categoria === "Todos" || e.categoria === categoria;
+    const coincideBusqueda = e.nombre.toLowerCase().includes(busqueda.toLowerCase());
+    return coincideCategoria && coincideBusqueda;
+  });
+
+  return (
+    <div className="mx-auto flex w-full max-w-lg flex-col gap-4 p-4">
+      <div className="flex items-center justify-between">
+        <h1 className="font-display text-h2 font-semibold text-ink">
+          ¿Qué vas a pedir hoy?
+        </h1>
+        <form action={logout}>
+          <button
+            type="submit"
+            title="Cerrar sesión"
+            className="flex items-center gap-1 text-caption font-body text-muted transition-colors duration-300 ease-in-out hover:text-ink"
+          >
+            <LogOut className="size-4" />
+            Salir
+          </button>
+        </form>
+      </div>
+
+      {pedido && <PedidoTracker pedido={pedido} />}
+
+      <Input
+        label="Buscar"
+        name="busqueda"
+        placeholder="Busca una empresa..."
+        icon={<Search className="size-4" />}
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+      />
+
+      <div className="flex flex-wrap gap-2">
+        {categorias.map((c) => (
+          <button
+            key={c}
+            onClick={() => setCategoria(c)}
+            className={`rounded-full border px-3 py-1.5 text-caption font-semibold font-body transition-colors duration-300 ease-in-out ${
+              categoria === c
+                ? "border-primary bg-primary text-white"
+                : "border-border bg-surface text-muted hover:text-ink"
+            }`}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
+
+      <h2 className="font-display text-h3 font-semibold text-ink">
+        Empresas de tu zona
+      </h2>
+
+      {empresasFiltradas.length === 0 ? (
+        <p className="rounded-lg border border-border bg-surface p-4 text-body font-body text-muted">
+          No encontramos empresas con ese filtro.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {empresasFiltradas.map((empresa) => (
+            <EmpresaCard
+              key={empresa.id}
+              empresa={empresa}
+              deshabilitado={pedido !== null && pedido.estado !== "entregado"}
+              onPedir={() => pedir(empresa.nombre)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
