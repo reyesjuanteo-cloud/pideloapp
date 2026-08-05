@@ -29,7 +29,12 @@ export function DriverDashboard() {
       if (actual.estado === "recogiendo") {
         return { ...actual, estado: "en_ruta" };
       }
-      // en_ruta → entregado: pasa al historial del día.
+      if (actual.estado === "en_ruta") {
+        // "Ya llegué" es lo máximo que el domiciliario puede marcar.
+        return { ...actual, estado: "llegue" };
+      }
+      // llegue → entregado: solo lo dispara la confirmación del cliente
+      // (llegará por Supabase realtime). Ningún botón del domiciliario llama esto.
       const { pedido } = actual;
       const hora = new Date().toLocaleTimeString("es-CO", {
         hour: "2-digit",
@@ -82,7 +87,7 @@ export function DriverDashboard() {
         </p>
       ) : disponibles.length === 0 ? (
         <p className="rounded-lg border border-border bg-surface p-4 text-body font-body text-muted">
-          No hay pedidos disponibles en tu zona por ahora.
+          Aún no hay pedidos. Cuando los clientes empiecen a pedir, aparecerán aquí.
         </p>
       ) : (
         <div className="flex flex-col gap-3">

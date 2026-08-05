@@ -1,4 +1,4 @@
-import { MapPin } from "lucide-react";
+import { Hourglass, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { EntregaActiva as EntregaActivaType, EstadoEntrega } from "./types";
 
@@ -11,12 +11,16 @@ const currency = new Intl.NumberFormat("es-CO", {
 const pasos: { estado: EstadoEntrega; label: string }[] = [
   { estado: "recogiendo", label: "Recogiendo" },
   { estado: "en_ruta", label: "En ruta" },
+  { estado: "llegue", label: "En destino" },
   { estado: "entregado", label: "Entregado" },
 ];
 
+// El domiciliario solo puede avanzar hasta "Ya llegué". El paso a "entregado"
+// lo confirma el cliente desde su panel — nunca el domiciliario.
 const accionPorEstado: Record<EstadoEntrega, string | null> = {
   recogiendo: "Ya recogí el pedido",
-  en_ruta: "Marcar como entregado",
+  en_ruta: "Ya llegué",
+  llegue: null,
   entregado: null,
 };
 
@@ -87,6 +91,13 @@ export function EntregaActiva({
           );
         })}
       </div>
+
+      {estado === "llegue" && (
+        <p className="flex items-center gap-2 rounded-md border border-border bg-bg p-3 text-caption font-body text-muted">
+          <Hourglass className="size-4 shrink-0" />
+          Esperando que el cliente confirme que recibió el pedido…
+        </p>
+      )}
 
       <div className="flex items-center justify-between">
         <span className="text-caption font-body text-muted">

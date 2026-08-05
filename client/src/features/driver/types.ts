@@ -8,7 +8,7 @@ export type PedidoDisponible = {
   pago: number;
 };
 
-export type EstadoEntrega = "recogiendo" | "en_ruta" | "entregado";
+export type EstadoEntrega = "recogiendo" | "en_ruta" | "llegue" | "entregado";
 
 export type EntregaActiva = {
   pedido: PedidoDisponible;
