@@ -2,7 +2,7 @@ import { Loader2 } from "lucide-react";
 import type { ButtonHTMLAttributes } from "react";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "accent";
+  variant?: "primary" | "accent" | "secondary";
   pending?: boolean;
   fullWidth?: boolean;
 };
@@ -10,6 +10,8 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 const variantClasses = {
   primary: "bg-primary text-white hover:bg-primary-dark rounded-md py-3",
   accent: "bg-accent text-white hover:brightness-95 rounded-sm py-2.5",
+  secondary:
+    "border border-border bg-surface text-ink hover:bg-bg rounded-md py-3",
 };
 
 export function Button({

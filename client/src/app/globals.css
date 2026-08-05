@@ -58,6 +58,21 @@ body {
   font-family: var(--font-body), sans-serif;
 }
 
+/* Sacudida de una sola pasada para el error del código OTP — feedback puntual,
+   no animación continua, permitida junto al punto "en camino". */
+@keyframes sacudida {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+
 /* Único elemento con animación continua permitido por STYLE_GUIDE.md:
    el punto "en camino" del tracker de pedido, en loop de ida y vuelta. */
 @keyframes ida-vuelta {
