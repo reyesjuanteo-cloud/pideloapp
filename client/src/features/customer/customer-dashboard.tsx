@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { LogOut, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { logout } from "@/features/auth/actions";
-import { categorias, mockEmpresas } from "./mock-empresas";
-import { EmpresaCard } from "./empresa-card";
+import { categorias, mockComercios } from "./mock-comercios";
+import { ComercioCard } from "./comercio-card";
 import { PedidoTracker } from "./pedido-tracker";
 import type { PedidoActivo } from "./types";
 
@@ -21,10 +21,10 @@ export function CustomerDashboard() {
     return () => pendientes.forEach(clearTimeout);
   }, []);
 
-  function pedir(empresa: string) {
+  function pedir(comercio: string) {
     contadorPedidos.current += 1;
     const codigo = `PD-${contadorPedidos.current}`;
-    setPedido({ codigo, empresa, estado: "preparando" });
+    setPedido({ codigo, comercio, estado: "preparando" });
 
     // Simulación del avance del pedido — reemplazar por estado real desde Supabase.
     timeouts.current.push(
@@ -35,12 +35,12 @@ export function CustomerDashboard() {
 
   const buscando = busqueda.trim().length >= 3;
 
-  const empresasFiltradas = mockEmpresas.filter((e) => {
+  const comerciosFiltrados = mockComercios.filter((c) => {
     if (buscando) {
       const q = busqueda.trim().toLowerCase();
-      return e.nombre.toLowerCase().includes(q) || e.categoria.toLowerCase().includes(q);
+      return c.nombre.toLowerCase().includes(q) || c.categoria.toLowerCase().includes(q);
     }
-    return categoria === "Todos" || e.categoria === categoria;
+    return categoria === "Todos" || c.categoria === categoria;
   });
 
   return (
@@ -67,7 +67,7 @@ export function CustomerDashboard() {
         <Input
           label="Buscar"
           name="busqueda"
-          placeholder="Busca una empresa..."
+          placeholder="Busca un comercio..."
           icon={<Search className="size-4" />}
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
@@ -101,21 +101,21 @@ export function CustomerDashboard() {
       </div>
 
       <h2 className="font-display text-h3 font-semibold text-ink">
-        Empresas de tu zona
+        Comercios de tu zona
       </h2>
 
-      {empresasFiltradas.length === 0 ? (
+      {comerciosFiltrados.length === 0 ? (
         <p className="rounded-lg border border-border bg-surface p-4 text-body font-body text-muted">
-          No encontramos empresas con ese filtro.
+          No encontramos comercios con ese filtro.
         </p>
       ) : (
         <div className="flex flex-col gap-3">
-          {empresasFiltradas.map((empresa) => (
-            <EmpresaCard
-              key={empresa.id}
-              empresa={empresa}
+          {comerciosFiltrados.map((comercio) => (
+            <ComercioCard
+              key={comercio.id}
+              comercio={comercio}
               deshabilitado={pedido !== null && pedido.estado !== "entregado"}
-              onPedir={() => pedir(empresa.nombre)}
+              onPedir={() => pedir(comercio.nombre)}
             />
           ))}
         </div>

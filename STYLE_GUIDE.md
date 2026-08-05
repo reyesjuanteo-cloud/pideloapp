@@ -43,7 +43,7 @@ Import (web):
 | Token | Tamaño | Fuente | Uso |
 |---|---|---|---|
 | `--text-display` | 26px / 700 | display | Nombre de marca |
-| `--text-h2` | 17px / 600 | display | Títulos de modal, nombre de empresa |
+| `--text-h2` | 17px / 600 | display | Títulos de modal, nombre de comercio |
 | `--text-h3` | 14px / 600 | display | Títulos de sección ("Domiciliarios de la zona") |
 | `--text-body` | 13.5px / 400–500 | body | Texto de formularios, descripciones |
 | `--text-label` | 11.5px / 600, uppercase | body | Etiquetas de campo |
@@ -55,7 +55,7 @@ Import (web):
 ```css
 --radius-sm: 9px;    /* botones, chips pequeños */
 --radius-md: 12px;   /* inputs, tarjetas */
---radius-lg: 14px;   /* tarjetas de pedido/empresa */
+--radius-lg: 14px;   /* tarjetas de pedido/comercio */
 --radius-xl: 20px;   /* modales */
 --radius-2xl: 28px;  /* contenedor principal de la app */
 
@@ -73,7 +73,7 @@ Import (web):
 ## Componentes
 
 - **Botón primario**: fondo `--color-primary`, texto blanco, `--radius-md`, peso 600, 12px vertical / 0 horizontal (full width en formularios).
-- **Botón de acento (CTA de pedir)**: fondo `--color-accent`, texto blanco, `--radius-sm`, usado solo en acciones puntuales dentro de una tarjeta (ej. "Pedir" en una empresa).
+- **Botón de acento (CTA de pedir)**: fondo `--color-accent`, texto blanco, `--radius-sm`, usado solo en acciones puntuales dentro de una tarjeta (ej. "Pedir" en un comercio).
 - **Chip / filtro**: radius circular (999px), borde `--color-border`, fondo blanco; estado activo con fondo `--color-primary` y texto blanco.
 - **Tarjeta**: fondo `--color-surface`, borde `--color-border`, `--radius-lg`, padding `--space-3`.
 - **Input**: fondo blanco, borde `--color-border`, `--radius-md`, ícono a la izquierda cuando aplica (de lucide-react), texto en `--font-body` 13.5px.

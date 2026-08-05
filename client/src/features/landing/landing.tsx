@@ -5,7 +5,7 @@ const features = [
   {
     icon: ShoppingBag,
     title: "Pide en tus negocios favoritos",
-    description: "Explora empresas cerca de ti y arma tu pedido en minutos.",
+    description: "Explora comercios cerca de ti y arma tu pedido en minutos.",
     tone: "primary",
   },
   {
@@ -17,7 +17,7 @@ const features = [
   {
     icon: MapPin,
     title: "Todo cerca de tu zona",
-    description: "Empresas y domiciliarios de tu barrio, sin vueltas.",
+    description: "Comercios y domiciliarios de tu barrio, sin vueltas.",
     tone: "primary",
   },
 ] as const;

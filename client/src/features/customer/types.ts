@@ -1,4 +1,4 @@
-export type Empresa = {
+export type Comercio = {
   id: string;
   nombre: string;
   categoria: string;
@@ -12,6 +12,6 @@ export type EstadoPedido = "preparando" | "en_camino" | "entregado";
 
 export type PedidoActivo = {
   codigo: string;
-  empresa: string;
+  comercio: string;
   estado: EstadoPedido;
 };

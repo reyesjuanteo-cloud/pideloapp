@@ -1,7 +1,7 @@
 export type PedidoDisponible = {
   id: string;
   codigo: string;
-  empresa: string;
+  comercio: string;
   zona: string;
   direccion: string;
   distanciaKm: number;
@@ -18,7 +18,7 @@ export type EntregaActiva = {
 export type EntregaCompletada = {
   id: string;
   codigo: string;
-  empresa: string;
+  comercio: string;
   zona: string;
   pago: number;
   hora: string;

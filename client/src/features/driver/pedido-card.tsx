@@ -21,7 +21,7 @@ export function PedidoCard({
     <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-3">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="font-display text-h3 font-semibold text-ink">{pedido.empresa}</p>
+          <p className="font-display text-h3 font-semibold text-ink">{pedido.comercio}</p>
           <p className="flex items-center gap-1 text-caption text-muted font-body">
             <MapPin className="size-3.5" />
             {pedido.zona} · {pedido.direccion}

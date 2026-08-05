@@ -40,7 +40,7 @@ export function EntregaActiva({
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="font-display text-h3 font-semibold text-ink">
-            Entrega en curso · {pedido.empresa}
+            Entrega en curso · {pedido.comercio}
           </p>
           <p className="flex items-center gap-1 text-caption text-muted font-body">
             <MapPin className="size-3.5" />

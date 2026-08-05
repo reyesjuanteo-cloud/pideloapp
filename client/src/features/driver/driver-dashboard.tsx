@@ -46,7 +46,7 @@ export function DriverDashboard() {
         {
           id: pedido.id,
           codigo: pedido.codigo,
-          empresa: pedido.empresa,
+          comercio: pedido.comercio,
           zona: pedido.zona,
           pago: pedido.pago,
           hora,

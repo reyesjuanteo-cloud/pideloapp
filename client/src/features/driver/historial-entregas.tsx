@@ -28,7 +28,7 @@ export function HistorialEntregas({ historial }: { historial: EntregaCompletada[
           <CheckCircle2 className="size-4 shrink-0 text-success" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-body font-semibold font-body text-ink">
-              {entrega.empresa}
+              {entrega.comercio}
             </p>
             <p className="text-caption text-muted font-body">
               {entrega.zona} · {entrega.hora} ·{" "}

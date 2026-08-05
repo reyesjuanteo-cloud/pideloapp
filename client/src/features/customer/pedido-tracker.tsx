@@ -13,7 +13,7 @@ export function PedidoTracker({ pedido }: { pedido: PedidoActivo }) {
     <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-3">
       <div className="flex items-center justify-between">
         <p className="font-display text-h3 font-semibold text-ink">
-          Tu pedido en {pedido.empresa}
+          Tu pedido en {pedido.comercio}
         </p>
         <span className="font-mono text-mono text-muted">{pedido.codigo}</span>
       </div>

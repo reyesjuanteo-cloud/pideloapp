@@ -1,7 +1,7 @@
-import type { Empresa } from "./types";
+import type { Comercio } from "./types";
 
-// Datos de ejemplo — reemplazar por una consulta a Supabase cuando exista la tabla `empresas`.
-export const mockEmpresas: Empresa[] = [
+// Datos de ejemplo — reemplazar por una consulta a Supabase cuando exista la tabla `comercios`.
+export const mockComercios: Comercio[] = [
   {
     id: "1",
     nombre: "Arepería La 14",

@@ -47,7 +47,7 @@ export async function login(
     return { error: "Correo o contraseña incorrectos." };
   }
 
-  // TODO: redirigir según el rol (cliente/empresa/domiciliario) una vez exista esa tabla.
+  // TODO: redirigir según el rol (cliente/comercio/domiciliario) una vez exista esa tabla.
   redirect("/driver/dashboard");
 }
 
