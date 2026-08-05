@@ -64,6 +64,8 @@ export function Checkout() {
       total: subtotal + envio,
       direccion: `${direccion.texto}${direccion.detalle ? `, ${direccion.detalle}` : ""}`,
       barrio: direccion.barrio,
+      lat: direccion.lat,
+      lng: direccion.lng,
     });
     vaciarCarrito();
     router.replace(`/pedido/${pedido.id}`);

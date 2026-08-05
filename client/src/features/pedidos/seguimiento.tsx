@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle2, PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { actualizarEstado, usePedidos } from "./almacen";
+import { MapaSeguimiento } from "./mapa-seguimiento";
 import type { EstadoPedido } from "./tipos";
 
 const currency = new Intl.NumberFormat("es-CO", {
@@ -75,6 +76,9 @@ export function Seguimiento({ pedidoId }: { pedidoId: string }) {
         </div>
         <span className="font-mono text-mono text-muted">{pedido.codigo}</span>
       </div>
+
+      {/* Mapa en vivo del mensajero (simulado hasta conectar Supabase) */}
+      <MapaSeguimiento pedido={pedido} />
 
       {/* Tracker */}
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-3">

@@ -31,6 +31,9 @@ export type Pedido = {
   total: number;
   direccion: string;
   barrio: string;
+  // Coordenadas del punto de entrega (el pin del mapa es la fuente de verdad).
+  lat?: number;
+  lng?: number;
   estado: EstadoPedido;
   horaCreacion: string;
   horaEntrega?: string;

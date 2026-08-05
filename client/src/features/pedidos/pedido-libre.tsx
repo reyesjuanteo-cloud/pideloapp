@@ -49,6 +49,8 @@ export function PedidoLibre() {
       total: cotizacion,
       direccion: `${direccion.texto}${direccion.detalle ? `, ${direccion.detalle}` : ""}`,
       barrio: direccion.barrio,
+      lat: direccion.lat,
+      lng: direccion.lng,
     });
     router.replace(`/pedido/${pedido.id}`);
   }
