@@ -52,7 +52,10 @@ export function MapaBase({
   const mapaRef = useRef<MapaGL | null>(null);
   const marcadoresRef = useRef<Map<string, Marker>>(new Map());
   const onMoveEndRef = useRef(onMoveEnd);
-  onMoveEndRef.current = onMoveEnd;
+
+  useEffect(() => {
+    onMoveEndRef.current = onMoveEnd;
+  }, [onMoveEnd]);
 
   useEffect(() => {
     if (!contenedorRef.current || mapaRef.current) return;
@@ -69,10 +72,11 @@ export function MapaBase({
       onMoveEndRef.current?.([c.lng, c.lat]);
     });
     mapaRef.current = mapa;
+    const marcadoresVivos = marcadoresRef.current;
     return () => {
       mapa.remove();
       mapaRef.current = null;
-      marcadoresRef.current.clear();
+      marcadoresVivos.clear();
     };
     // El centro/zoom inicial solo aplica al crear el mapa.
     // eslint-disable-next-line react-hooks/exhaustive-deps

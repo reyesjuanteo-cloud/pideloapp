@@ -6,7 +6,7 @@ import { ArrowLeft, Briefcase, Home, MapPin, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Chip } from "@/components/ui/chip";
-import { leerDireccion, guardarDireccion, type Direccion } from "./direccion";
+import { useDireccion, guardarDireccion, type Direccion } from "./direccion";
 
 const etiquetas = [
   { valor: "Casa", icono: Home },
@@ -16,27 +16,29 @@ const etiquetas = [
 
 export function Entrega() {
   const router = useRouter();
-  const [direccion, setDireccion] = useState<Direccion | null>(null);
-  const [detalle, setDetalle] = useState("");
-  const [indicaciones, setIndicaciones] = useState("");
-  const [etiqueta, setEtiqueta] = useState<Direccion["etiqueta"]>("Casa");
+  const direccion = useDireccion();
 
   useEffect(() => {
-    const guardada = leerDireccion();
-    if (!guardada) {
-      router.replace("/mapa");
-      return;
-    }
-    setDireccion(guardada);
-    setDetalle(guardada.detalle ?? "");
-    setIndicaciones(guardada.indicaciones ?? "");
-    setEtiqueta(guardada.etiqueta ?? "Casa");
-  }, [router]);
+    if (direccion === null) router.replace("/mapa");
+  }, [direccion, router]);
 
   if (!direccion) return null;
 
+  return <FormularioEntrega direccion={direccion} />;
+}
+
+// Hijo separado: monta cuando la dirección ya existe, así los useState
+// pueden inicializarse directamente desde ella (sin setState en efectos).
+function FormularioEntrega({ direccion }: { direccion: Direccion }) {
+  const router = useRouter();
+  const [detalle, setDetalle] = useState(direccion.detalle ?? "");
+  const [indicaciones, setIndicaciones] = useState(direccion.indicaciones ?? "");
+  const [etiqueta, setEtiqueta] = useState<Direccion["etiqueta"]>(
+    direccion.etiqueta ?? "Casa"
+  );
+
   function guardar() {
-    guardarDireccion({ ...direccion!, detalle, indicaciones, etiqueta });
+    guardarDireccion({ ...direccion, detalle, indicaciones, etiqueta });
     router.push("/home");
   }
 

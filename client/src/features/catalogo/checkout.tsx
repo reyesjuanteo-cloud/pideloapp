@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Banknote, CreditCard, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { leerDireccion, type Direccion } from "@/features/onboarding/direccion";
+import { useDireccion } from "@/features/onboarding/direccion";
 import { mockComercios } from "@/features/customer/mock-comercios";
 import { crearPedido } from "@/features/pedidos/almacen";
 import { productosDeComercio } from "./mock-productos";
-import { leerCarrito, vaciarCarrito } from "./carrito";
+import { useCarrito, vaciarCarrito } from "./carrito";
 
 const currency = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -18,25 +18,20 @@ const currency = new Intl.NumberFormat("es-CO", {
 
 export function Checkout() {
   const router = useRouter();
-  const [direccion, setDireccion] = useState<Direccion | null>(null);
+  const direccion = useDireccion();
+  const carrito = useCarrito();
   const [confirmando, setConfirmando] = useState(false);
-  const [listo, setListo] = useState(false);
 
-  useEffect(() => {
-    setDireccion(leerDireccion());
-    setListo(true);
-  }, []);
-
-  const carrito = typeof window !== "undefined" ? leerCarrito() : null;
   const comercio = carrito
     ? mockComercios.find((c) => c.id === carrito.comercioId)
     : undefined;
 
   useEffect(() => {
-    if (listo && (!carrito || !comercio)) router.replace("/home");
-  }, [listo, carrito, comercio, router]);
+    // Sin carrito no hay nada que confirmar — salvo justo tras crear el pedido.
+    if (!confirmando && (!carrito || !comercio)) router.replace("/home");
+  }, [carrito, comercio, confirmando, router]);
 
-  if (!listo || !carrito || !comercio) return null;
+  if (!carrito || !comercio) return null;
 
   const lineas = productosDeComercio(comercio.id)
     .map((p) => ({ producto: p, cantidad: carrito.cantidades[p.id] ?? 0 }))
@@ -120,7 +115,7 @@ export function Checkout() {
           </div>
         ))}
         <div className="flex justify-between text-muted">
-          <span>Envío</span>
+          <span>Envío (para el mensajero)</span>
           <span>{currency.format(envio)}</span>
         </div>
         <div className="flex justify-between border-t border-border pt-2 font-semibold text-ink">

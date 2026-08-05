@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ChevronDown,
@@ -14,7 +13,7 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { mockComercios } from "@/features/customer/mock-comercios";
-import { leerDireccion } from "@/features/onboarding/direccion";
+import { useDireccion } from "@/features/onboarding/direccion";
 import { BottomNav } from "./bottom-nav";
 import { PedidoEnCurso } from "./pedido-en-curso";
 import { PedidoLibreCard } from "./pedido-libre-card";
@@ -33,12 +32,7 @@ const currency = new Intl.NumberFormat("es-CO", {
 });
 
 export function HomeCliente() {
-  const [direccion, setDireccion] = useState("Agrega tu dirección");
-
-  useEffect(() => {
-    const guardada = leerDireccion();
-    if (guardada) setDireccion(guardada.texto);
-  }, []);
+  const direccion = useDireccion();
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col gap-4 px-4 pb-20 pt-4">
@@ -53,7 +47,7 @@ export function HomeCliente() {
             className="flex max-w-full items-center gap-1 text-body font-semibold font-body text-ink"
           >
             <MapPin className="size-4 shrink-0 text-primary" />
-            <span className="truncate">{direccion}</span>
+            <span className="truncate">{direccion?.texto ?? "Agrega tu dirección"}</span>
             <ChevronDown className="size-3.5 shrink-0 text-muted" />
           </Link>
         </div>

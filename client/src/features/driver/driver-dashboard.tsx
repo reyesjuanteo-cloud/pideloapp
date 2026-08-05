@@ -2,9 +2,13 @@
 
 import { useState } from "react";
 import { LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Banner } from "@/components/ui/banner";
 import { logout } from "@/features/auth/actions";
 import { actualizarEstado, usePedidos } from "@/features/pedidos/almacen";
+import { COMISION_PEDIDO, RECARGA_PEDIDOS, RECARGA_VALOR } from "@/features/pedidos/tarifas";
 import type { Pedido } from "@/features/pedidos/tipos";
+import { descontarComision, recargar, useSaldo } from "./saldo";
 import { PedidoCard } from "./pedido-card";
 import { AvailabilityToggle } from "./availability-toggle";
 import { EntregaActiva } from "./entrega-activa";
@@ -41,9 +45,17 @@ const siguienteEstado: Partial<Record<Pedido["estado"], Pedido["estado"]>> = {
   en_camino: "llegue",
 };
 
+const currency = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
+
 export function DriverDashboard() {
   const [available, setAvailable] = useState(true);
   const pedidos = usePedidos();
+  const saldo = useSaldo();
+  const sinSaldo = saldo < COMISION_PEDIDO;
 
   const disponibles = pedidos.filter((p) => p.estado === "buscando");
   const activo = pedidos.find((p) =>
@@ -59,6 +71,12 @@ export function DriverDashboard() {
       pago: p.envio,
       hora: p.horaEntrega ?? p.horaCreacion,
     }));
+
+  function aceptarPedido(id: string) {
+    // La comisión se descuenta al aceptar; sin saldo no se puede aceptar.
+    if (!descontarComision()) return;
+    actualizarEstado(id, "preparando");
+  }
 
   function avanzarEntrega() {
     if (!activo) return;
@@ -87,7 +105,20 @@ export function DriverDashboard() {
         </div>
       </div>
 
-      <GananciasResumen historial={historial} />
+      <GananciasResumen historial={historial} saldo={saldo} />
+
+      {sinSaldo && (
+        <div className="flex flex-col gap-2">
+          <Banner tone="advertencia">
+            Te quedaste sin saldo. Recarga para seguir recibiendo pedidos — cada pedido
+            descuenta {currency.format(COMISION_PEDIDO)}.
+          </Banner>
+          {/* ⚠️ TEMPORAL: recarga simulada; irá a una pasarela de pagos real */}
+          <Button fullWidth onClick={recargar}>
+            Recargar {currency.format(RECARGA_VALOR)} · {RECARGA_PEDIDOS} pedidos
+          </Button>
+        </div>
+      )}
 
       {activo && (
         <EntregaActiva
@@ -116,8 +147,8 @@ export function DriverDashboard() {
             <PedidoCard
               key={pedido.id}
               pedido={comoDisponible(pedido)}
-              deshabilitado={activo !== undefined}
-              onAceptar={() => actualizarEstado(pedido.id, "preparando")}
+              deshabilitado={activo !== undefined || sinSaldo}
+              onAceptar={() => aceptarPedido(pedido.id)}
             />
           ))}
         </div>

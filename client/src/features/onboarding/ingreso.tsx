@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Apple, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PhoneField, telefonoValido } from "@/components/ui/phone-field";
+import { guardarTelefono } from "./telefono";
 
 export function Ingreso() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export function Ingreso() {
     setEnviando(true);
     // ⚠️ TEMPORAL: sin proveedor de SMS todavía — pasamos directo a la pantalla
     // de código, que acepta el código demo 1234.
-    window.sessionStorage.setItem("pidelo-telefono", digitos);
+    guardarTelefono(digitos);
     router.push("/codigo");
   }
 

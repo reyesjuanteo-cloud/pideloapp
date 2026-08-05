@@ -9,7 +9,7 @@ export const mockComercios: Comercio[] = [
     zona: "El Poblado",
     tiempoMin: 20,
     tiempoMax: 35,
-    costoDomicilio: 3500,
+    costoDomicilio: 5000,
   },
   {
     id: "2",
@@ -18,7 +18,7 @@ export const mockComercios: Comercio[] = [
     zona: "Laureles",
     tiempoMin: 30,
     tiempoMax: 45,
-    costoDomicilio: 4200,
+    costoDomicilio: 5000,
   },
   {
     id: "3",
@@ -27,7 +27,7 @@ export const mockComercios: Comercio[] = [
     zona: "Envigado",
     tiempoMin: 15,
     tiempoMax: 25,
-    costoDomicilio: 2800,
+    costoDomicilio: 5000,
   },
   {
     id: "4",
@@ -36,7 +36,7 @@ export const mockComercios: Comercio[] = [
     zona: "El Poblado",
     tiempoMin: 15,
     tiempoMax: 30,
-    costoDomicilio: 3000,
+    costoDomicilio: 5000,
   },
   {
     id: "5",

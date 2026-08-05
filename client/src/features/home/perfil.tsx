@@ -1,26 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronRight, LogOut, MapPin, Phone, User } from "lucide-react";
 import { formatearTelefono } from "@/components/ui/phone-field";
-import { leerDireccion } from "@/features/onboarding/direccion";
+import { useDireccion } from "@/features/onboarding/direccion";
+import { useTelefono } from "@/features/onboarding/telefono";
 import { cerrarSesion } from "@/features/onboarding/actions";
 import { BottomNav } from "./bottom-nav";
 
 export function Perfil() {
-  const [telefono, setTelefono] = useState("");
-  const [direccion, setDireccion] = useState("Sin dirección guardada");
-  const [etiqueta, setEtiqueta] = useState<string | null>(null);
+  const telefono = useTelefono();
+  const direccion = useDireccion();
 
-  useEffect(() => {
-    setTelefono(window.sessionStorage.getItem("pidelo-telefono") ?? "");
-    const guardada = leerDireccion();
-    if (guardada) {
-      setDireccion(`${guardada.texto}${guardada.detalle ? `, ${guardada.detalle}` : ""}`);
-      setEtiqueta(guardada.etiqueta ?? null);
-    }
-  }, []);
+  const textoDireccion = direccion
+    ? `${direccion.texto}${direccion.detalle ? `, ${direccion.detalle}` : ""}`
+    : "Sin dirección guardada";
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col gap-4 px-4 pb-20 pt-4">
@@ -44,9 +38,9 @@ export function Perfil() {
           <MapPin className="size-4 shrink-0 text-primary" />
           <div className="min-w-0 flex-1">
             <p className="text-body font-semibold font-body text-ink">
-              {etiqueta ?? "Dirección"}
+              {direccion?.etiqueta ?? "Dirección"}
             </p>
-            <p className="truncate text-caption font-body text-muted">{direccion}</p>
+            <p className="truncate text-caption font-body text-muted">{textoDireccion}</p>
           </div>
           <ChevronRight className="size-4 shrink-0 text-muted" />
         </Link>

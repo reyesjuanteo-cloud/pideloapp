@@ -9,6 +9,7 @@ import { OtpInput } from "@/components/ui/otp-input";
 import { formatearTelefono } from "@/components/ui/phone-field";
 import { verificarCodigo } from "./actions";
 import { leerDireccion } from "./direccion";
+import { useTelefono } from "./telefono";
 
 const MAX_INTENTOS = 5;
 
@@ -19,12 +20,8 @@ export function Codigo() {
   const [error, setError] = useState(false);
   const [intentos, setIntentos] = useState(0);
   const [segundos, setSegundos] = useState(30);
-  const [telefono, setTelefono] = useState("");
+  const telefono = useTelefono();
   const verificandoRef = useRef(false);
-
-  useEffect(() => {
-    setTelefono(window.sessionStorage.getItem("pidelo-telefono") ?? "");
-  }, []);
 
   useEffect(() => {
     if (segundos <= 0) return;
