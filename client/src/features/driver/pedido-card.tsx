@@ -1,4 +1,4 @@
-import { CheckCircle2, MapPin, Navigation } from "lucide-react";
+import { MapPin, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { PedidoDisponible } from "./types";
 
@@ -10,11 +10,11 @@ const currency = new Intl.NumberFormat("es-CO", {
 
 export function PedidoCard({
   pedido,
-  aceptado,
+  deshabilitado,
   onAceptar,
 }: {
   pedido: PedidoDisponible;
-  aceptado: boolean;
+  deshabilitado: boolean;
   onAceptar: () => void;
 }) {
   return (
@@ -27,7 +27,7 @@ export function PedidoCard({
             {pedido.zona} · {pedido.direccion}
           </p>
         </div>
-        <span className="text-mono font-mono text-muted">{pedido.codigo}</span>
+        <span className="font-mono text-mono text-muted">{pedido.codigo}</span>
       </div>
 
       <div className="flex items-center justify-between">
@@ -39,16 +39,9 @@ export function PedidoCard({
           <span className="font-semibold text-ink">{currency.format(pedido.pago)}</span>
         </div>
 
-        {aceptado ? (
-          <span className="flex items-center gap-1.5 text-caption font-semibold text-success font-body">
-            <CheckCircle2 className="size-4" />
-            Aceptado
-          </span>
-        ) : (
-          <Button variant="accent" onClick={onAceptar}>
-            Aceptar
-          </Button>
-        )}
+        <Button variant="accent" onClick={onAceptar} disabled={deshabilitado}>
+          Aceptar
+        </Button>
       </div>
     </div>
   );
