@@ -57,3 +57,15 @@ body {
   color: var(--color-ink);
   font-family: var(--font-body), sans-serif;
 }
+
+/* Único elemento con animación continua permitido por STYLE_GUIDE.md:
+   el punto "en camino" del tracker de pedido, en loop de ida y vuelta. */
+@keyframes ida-vuelta {
+  0%,
+  100% {
+    transform: translateX(-3px);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+}

@@ -20,18 +20,21 @@ export function PedidoTracker({ pedido }: { pedido: PedidoActivo }) {
 
       <div className="flex items-center">
         {pasos.map((paso, i) => {
-          const completado = i < pasoActual || pedido.estado === "entregado";
+          const entregado = pedido.estado === "entregado";
+          const completado = i < pasoActual || entregado;
           const activo = i === pasoActual && pedido.estado === "en_camino";
           return (
             <div key={paso.estado} className="flex flex-1 items-center last:flex-none">
               <div className="flex flex-col items-center gap-1">
                 <span
-                  className={`size-3 rounded-full ${
+                  className={`size-3 rounded-full transition-colors duration-300 ease-in-out ${
                     activo
-                      ? "bg-accent animate-pulse"
-                      : completado || i === pasoActual
-                        ? "bg-primary"
-                        : "bg-border"
+                      ? "bg-accent animate-[ida-vuelta_1.2s_ease-in-out_infinite]"
+                      : entregado
+                        ? "bg-success"
+                        : completado || i === pasoActual
+                          ? "bg-primary"
+                          : "bg-border"
                   }`}
                 />
                 <span
@@ -45,7 +48,7 @@ export function PedidoTracker({ pedido }: { pedido: PedidoActivo }) {
               {i < pasos.length - 1 && (
                 <span
                   className={`mx-2 mb-4 h-0.5 flex-1 ${
-                    i < pasoActual ? "bg-primary" : "bg-border"
+                    entregado ? "bg-success" : i < pasoActual ? "bg-primary" : "bg-border"
                   }`}
                 />
               )}
