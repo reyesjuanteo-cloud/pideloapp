@@ -7,9 +7,11 @@ import "maplibre-gl/dist/maplibre-gl.css";
 // Estilo plano y claro servido por OpenFreeMap (OpenStreetMap) — gratis, sin key.
 export const ESTILO_MAPA = "https://tiles.openfreemap.org/styles/positron";
 
-// Centro de Bogotá y radio de cobertura simulado.
-export const CENTRO_BOGOTA: [number, number] = [-74.0721, 4.6482];
-export const RADIO_COBERTURA_KM = 15;
+// Zona inicial de operación: Girardot (Cundinamarca), Ricaurte y Flandes.
+// El centro es un punto medio entre los tres municipios; el radio los cubre
+// sin alcanzar poblaciones vecinas (Melgar, Tocaima).
+export const CENTRO_ZONA: [number, number] = [-74.796, 4.295];
+export const RADIO_COBERTURA_KM = 8;
 
 export function distanciaKm(
   a: [number, number],

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, LocateFixed, MapPin, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  CENTRO_BOGOTA,
+  CENTRO_ZONA,
   MapaBase,
   RADIO_COBERTURA_KM,
   distanciaKm,
@@ -14,21 +14,22 @@ import { guardarDireccion } from "./direccion";
 
 // Dirección aproximada si la geocodificación inversa no responde.
 function direccionDeRespaldo(lng: number, lat: number) {
-  const cra = Math.min(170, Math.max(1, Math.round(13 + (CENTRO_BOGOTA[0] - lng) * 900)));
-  const calle = Math.min(200, Math.max(1, Math.round(60 + (lat - 4.6) * 900)));
-  return { texto: `Cra ${cra} #${calle}`, barrio: "Bogotá" };
+  const cra = Math.min(30, Math.max(1, Math.round(10 + (CENTRO_ZONA[0] - lng) * 900)));
+  const calle = Math.min(40, Math.max(1, Math.round(15 + (lat - CENTRO_ZONA[1]) * 900)));
+  return { texto: `Cra ${cra} #${calle}`, barrio: "Girardot" };
 }
 
 export function Mapa() {
   const router = useRouter();
-  const [centro, setCentro] = useState<[number, number]>(CENTRO_BOGOTA);
+  const [centro, setCentro] = useState<[number, number]>(CENTRO_ZONA);
   const [texto, setTexto] = useState("Mueve el mapa para ubicar el pin");
-  const [barrio, setBarrio] = useState("Bogotá");
+  const [barrio, setBarrio] = useState("Girardot");
+  const [ciudad, setCiudad] = useState("Girardot");
   const [buscando, setBuscando] = useState(false);
   const [interactuado, setInteractuado] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  const fueraDeZona = distanciaKm(centro, CENTRO_BOGOTA) > RADIO_COBERTURA_KM;
+  const fueraDeZona = distanciaKm(centro, CENTRO_ZONA) > RADIO_COBERTURA_KM;
 
   async function alMoverse(nuevoCentro: [number, number]) {
     setCentro(nuevoCentro);
@@ -52,7 +53,8 @@ export function Mapa() {
         ? `${via}${d.house_number ? ` #${d.house_number}` : ""}`
         : (datos.display_name?.split(",")[0] ?? direccionDeRespaldo(...nuevoCentro).texto);
       setTexto(nuevoTexto);
-      setBarrio(d.suburb ?? d.neighbourhood ?? d.city_district ?? "Bogotá");
+      setBarrio(d.suburb ?? d.neighbourhood ?? d.city_district ?? "Centro");
+      setCiudad(d.city ?? d.town ?? d.village ?? d.municipality ?? "Girardot");
     } catch {
       if (!control.signal.aborted) {
         const respaldo = direccionDeRespaldo(...nuevoCentro);
@@ -66,22 +68,22 @@ export function Mapa() {
 
   function recentrar() {
     if (!navigator.geolocation) {
-      setCentro([...CENTRO_BOGOTA]);
+      setCentro([...CENTRO_ZONA]);
       return;
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const destino: [number, number] = [pos.coords.longitude, pos.coords.latitude];
-        // Si el GPS está lejos de Bogotá (emulador, VPN), volver al centro.
-        setCentro(distanciaKm(destino, CENTRO_BOGOTA) > 60 ? [...CENTRO_BOGOTA] : destino);
+        // Si el GPS está lejos de la zona (emulador, VPN), volver al centro.
+        setCentro(distanciaKm(destino, CENTRO_ZONA) > 60 ? [...CENTRO_ZONA] : destino);
       },
-      () => setCentro([...CENTRO_BOGOTA]),
+      () => setCentro([...CENTRO_ZONA]),
       { timeout: 8000 }
     );
   }
 
   function confirmar() {
-    guardarDireccion({ texto, barrio, lat: centro[1], lng: centro[0] });
+    guardarDireccion({ texto, barrio, ciudad, lat: centro[1], lng: centro[0] });
     router.push("/entrega");
   }
 
@@ -131,7 +133,8 @@ export function Mapa() {
               Todavía no llegamos a esta zona
             </p>
             <p className="text-caption font-body text-muted">
-              Mueve el mapa hacia Bogotá o{" "}
+              Por ahora entregamos en Girardot, Ricaurte y Flandes. Mueve el mapa hacia
+              allá o{" "}
               <button className="text-primary">avísame cuando lleguen</button>.
             </p>
             <Button fullWidth disabled>
@@ -145,7 +148,7 @@ export function Mapa() {
                 Entregar en
               </p>
               <p className="mt-0.5 font-display text-h3 font-semibold text-ink">{texto}</p>
-              <p className="text-caption font-body text-muted">{barrio} · Bogotá</p>
+              <p className="text-caption font-body text-muted">{barrio} · {ciudad}</p>
             </div>
             <Button fullWidth onClick={confirmar} disabled={!interactuado && buscando}>
               Confirmar dirección

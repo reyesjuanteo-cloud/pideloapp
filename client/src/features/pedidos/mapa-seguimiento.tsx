@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
-  CENTRO_BOGOTA,
+  CENTRO_ZONA,
   MapaBase,
   distanciaKm,
   type Marcador,
@@ -28,7 +28,7 @@ export function MapaSeguimiento({ pedido }: { pedido: Pedido }) {
   const tieneCoords =
     pedido.lat !== undefined &&
     pedido.lng !== undefined &&
-    distanciaKm([pedido.lng, pedido.lat], CENTRO_BOGOTA) < 80;
+    distanciaKm([pedido.lng, pedido.lat], CENTRO_ZONA) < 80;
 
   useEffect(() => {
     if (pedido.estado !== "en_camino") return;

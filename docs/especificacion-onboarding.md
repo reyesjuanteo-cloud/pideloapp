@@ -7,6 +7,11 @@
 > Inter / IBM Plex Mono), lucide-react y radios del STYLE_GUIDE. El modo oscuro queda
 > pendiente hasta que el STYLE_GUIDE defina tokens oscuros. El OTP por SMS está simulado
 > (código `1234`) hasta configurar Supabase + proveedor de SMS.
+>
+> **Zona inicial (decisión del equipo, 2026-08-05):** aunque este documento dice Bogotá,
+> la prueba piloto opera en **Girardot (Cundinamarca), Ricaurte y Flandes**. El centro y
+> radio de cobertura viven en `client/src/components/ui/mapa-base.tsx` (`CENTRO_ZONA`,
+> `RADIO_COBERTURA_KM`).
 
 Contexto para implementación. Cubre las 6 pantallas del onboarding, desde el arranque
 hasta el home. No incluye ficha de tienda, carrito, checkout ni seguimiento.

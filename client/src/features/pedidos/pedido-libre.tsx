@@ -72,7 +72,7 @@ export function PedidoLibre() {
         <textarea
           id="descripcion"
           autoFocus
-          placeholder="Un cargador tipo C. Puede ser de la tienda de tecnología de la Cra 15 con 85."
+          placeholder="Un cargador tipo C. Puede ser de la tienda de tecnología del centro de Girardot."
           value={descripcion}
           onChange={(e) => setDescripcion(e.target.value)}
           className="h-28 w-full resize-none rounded-md border border-border bg-surface px-3 py-2.5 text-body font-body text-ink placeholder:text-muted transition-colors duration-300 ease-in-out focus:outline-none focus:border-primary"

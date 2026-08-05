@@ -62,7 +62,9 @@ function FormularioEntrega({ direccion }: { direccion: Direccion }) {
           <p className="truncate text-body font-semibold font-body text-ink">
             {direccion.texto}
           </p>
-          <p className="text-caption font-body text-muted">{direccion.barrio} · Bogotá</p>
+          <p className="text-caption font-body text-muted">
+            {direccion.barrio} · {direccion.ciudad ?? "Girardot"}
+          </p>
         </div>
         <button
           onClick={() => router.push("/mapa")}

@@ -89,7 +89,9 @@ export function Checkout() {
                 {direccion.texto}
                 {direccion.detalle ? `, ${direccion.detalle}` : ""}
               </p>
-              <p className="text-caption font-body text-muted">{direccion.barrio} · Bogotá</p>
+              <p className="text-caption font-body text-muted">
+                {direccion.barrio} · {direccion.ciudad ?? "Girardot"}
+              </p>
             </>
           ) : (
             <p className="text-body font-body text-muted">Agrega tu dirección de entrega</p>

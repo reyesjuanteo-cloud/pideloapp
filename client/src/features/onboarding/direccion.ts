@@ -7,6 +7,7 @@ import { useSyncExternalStore } from "react";
 export type Direccion = {
   texto: string;
   barrio: string;
+  ciudad?: string; // Girardot, Ricaurte o Flandes
   lat: number;
   lng: number;
   detalle?: string;
