@@ -49,6 +49,46 @@ function aLugar(rasgo: RasgoPhoton): Lugar {
   };
 }
 
+// --- Google Geocoding: se usa solo si hay llave configurada ---
+type ResultadoGoogle = {
+  formatted_address: string;
+  geometry: { location: { lat: number; lng: number } };
+  address_components: { long_name: string; types: string[] }[];
+};
+
+function aLugarGoogle(r: ResultadoGoogle): Lugar {
+  const parte = (tipo: string) =>
+    r.address_components.find((c) => c.types.includes(tipo))?.long_name ?? "";
+  const via = parte("route");
+  const numero = parte("street_number");
+  return {
+    texto: via ? (numero ? `${via} #${numero}` : via) : r.formatted_address.split(",")[0],
+    barrio: parte("sublocality") || parte("neighborhood"),
+    ciudad: parte("locality") || parte("administrative_area_level_2") || "Girardot",
+    lat: r.geometry.location.lat,
+    lng: r.geometry.location.lng,
+  };
+}
+
+async function conGoogle(
+  params: string
+): Promise<ResultadoGoogle[] | null> {
+  const llave = process.env.GOOGLE_MAPS_LLAVE;
+  if (!llave) return null;
+  try {
+    const r = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?${params}&language=es&region=co&key=${llave}`,
+      { next: { revalidate: 60 } }
+    );
+    if (!r.ok) return null;
+    const datos = await r.json();
+    if (datos.status !== "OK") return null;
+    return datos.results as ResultadoGoogle[];
+  } catch {
+    return null;
+  }
+}
+
 export async function GET(peticion: Request) {
   const url = new URL(peticion.url);
   const lat = url.searchParams.get("lat");
@@ -56,6 +96,32 @@ export async function GET(peticion: Request) {
   const q = url.searchParams.get("q");
 
   try {
+    // Google primero cuando está configurado: resuelve mejor las direcciones
+    // colombianas. Si no hay llave o falla, sigue Photon.
+    if (lat && lng) {
+      const google = await conGoogle(`latlng=${lat},${lng}`);
+      if (google?.length) {
+        return NextResponse.json({
+          ...aLugarGoogle(google[0]),
+          lat: Number(lat),
+          lng: Number(lng),
+        });
+      }
+    } else if (q && q.trim().length >= 3) {
+      const google = await conGoogle(
+        `address=${encodeURIComponent(q + ", Girardot, Cundinamarca, Colombia")}` +
+          `&bounds=4.24,-74.88|4.36,-74.72`
+      );
+      if (google?.length) {
+        const municipios = ["girardot", "ricaurte", "flandes"];
+        const lugares = google
+          .map(aLugarGoogle)
+          .filter((l) => municipios.includes(l.ciudad.toLowerCase()))
+          .slice(0, 6);
+        if (lugares.length) return NextResponse.json(lugares);
+      }
+    }
+
     if (lat && lng) {
       const r = await fetch(`${BASE}/reverse?lat=${lat}&lon=${lng}`, {
         next: { revalidate: 60 },

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Map as MapaGL, Marker } from "maplibre-gl";
+import { MapaGoogle, hayGoogleMaps } from "./mapa-google";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 // Estilo plano y claro servido por OpenFreeMap (OpenStreetMap) — gratis, sin key.
@@ -35,7 +36,19 @@ export type Marcador = {
   suave?: boolean; // transición suave entre posiciones
 };
 
-export function MapaBase({
+export function MapaBase(props: {
+  centro: [number, number];
+  zoom?: number;
+  interactivo?: boolean;
+  marcadores?: Marcador[];
+  onMoveEnd?: (centro: [number, number]) => void;
+  className?: string;
+}) {
+  // Con llave de Google se usa su mapa; si no, MapLibre (gratis, sin llave).
+  return hayGoogleMaps() ? <MapaGoogle {...props} /> : <MapaLibre {...props} />;
+}
+
+function MapaLibre({
   centro,
   zoom = 14,
   interactivo = true,

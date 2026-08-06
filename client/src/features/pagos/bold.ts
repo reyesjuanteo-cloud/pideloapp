@@ -81,8 +81,54 @@ export async function crearRecargaBold(
   }
 }
 
-// Acredita una recarga pagada. La llama el webhook de Bold y es idempotente:
-// si Bold reintenta el aviso, el saldo no se suma dos veces.
+// Le pregunta a Bold si una recarga ya se pagó. No dependemos del webhook:
+// si no llega (no registrado, red caída, formato distinto), el saldo se
+// acredita igual cuando el mensajero vuelve a su panel.
+async function estaPagadaEnBold(referencia: string): Promise<boolean> {
+  const llave = process.env.BOLD_LLAVE_IDENTIDAD;
+  if (!llave) return false;
+  try {
+    const r = await fetch(`${BOLD_ENLACES}/${referencia}`, {
+      headers: { Authorization: `x-api-key ${llave}` },
+      cache: "no-store",
+    });
+    if (!r.ok) return false;
+    const datos = await r.json();
+    return String(datos?.status ?? "").toUpperCase() === "PAID";
+  } catch {
+    return false;
+  }
+}
+
+// Revisa las recargas pendientes del mensajero y acredita las que la pasarela
+// da por pagadas. Se llama al abrir el panel y al volver del checkout.
+export async function conciliarRecargas(): Promise<{ acreditadas: number }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { acreditadas: 0 };
+
+  const admin = clienteAdmin();
+  const { data: pendientes } = await admin
+    .from("recargas")
+    .select("id, referencia")
+    .eq("mensajero_id", user.id)
+    .eq("estado", "pendiente")
+    .not("referencia", "is", null);
+
+  let acreditadas = 0;
+  for (const recarga of pendientes ?? []) {
+    if (await estaPagadaEnBold(recarga.referencia as string)) {
+      const r = await acreditarRecargaPagada(recarga.referencia as string);
+      if (r.ok) acreditadas += 1;
+    }
+  }
+  return { acreditadas };
+}
+
+// Acredita una recarga pagada. La llaman el webhook y la conciliación; es
+// idempotente: si el aviso se repite, el saldo no se suma dos veces.
 export async function acreditarRecargaPagada(
   referencia: string
 ): Promise<{ ok: boolean }> {

@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Banner } from "@/components/ui/banner";
 import { cerrarSesion } from "@/features/onboarding/actions";
 import { actualizarEstado, refrescarPedidos, usePedidos } from "@/features/pedidos/almacen";
 import { aceptarPedido as aceptarPedidoAccion } from "@/features/pedidos/acciones";
-import { crearRecargaBold } from "@/features/pagos/bold";
+import { conciliarRecargas, crearRecargaBold } from "@/features/pagos/bold";
 import {
   COMISION_PEDIDO,
   NEQUI_PIDELO,
@@ -71,6 +71,21 @@ export function DriverDashboard() {
   const [aviso, setAviso] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [chatAbierto, setChatAbierto] = useState(false);
+
+  // Al abrir el panel (y al volver del checkout de Bold) se consulta a la
+  // pasarela si hay recargas pagadas sin acreditar. No dependemos del webhook.
+  useEffect(() => {
+    const revisar = async () => {
+      const r = await conciliarRecargas();
+      if (r.acreditadas > 0) void refrescarSaldo();
+    };
+    void revisar();
+    const alVolver = () => {
+      if (document.visibilityState === "visible") void revisar();
+    };
+    document.addEventListener("visibilitychange", alVolver);
+    return () => document.removeEventListener("visibilitychange", alVolver);
+  }, []);
   const pedidos = usePedidos();
   const { datos: saldo, cargado: saldoCargado } = useEstadoSaldo();
   const perfil = usePerfilMensajero();
