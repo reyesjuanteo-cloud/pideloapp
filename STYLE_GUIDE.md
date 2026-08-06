@@ -5,22 +5,28 @@ Este documento es la referencia única de identidad visual del proyecto. Cualqui
 ## Colores
 
 ```css
---color-primary: #0E5C56;       /* Petróleo — marca, botones principales, links activos */
---color-primary-dark: #0A4640;  /* Header, hover de primario */
---color-accent: #FF6A39;        /* Naranja chaleco — CTA, estado "en camino", elementos que piden acción */
---color-bg: #EEF0E9;            /* Fondo base de la app */
+/* Paleta "fuego", derivada del logo oficial (rebrand 2026-08-05) */
+--color-primary: #E8380D;       /* Rojo-naranja marca — botones principales, nav activa, hero */
+--color-primary-dark: #B8280A;  /* Hover/presionado del primario, final de degradados */
+--color-accent: #FF9800;        /* Ámbar del resplandor del logo — CTA puntuales (texto ink), estado "en camino" */
+--color-accent-deep: #A85E00;   /* Ámbar oscuro: TEXTO sobre tintes ámbar (accent/10) */
+--color-bg: #F7F2ED;            /* Fondo base cálido */
 --color-surface: #FFFFFF;       /* Tarjetas, inputs, modales */
---color-ink: #16231F;           /* Texto principal */
---color-muted: #5B6660;         /* Texto secundario, metadatos */
---color-border: #D6DAD1;        /* Bordes y líneas divisorias */
+--color-ink: #241A14;           /* Texto principal cálido */
+--color-muted: #75655C;         /* Texto secundario, metadatos */
+--color-border: #E6DCD2;        /* Bordes y líneas divisorias */
 --color-success: #2F9E44;       /* Domiciliario disponible, pedido entregado */
---color-error: #C1442E;         /* Errores de formulario, acciones destructivas */
+--color-error: #8F1D1D;         /* Errores — carmesí profundo, distinto del primario */
 ```
+
+> El logo (`logo.png` en la raíz; la "P" recortada en `client/public/marca-p.png`) es la
+> fuente de la paleta. Sobre fondos ámbar (`--color-accent`) el texto va en `--color-ink`,
+> nunca blanco. `--color-accent-deep` es solo para texto sobre tintes claros de ámbar.
 
 ### Reglas de uso
 
-- El primario (petróleo) es para lo estructural: header, botones de confirmación, navegación activa.
-- El acento (naranja) se reserva para lo que necesita atención inmediata: pedir, en camino, alertas suaves. No usarlo como color de fondo grande — es un color de acción, no decorativo.
+- El primario (rojo-naranja fuego) es para lo estructural: header, botones de confirmación, navegación activa.
+- El acento (ámbar) se reserva para lo que necesita atención inmediata: pedir, en camino, alertas suaves. No usarlo como color de fondo grande — es un color de acción, no decorativo. Sobre ámbar el texto siempre va en `--color-ink`.
 - Nunca usar negro puro (#000) ni blanco puro para texto — usar `--color-ink` y `--color-bg`/`--color-surface`.
 - Los estados del domiciliario y del pedido siempre usan `--color-success` (disponible/entregado) o `--color-accent` (en ruta/en camino), nunca colores nuevos.
 
@@ -73,7 +79,7 @@ Import (web):
 ## Componentes
 
 - **Botón primario**: fondo `--color-primary`, texto blanco, `--radius-md`, peso 600, 12px vertical / 0 horizontal (full width en formularios).
-- **Botón de acento (CTA de pedir)**: fondo `--color-accent`, texto blanco, `--radius-sm`, usado solo en acciones puntuales dentro de una tarjeta (ej. "Pedir" en un comercio).
+- **Botón de acento (CTA de pedir)**: fondo `--color-accent`, texto `--color-ink`, `--radius-sm`, usado solo en acciones puntuales dentro de una tarjeta (ej. "Pedir" en un comercio).
 - **Chip / filtro**: radius circular (999px), borde `--color-border`, fondo blanco; estado activo con fondo `--color-primary` y texto blanco.
 - **Tarjeta**: fondo `--color-surface`, borde `--color-border`, `--radius-lg`, padding `--space-3`.
 - **Input**: fondo blanco, borde `--color-border`, `--radius-md`, ícono a la izquierda cuando aplica (de lucide-react), texto en `--font-body` 13.5px.

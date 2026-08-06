@@ -19,7 +19,7 @@ import { PedidoEnCurso } from "./pedido-en-curso";
 import { PedidoLibreCard } from "./pedido-libre-card";
 
 const categorias = [
-  { icono: UtensilsCrossed, label: "Comida", tinte: "bg-accent/10 text-accent" },
+  { icono: UtensilsCrossed, label: "Comida", tinte: "bg-accent/10 text-accent-deep" },
   { icono: ShoppingCart, label: "Mercado", tinte: "bg-primary/10 text-primary" },
   { icono: Pill, label: "Farmacia", tinte: "bg-success/10 text-success" },
   { icono: Package, label: "Envíos", tinte: "bg-primary/10 text-primary-dark" },

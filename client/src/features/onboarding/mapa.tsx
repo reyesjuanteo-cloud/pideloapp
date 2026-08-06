@@ -142,7 +142,7 @@ function SelectorMapa({ guardada }: { guardada: Direccion | null }) {
       <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col gap-3 rounded-t-xl border-t border-border bg-surface p-5">
         {fueraDeZona ? (
           <>
-            <p className="text-body font-semibold font-body text-accent">
+            <p className="text-body font-semibold font-body text-accent-deep">
               Todavía no llegamos a esta zona
             </p>
             <p className="text-caption font-body text-muted">

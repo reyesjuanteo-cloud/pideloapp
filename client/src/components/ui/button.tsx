@@ -9,9 +9,9 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClasses = {
   primary:
-    "bg-primary text-white hover:bg-primary-dark rounded-md py-3 shadow-[0_10px_25px_rgba(14,92,86,0.28)] hover:-translate-y-0.5",
+    "bg-primary text-white hover:bg-primary-dark rounded-md py-3 shadow-[0_10px_25px_rgba(232,56,13,0.28)] hover:-translate-y-0.5",
   accent:
-    "bg-accent text-white hover:brightness-95 rounded-sm py-2.5 shadow-[0_10px_25px_rgba(255,106,57,0.30)] hover:-translate-y-0.5",
+    "bg-accent text-ink hover:brightness-95 rounded-sm py-2.5 shadow-[0_10px_25px_rgba(255,152,0,0.35)] hover:-translate-y-0.5",
   secondary:
     "border border-border bg-surface text-ink hover:bg-bg rounded-md py-3",
 };

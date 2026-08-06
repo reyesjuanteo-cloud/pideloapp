@@ -99,7 +99,7 @@ export function FichaComercio({ comercioId }: { comercioId: string }) {
                   onClick={() => cambiarCantidad(comercio.id, producto.id, 1)}
                   disabled={!comercio.abierto}
                   aria-label={`Agregar ${producto.nombre}`}
-                  className="flex size-9 shrink-0 items-center justify-center rounded-sm bg-accent text-white transition-colors duration-300 ease-in-out hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-45"
+                  className="flex size-9 shrink-0 items-center justify-center rounded-sm bg-accent text-ink transition-colors duration-300 ease-in-out hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   <Plus className="size-4" />
                 </button>

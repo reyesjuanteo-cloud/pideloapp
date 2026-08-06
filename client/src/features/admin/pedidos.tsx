@@ -12,9 +12,9 @@ const currency = new Intl.NumberFormat("es-CO", {
 });
 
 const etiquetaEstado: Record<EstadoPedido, { texto: string; clase: string }> = {
-  buscando: { texto: "Buscando mensajero", clase: "bg-accent/10 text-accent" },
+  buscando: { texto: "Buscando mensajero", clase: "bg-accent/10 text-accent-deep" },
   preparando: { texto: "Preparando", clase: "bg-primary/10 text-primary" },
-  en_camino: { texto: "En camino", clase: "bg-accent/10 text-accent" },
+  en_camino: { texto: "En camino", clase: "bg-accent/10 text-accent-deep" },
   llegue: { texto: "En destino", clase: "bg-primary/10 text-primary" },
   entregado: { texto: "Entregado", clase: "bg-success/10 text-success" },
 };

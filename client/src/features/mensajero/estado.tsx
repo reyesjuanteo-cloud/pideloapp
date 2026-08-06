@@ -28,7 +28,7 @@ export function EstadoMensajero() {
 
   const contenido = {
     en_revision: {
-      icono: <Clock className="size-8 text-accent" />,
+      icono: <Clock className="size-8 text-accent-deep" />,
       fondo: "bg-accent/10",
       titulo: "Estamos revisando tus datos",
       texto:

@@ -11,7 +11,7 @@ import type { EstadoMensajero } from "@/features/mensajero/tipos";
 const badge: Record<EstadoMensajero, { texto: string; clase: string; icono: React.ReactNode }> = {
   en_revision: {
     texto: "En revisión",
-    clase: "bg-accent/10 text-accent",
+    clase: "bg-accent/10 text-accent-deep",
     icono: <Clock className="size-3.5" />,
   },
   aprobado: {

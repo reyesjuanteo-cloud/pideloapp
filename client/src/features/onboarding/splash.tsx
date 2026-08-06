@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Bike } from "lucide-react";
 import { leerDireccion } from "./direccion";
 
 export function Splash({ tieneSesion }: { tieneSesion: boolean }) {
@@ -37,9 +37,14 @@ export function Splash({ tieneSesion }: { tieneSesion: boolean }) {
         aria-hidden
         className="pointer-events-none absolute -top-16 -right-16 size-48 rounded-full bg-accent/30 blur-2xl"
       />
-      <div className="relative flex size-18 items-center justify-center rounded-[22px] bg-white/15 ring-1 ring-white/25">
-        <Bike className="size-9 text-white" strokeWidth={2.2} />
-      </div>
+      <Image
+        src="/marca-p.png"
+        alt="Pídelo"
+        width={110}
+        height={110}
+        priority
+        className="relative"
+      />
       <p className="mt-4 font-display text-display font-bold tracking-tight text-white">
         Pídelo
       </p>

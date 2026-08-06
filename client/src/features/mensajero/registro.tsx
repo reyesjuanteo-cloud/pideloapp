@@ -156,7 +156,7 @@ export function RegistroMensajero() {
                   type="checkbox"
                   checked={soat}
                   onChange={(e) => setSoat(e.target.checked)}
-                  className="size-4 accent-[#0e5c56]"
+                  className="size-4 accent-[#e8380d]"
                 />
                 Declaro que tengo SOAT vigente
               </label>

@@ -69,14 +69,14 @@ export function AdminResumen() {
           >
             <div
               className={`flex size-11 shrink-0 items-center justify-center rounded-md ${
-                alerta ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary"
+                alerta ? "bg-accent/10 text-accent-deep" : "bg-primary/10 text-primary"
               }`}
             >
               <Icono className="size-5" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-body font-semibold font-body text-ink">{titulo}</p>
-              <p className={`text-caption font-body ${alerta ? "text-accent" : "text-muted"}`}>
+              <p className={`text-caption font-body ${alerta ? "text-accent-deep" : "text-muted"}`}>
                 {detalle}
               </p>
             </div>

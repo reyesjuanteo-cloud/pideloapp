@@ -1,5 +1,5 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Bike } from "lucide-react";
 
 // Pantalla de bienvenida: una sola pantalla móvil, sin información de relleno.
 // Solo la marca, la promesa y las dos acciones.
@@ -20,11 +20,9 @@ export function Landing() {
       />
 
       <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col items-center justify-center px-6 text-center">
-        <div className="flex size-20 items-center justify-center rounded-[22px] bg-white/15 ring-1 ring-white/25">
-          <Bike className="size-10 text-white" strokeWidth={2.2} />
-        </div>
-        <p className="mt-5 font-display text-display font-bold tracking-tight text-white">
-          Pídelo
+        <Image src="/marca-p.png" alt="PideloApp" width={150} height={150} priority />
+        <p className="mt-3 font-display text-display font-bold tracking-tight text-white">
+          PideloApp
         </p>
         <h1 className="mt-6 max-w-[16ch] font-display text-[32px] font-bold leading-tight text-white">
           Pide ahora, recíbelo en minutos
@@ -37,7 +35,7 @@ export function Landing() {
       <div className="relative mx-auto flex w-full max-w-sm flex-col gap-3 px-6 pb-10">
         <Link
           href="/ubicacion"
-          className="rounded-sm bg-accent py-3.5 text-center text-body font-body font-semibold text-white shadow-[0_10px_25px_rgba(255,106,57,0.35)] transition-transform duration-300 ease-in-out hover:-translate-y-0.5"
+          className="rounded-sm bg-accent py-3.5 text-center text-body font-body font-semibold text-ink shadow-[0_10px_25px_rgba(255,152,0,0.35)] transition-transform duration-300 ease-in-out hover:-translate-y-0.5"
         >
           Crear cuenta
         </Link>

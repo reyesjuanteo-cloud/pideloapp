@@ -56,7 +56,7 @@ export function GananciasResumen({
         value={currency.format(saldo)}
         nota={`${pedidosRestantes} ${pedidosRestantes === 1 ? "pedido" : "pedidos"}`}
         tinte={
-          pedidosRestantes <= 1 ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary-dark"
+          pedidosRestantes <= 1 ? "bg-accent/10 text-accent-deep" : "bg-primary/10 text-primary-dark"
         }
       />
     </div>

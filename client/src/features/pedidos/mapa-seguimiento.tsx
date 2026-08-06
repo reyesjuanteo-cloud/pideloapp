@@ -56,14 +56,14 @@ export function MapaSeguimiento({ pedido }: { pedido: Pedido }) {
   }
 
   const marcadores: Marcador[] = [
-    { id: "destino", lng: destino[0], lat: destino[1], color: "#0e5c56" },
+    { id: "destino", lng: destino[0], lat: destino[1], color: "#e8380d" },
   ];
   if (mensajero) {
     marcadores.push({
       id: "mensajero",
       lng: mensajero[0],
       lat: mensajero[1],
-      color: "#ff6a39",
+      color: "#ff9800",
       anillo: true,
       suave: true,
     });

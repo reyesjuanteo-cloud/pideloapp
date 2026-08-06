@@ -43,7 +43,7 @@ export function PedidoLibreCard() {
       </p>
       <div className="relative mt-3 flex min-h-11 items-center justify-between gap-2 rounded-md bg-surface px-3">
         <span className="truncate text-body font-body text-muted">{ejemplos[indice]}</span>
-        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-white">
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-ink">
           <ArrowRight className="size-4" />
         </span>
       </div>

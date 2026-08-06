@@ -10,8 +10,8 @@ const currency = new Intl.NumberFormat("es-CO", {
 
 // Tinte del avatar según la categoría, para que la lista no sea monocroma.
 const tintes: Record<string, string> = {
-  Comida: "bg-accent/10 text-accent",
-  Panadería: "bg-accent/10 text-accent",
+  Comida: "bg-accent/10 text-accent-deep",
+  Panadería: "bg-accent/10 text-accent-deep",
   Mercado: "bg-primary/10 text-primary",
   Farmacia: "bg-success/10 text-success",
 };

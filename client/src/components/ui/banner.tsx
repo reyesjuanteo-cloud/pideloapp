@@ -7,7 +7,7 @@ type BannerTone = "info" | "exito" | "advertencia" | "error";
 const toneClasses: Record<BannerTone, string> = {
   info: "bg-primary/10 text-primary",
   exito: "bg-success/10 text-success",
-  advertencia: "bg-accent/10 text-accent",
+  advertencia: "bg-accent/10 text-accent-deep",
   error: "bg-error/10 text-error",
 };
 

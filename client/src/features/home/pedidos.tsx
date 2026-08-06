@@ -50,7 +50,7 @@ export function Pedidos() {
                   className="flex items-center gap-3 rounded-lg border border-border bg-surface p-3 transition-colors duration-300 ease-in-out hover:bg-bg"
                 >
                   <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-accent/10">
-                    <Bike className="size-5 text-accent" />
+                    <Bike className="size-5 text-accent-deep" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-body font-semibold font-body text-ink">
