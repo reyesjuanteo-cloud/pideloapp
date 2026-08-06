@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Clock, Minus, Plus, ShoppingBag } from "lucide-react";
-import type { Comercio as ComercioType } from "@/features/customer/types";
-import { productosDeComercio } from "./mock-productos";
+import { useComercios } from "@/features/comercios/store";
+import { useProductos } from "@/features/comercios/productos-store";
+import { Banner } from "@/components/ui/banner";
 import { cambiarCantidad, useCarrito } from "./carrito";
 
 const currency = new Intl.NumberFormat("es-CO", {
@@ -13,10 +14,24 @@ const currency = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-export function FichaComercio({ comercio }: { comercio: ComercioType }) {
+export function FichaComercio({ comercioId }: { comercioId: string }) {
   const router = useRouter();
   const carrito = useCarrito();
-  const productos = productosDeComercio(comercio.id);
+  const comercio = useComercios().find((c) => c.id === comercioId);
+  const productos = useProductos().filter((p) => p.comercioId === comercioId);
+
+  if (!comercio) {
+    return (
+      <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col items-center justify-center gap-3 px-4 text-center">
+        <p className="text-body font-semibold font-body text-ink">
+          Este comercio ya no está disponible
+        </p>
+        <Link href="/home" className="text-body font-body text-primary hover:text-primary-dark">
+          Volver al inicio
+        </Link>
+      </div>
+    );
+  }
 
   const cantidades =
     carrito && carrito.comercioId === comercio.id ? carrito.cantidades : {};
@@ -50,7 +65,18 @@ export function FichaComercio({ comercio }: { comercio: ComercioType }) {
         </div>
       </div>
 
+      {!comercio.abierto && (
+        <Banner tone="advertencia">
+          Este comercio está cerrado ahora. Puedes mirar el menú, pero no pedir.
+        </Banner>
+      )}
+
       <div className="flex flex-col gap-2">
+        {productos.length === 0 && (
+          <p className="rounded-lg border border-border bg-surface p-4 text-body font-body text-muted">
+            Este comercio aún no tiene productos cargados.
+          </p>
+        )}
         {productos.map((producto) => {
           const cantidad = cantidades[producto.id] ?? 0;
           return (
@@ -71,8 +97,9 @@ export function FichaComercio({ comercio }: { comercio: ComercioType }) {
               {cantidad === 0 ? (
                 <button
                   onClick={() => cambiarCantidad(comercio.id, producto.id, 1)}
+                  disabled={!comercio.abierto}
                   aria-label={`Agregar ${producto.nombre}`}
-                  className="flex size-9 shrink-0 items-center justify-center rounded-sm bg-accent text-white transition-colors duration-300 ease-in-out hover:brightness-95"
+                  className="flex size-9 shrink-0 items-center justify-center rounded-sm bg-accent text-white transition-colors duration-300 ease-in-out hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   <Plus className="size-4" />
                 </button>

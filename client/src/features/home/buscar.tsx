@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { Clock, Search } from "lucide-react";
 import { Chip } from "@/components/ui/chip";
-import { mockComercios, categorias } from "@/features/customer/mock-comercios";
+import { categorias } from "@/features/customer/mock-comercios";
+import { useComercios } from "@/features/comercios/store";
 import { BottomNav } from "./bottom-nav";
 
 const currency = new Intl.NumberFormat("es-CO", {
@@ -26,7 +27,8 @@ export function Buscar({ categoriaInicial }: { categoriaInicial?: string }) {
     categoriaInicial && categorias.includes(categoriaInicial) ? categoriaInicial : "Todos"
   );
 
-  const resultados = mockComercios.filter((comercio) => {
+  const comercios = useComercios();
+  const resultados = comercios.filter((comercio) => {
     const q = normalizar(consulta);
     const coincideCategoria = categoria === "Todos" || comercio.categoria === categoria;
     const coincideConsulta =

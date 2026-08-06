@@ -1,5 +1,3 @@
-import { notFound } from "next/navigation";
-import { mockComercios } from "@/features/customer/mock-comercios";
 import { FichaComercio } from "@/features/catalogo/comercio";
 
 export default async function ComercioPage({
@@ -8,7 +6,5 @@ export default async function ComercioPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const comercio = mockComercios.find((c) => c.id === id);
-  if (!comercio) notFound();
-  return <FichaComercio comercio={comercio} />;
+  return <FichaComercio comercioId={id} />;
 }

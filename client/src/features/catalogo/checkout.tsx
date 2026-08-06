@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Banknote, CreditCard, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDireccion } from "@/features/onboarding/direccion";
-import { mockComercios } from "@/features/customer/mock-comercios";
+import { useComercios } from "@/features/comercios/store";
+import { useProductos } from "@/features/comercios/productos-store";
 import { crearPedido } from "@/features/pedidos/almacen";
-import { productosDeComercio } from "./mock-productos";
 import { useCarrito, vaciarCarrito } from "./carrito";
 
 const currency = new Intl.NumberFormat("es-CO", {
@@ -22,8 +22,10 @@ export function Checkout() {
   const carrito = useCarrito();
   const [confirmando, setConfirmando] = useState(false);
 
+  const comercios = useComercios();
+  const todosProductos = useProductos();
   const comercio = carrito
-    ? mockComercios.find((c) => c.id === carrito.comercioId)
+    ? comercios.find((c) => c.id === carrito.comercioId)
     : undefined;
 
   useEffect(() => {
@@ -33,7 +35,8 @@ export function Checkout() {
 
   if (!carrito || !comercio) return null;
 
-  const lineas = productosDeComercio(comercio.id)
+  const lineas = todosProductos
+    .filter((p) => p.comercioId === comercio.id)
     .map((p) => ({ producto: p, cantidad: carrito.cantidades[p.id] ?? 0 }))
     .filter((l) => l.cantidad > 0);
   const subtotal = lineas.reduce((s, l) => s + l.producto.precio * l.cantidad, 0);

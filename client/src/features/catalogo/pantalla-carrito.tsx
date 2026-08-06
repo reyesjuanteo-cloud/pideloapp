@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Minus, Plus, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { mockComercios } from "@/features/customer/mock-comercios";
-import { productosDeComercio } from "./mock-productos";
+import { useComercios } from "@/features/comercios/store";
+import { useProductos } from "@/features/comercios/productos-store";
 import { cambiarCantidad, useCarrito } from "./carrito";
 
 const currency = new Intl.NumberFormat("es-CO", {
@@ -18,10 +18,14 @@ export function PantallaCarrito() {
   const router = useRouter();
   const carrito = useCarrito();
 
+  const comercios = useComercios();
+  const todosProductos = useProductos();
   const comercio = carrito
-    ? mockComercios.find((c) => c.id === carrito.comercioId)
+    ? comercios.find((c) => c.id === carrito.comercioId)
     : undefined;
-  const productos = comercio ? productosDeComercio(comercio.id) : [];
+  const productos = comercio
+    ? todosProductos.filter((p) => p.comercioId === comercio.id)
+    : [];
   const lineas = productos
     .map((p) => ({ producto: p, cantidad: carrito?.cantidades[p.id] ?? 0 }))
     .filter((l) => l.cantidad > 0);

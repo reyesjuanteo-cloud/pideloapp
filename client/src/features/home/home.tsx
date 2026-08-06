@@ -12,7 +12,7 @@ import {
   User,
   UtensilsCrossed,
 } from "lucide-react";
-import { mockComercios } from "@/features/customer/mock-comercios";
+import { useComercios } from "@/features/comercios/store";
 import { useDireccion } from "@/features/onboarding/direccion";
 import { BottomNav } from "./bottom-nav";
 import { PedidoEnCurso } from "./pedido-en-curso";
@@ -33,6 +33,7 @@ const currency = new Intl.NumberFormat("es-CO", {
 
 export function HomeCliente() {
   const direccion = useDireccion();
+  const comercios = useComercios();
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col gap-4 px-4 pb-20 pt-4">
@@ -96,18 +97,20 @@ export function HomeCliente() {
         <h2 className="font-display text-h3 font-semibold text-ink">
           Cerca de ti · llega en 15 min
         </h2>
-        {mockComercios.length === 0 ? (
+        {comercios.length === 0 ? (
           <p className="rounded-lg border border-border bg-surface p-4 text-body font-body text-muted">
             No hay tiendas cerca todavía. Escribe lo que necesitas en «Pide lo que sea» y
             un mensajero lo consigue.
           </p>
         ) : (
           <div className="flex flex-col gap-2">
-            {mockComercios.map((comercio) => (
+            {comercios.map((comercio) => (
               <Link
                 key={comercio.id}
                 href={`/comercio/${comercio.id}`}
-                className="flex items-center gap-3 rounded-lg border border-border bg-surface p-3 text-left transition-colors duration-300 ease-in-out hover:bg-bg"
+                className={`flex items-center gap-3 rounded-lg border border-border bg-surface p-3 text-left transition-colors duration-300 ease-in-out hover:bg-bg ${
+                  comercio.abierto ? "" : "opacity-50"
+                }`}
               >
                 <span className="flex size-10.5 shrink-0 items-center justify-center rounded-md bg-primary/10 font-display text-h3 font-semibold text-primary">
                   {comercio.nombre[0]}
@@ -115,6 +118,11 @@ export function HomeCliente() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-body font-semibold font-body text-ink">
                     {comercio.nombre}
+                    {!comercio.abierto && (
+                      <span className="ml-2 rounded-full bg-bg px-2 py-0.5 text-caption font-semibold text-muted">
+                        Cerrado
+                      </span>
+                    )}
                   </p>
                   <p className="flex items-center gap-2 text-caption font-body text-muted">
                     <span className="flex items-center gap-1">
