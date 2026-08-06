@@ -1,4 +1,4 @@
-import { Hourglass, MapPin } from "lucide-react";
+import { Hourglass, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { EntregaActiva as EntregaActivaType, EstadoEntrega } from "./types";
 
@@ -27,9 +27,15 @@ const accionPorEstado: Record<EstadoEntrega, string | null> = {
 export function EntregaActiva({
   entrega,
   onAvanzar,
+  onAbrirChat,
+  telefonoCliente,
+  nombreCliente,
 }: {
   entrega: EntregaActivaType;
   onAvanzar: () => void;
+  onAbrirChat?: () => void;
+  telefonoCliente?: string;
+  nombreCliente?: string;
 }) {
   const { pedido, estado } = entrega;
   const pasoActual = pasos.findIndex((p) => p.estado === estado);
@@ -97,6 +103,31 @@ export function EntregaActiva({
           <Hourglass className="size-4 shrink-0" />
           Esperando que el cliente confirme que recibió el pedido…
         </p>
+      )}
+
+      {/* Contacto con el cliente */}
+      {onAbrirChat && (
+        <div className="flex items-center gap-2 rounded-md border border-border bg-bg p-2.5">
+          <span className="min-w-0 flex-1 truncate text-caption font-body text-muted">
+            {nombreCliente ? `Cliente: ${nombreCliente}` : "Contacta al cliente"}
+          </span>
+          <button
+            onClick={onAbrirChat}
+            aria-label="Escribirle al cliente"
+            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+          >
+            <MessageCircle className="size-4.5" />
+          </button>
+          {telefonoCliente && (
+            <a
+              href={`tel:+57${telefonoCliente}`}
+              aria-label="Llamar al cliente"
+              className="flex size-10 shrink-0 items-center justify-center rounded-full bg-success/10 text-success"
+            >
+              <Phone className="size-4.5" />
+            </a>
+          )}
+        </div>
       )}
 
       <div className="flex items-center justify-between">

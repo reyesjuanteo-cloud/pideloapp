@@ -41,4 +41,8 @@ export type Pedido = {
   mensajeroNombre?: string;
   mensajeroVehiculo?: "moto" | "bicicleta";
   mensajeroPlaca?: string;
+  mensajeroCelular?: string;
+  // Datos del cliente (visibles para el mensajero de la entrega)
+  clienteNombre?: string;
+  clienteCelular?: string;
 };

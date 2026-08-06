@@ -29,8 +29,9 @@ type FilaPedido = {
   mensajeros: {
     vehiculo: "moto" | "bicicleta";
     placa: string | null;
-    perfiles: { nombre: string | null } | null;
+    perfiles: { nombre: string | null; celular: string | null } | null;
   } | null;
+  perfiles: { nombre: string | null; celular: string | null } | null;
 };
 
 function hora(iso: string): string {
@@ -66,13 +67,16 @@ function aPedido(fila: FilaPedido): Pedido {
     mensajeroNombre: fila.mensajeros?.perfiles?.nombre ?? undefined,
     mensajeroVehiculo: fila.mensajeros?.vehiculo,
     mensajeroPlaca: fila.mensajeros?.placa ?? undefined,
+    mensajeroCelular: fila.mensajeros?.perfiles?.celular ?? undefined,
+    clienteNombre: fila.perfiles?.nombre ?? undefined,
+    clienteCelular: fila.perfiles?.celular ?? undefined,
   };
 }
 
 async function cargarPedidos(): Promise<Pedido[]> {
   const { data, error } = await supabase()
     .from("pedidos")
-    .select("*, comercios(nombre), mensajeros(vehiculo, placa, perfiles(nombre))")
+    .select("*, comercios(nombre), perfiles!pedidos_cliente_id_fkey(nombre, celular), mensajeros(vehiculo, placa, perfiles(nombre, celular))")
     .order("creado_en", { ascending: true });
   if (error) throw error;
   return (data as FilaPedido[]).map(aPedido);

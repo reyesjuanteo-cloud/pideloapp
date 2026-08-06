@@ -1,6 +1,7 @@
 "use client";
 
-import { Bike, CheckCircle2, Clock, ShieldCheck, XCircle } from "lucide-react";
+import { useState } from "react";
+import { Bike, CheckCircle2, Clock, MessageCircle, ShieldCheck, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { crearRecursoRemoto } from "@/lib/recurso-remoto";
 import type { EstadoMensajero } from "@/features/mensajero/tipos";
@@ -43,8 +44,19 @@ const badge: Record<EstadoMensajero, { texto: string; clase: string; icono: Reac
 export function AdminMensajeros() {
   const mensajeros = useMensajerosAdmin();
 
+  const [avisoCorreo, setAvisoCorreo] = useState<string | null>(null);
+
   async function cambiar(id: string, estado: EstadoMensajero) {
-    await cambiarEstadoMensajero(leerClaveAdmin(), id, estado);
+    const r = await cambiarEstadoMensajero(leerClaveAdmin(), id, estado);
+    // El correo automático está programado pero apagado hasta tener dominio:
+    // mientras tanto, avisarle al equipo que debe contactar al aspirante.
+    if (r.ok && !r.correoEnviado && estado !== "en_revision") {
+      setAvisoCorreo(
+        "Guardado. El correo automático aún no está activo — avísale por WhatsApp."
+      );
+    } else {
+      setAvisoCorreo(null);
+    }
     void recurso.refrescar();
   }
 
@@ -56,6 +68,12 @@ export function AdminMensajeros() {
           Mensajeros — aprobación
         </h1>
       </div>
+
+      {avisoCorreo && (
+        <p className="rounded-md bg-accent/10 p-3 text-caption font-body text-accent-deep">
+          {avisoCorreo}
+        </p>
+      )}
 
       {mensajeros.length === 0 ? (
         <p className="rounded-lg border border-border bg-surface p-4 text-body font-body text-muted">
@@ -159,6 +177,16 @@ export function AdminMensajeros() {
               </p>
             )}
 
+
+            <a
+              href={`https://wa.me/57${perfil.celular}`}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 text-caption font-body text-primary hover:text-primary-dark"
+            >
+              <MessageCircle className="size-3.5" />
+              Escribirle por WhatsApp
+            </a>
 
             {perfil.estado === "en_revision" ? (
               <div className="flex gap-2">

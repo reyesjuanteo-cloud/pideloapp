@@ -12,6 +12,7 @@ import type { Pedido } from "@/features/pedidos/tipos";
 import { refrescarSaldo, useEstadoSaldo } from "./saldo";
 import { usePerfilMensajero } from "@/features/mensajero/perfil";
 import Link from "next/link";
+import { ChatPedido } from "@/features/chat/chat-pedido";
 import { PedidoCard } from "./pedido-card";
 import { AvailabilityToggle } from "./availability-toggle";
 import { EntregaActiva } from "./entrega-activa";
@@ -58,6 +59,7 @@ export function DriverDashboard() {
   const [available, setAvailable] = useState(true);
   const [aviso, setAviso] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  const [chatAbierto, setChatAbierto] = useState(false);
   const pedidos = usePedidos();
   const { datos: saldo, cargado: saldoCargado } = useEstadoSaldo();
   const perfil = usePerfilMensajero();
@@ -191,6 +193,18 @@ export function DriverDashboard() {
             estado: estadoEntregaPorPedido[activo.estado] ?? "recogiendo",
           }}
           onAvanzar={avanzar}
+          onAbrirChat={() => setChatAbierto(true)}
+          telefonoCliente={activo.clienteCelular}
+          nombreCliente={activo.clienteNombre}
+        />
+      )}
+
+      {chatAbierto && activo && (
+        <ChatPedido
+          pedidoId={activo.id}
+          titulo={activo.clienteNombre ?? "Cliente"}
+          telefono={activo.clienteCelular}
+          onCerrar={() => setChatAbierto(false)}
         />
       )}
 

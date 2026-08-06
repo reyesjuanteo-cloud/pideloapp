@@ -1,6 +1,7 @@
 "use server";
 
 import { clienteAdmin, claveAdminValida } from "@/lib/supabase/admin";
+import { enviarCorreoMensajero } from "@/features/mensajero/correo";
 import type {
   EstadoMensajero,
   PerfilMensajero,
@@ -189,11 +190,34 @@ export async function cambiarEstadoMensajero(
   clave: string,
   id: string,
   estado: EstadoMensajero
-): Promise<{ ok: boolean }> {
+): Promise<{ ok: boolean; correoEnviado?: boolean }> {
   if (!claveAdminValida(clave)) return { ok: false };
-  const { error } = await clienteAdmin()
-    .from("mensajeros")
-    .update({ estado })
-    .eq("id", id);
-  return { ok: !error };
+  const admin = clienteAdmin();
+  const { error } = await admin.from("mensajeros").update({ estado }).eq("id", id);
+  if (error) return { ok: false };
+
+  // Notificación por correo: programada pero inactiva hasta que haya dominio
+  // (ver features/mensajero/correo.ts). Nunca bloquea la decisión del equipo.
+  if (estado === "aprobado" || estado === "rechazado") {
+    const { data: perfil } = await admin
+      .from("perfiles")
+      .select("nombre, correo")
+      .eq("id", id)
+      .maybeSingle();
+    if (perfil?.correo) {
+      const r = await enviarCorreoMensajero(
+        perfil.correo as string,
+        (perfil.nombre as string) ?? "",
+        estado
+      );
+      if (r.enviado) {
+        await admin
+          .from("mensajeros")
+          .update({ correo_enviado_en: new Date().toISOString() })
+          .eq("id", id);
+      }
+      return { ok: true, correoEnviado: r.enviado };
+    }
+  }
+  return { ok: true, correoEnviado: false };
 }

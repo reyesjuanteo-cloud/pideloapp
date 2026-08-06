@@ -3,11 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Bike, CheckCircle2, PackageSearch } from "lucide-react";
+import { ArrowLeft, Bike, CheckCircle2, MessageCircle, PackageSearch, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Banner } from "@/components/ui/banner";
 import { actualizarEstado, useEstadoPedidos } from "./almacen";
 import { MapaSeguimiento } from "./mapa-seguimiento";
+import { ChatPedido } from "@/features/chat/chat-pedido";
 import type { EstadoPedido } from "./tipos";
 
 const currency = new Intl.NumberFormat("es-CO", {
@@ -38,6 +39,7 @@ export function Seguimiento({ pedidoId }: { pedidoId: string }) {
   const pedido = pedidos.find((p) => p.id === pedidoId);
   const [confirmando, setConfirmando] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [chatAbierto, setChatAbierto] = useState(false);
 
   if (!pedido) {
     return (
@@ -118,7 +120,34 @@ export function Seguimiento({ pedidoId }: { pedidoId: string }) {
                 : "Bicicleta"}
             </p>
           </div>
+          <div className="flex shrink-0 gap-2">
+            <button
+              onClick={() => setChatAbierto(true)}
+              aria-label="Escribirle al mensajero"
+              className="flex size-11 items-center justify-center rounded-full bg-primary/10 text-primary"
+            >
+              <MessageCircle className="size-5" />
+            </button>
+            {pedido.mensajeroCelular && (
+              <a
+                href={`tel:+57${pedido.mensajeroCelular}`}
+                aria-label="Llamar al mensajero"
+                className="flex size-11 items-center justify-center rounded-full bg-success/10 text-success"
+              >
+                <Phone className="size-5" />
+              </a>
+            )}
+          </div>
         </div>
+      )}
+
+      {chatAbierto && (
+        <ChatPedido
+          pedidoId={pedido.id}
+          titulo={pedido.mensajeroNombre ?? "Tu mensajero"}
+          telefono={pedido.mensajeroCelular}
+          onCerrar={() => setChatAbierto(false)}
+        />
       )}
 
       {/* Tracker */}
