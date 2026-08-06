@@ -1,4 +1,4 @@
-import { Hourglass, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Hourglass, MapPin, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { EntregaActiva as EntregaActivaType, EstadoEntrega } from "./types";
 
@@ -28,13 +28,11 @@ export function EntregaActiva({
   entrega,
   onAvanzar,
   onAbrirChat,
-  telefonoCliente,
   nombreCliente,
 }: {
   entrega: EntregaActivaType;
   onAvanzar: () => void;
   onAbrirChat?: () => void;
-  telefonoCliente?: string;
   nombreCliente?: string;
 }) {
   const { pedido, estado } = entrega;
@@ -118,15 +116,6 @@ export function EntregaActiva({
           >
             <MessageCircle className="size-4.5" />
           </button>
-          {telefonoCliente && (
-            <a
-              href={`tel:+57${telefonoCliente}`}
-              aria-label="Llamar al cliente"
-              className="flex size-10 shrink-0 items-center justify-center rounded-full bg-success/10 text-success"
-            >
-              <Phone className="size-4.5" />
-            </a>
-          )}
         </div>
       )}
 

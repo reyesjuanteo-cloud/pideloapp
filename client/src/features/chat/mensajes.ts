@@ -87,12 +87,26 @@ export function useMensajes(pedidoId: string) {
   return { mensajes, yo, cargado };
 }
 
+// Detecta datos de contacto: la base los rechaza igual, pero avisar antes
+// de enviar es mejor experiencia que un error después.
+export function tieneDatosPersonales(texto: string): boolean {
+  const digitos = texto.replace(/[\s.\-()]/g, "");
+  if (/\d{7,}/.test(digitos)) return true;
+  if (/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.test(texto)) return true;
+  return /(whatsapp|wasap|whats app|telegram|instagram|insta |facebook|tiktok|snapchat|t\.me\/|wa\.me\/|@[a-z0-9._]{3,})/i.test(
+    texto
+  );
+}
+
 export async function enviarMensaje(
   pedidoId: string,
   texto: string
-): Promise<{ ok: boolean }> {
+): Promise<{ ok: boolean; motivo?: "contacto_personal" | "fallo" }> {
   const limpio = texto.trim().slice(0, 500);
-  if (!limpio) return { ok: false };
+  if (!limpio) return { ok: false, motivo: "fallo" };
+  if (tieneDatosPersonales(limpio)) {
+    return { ok: false, motivo: "contacto_personal" };
+  }
   try {
     const usuario = await asegurarSesion();
     const { error } = await supabase().from("mensajes").insert({
@@ -100,8 +114,12 @@ export async function enviarMensaje(
       autor_id: usuario.id,
       texto: limpio,
     });
-    return { ok: !error };
+    if (!error) return { ok: true };
+    return {
+      ok: false,
+      motivo: error.message.includes("contacto_personal") ? "contacto_personal" : "fallo",
+    };
   } catch {
-    return { ok: false };
+    return { ok: false, motivo: "fallo" };
   }
 }

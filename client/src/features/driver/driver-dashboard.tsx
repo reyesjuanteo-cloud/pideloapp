@@ -194,7 +194,6 @@ export function DriverDashboard() {
           }}
           onAvanzar={avanzar}
           onAbrirChat={() => setChatAbierto(true)}
-          telefonoCliente={activo.clienteCelular}
           nombreCliente={activo.clienteNombre}
         />
       )}
@@ -203,7 +202,6 @@ export function DriverDashboard() {
         <ChatPedido
           pedidoId={activo.id}
           titulo={activo.clienteNombre ?? "Cliente"}
-          telefono={activo.clienteCelular}
           onCerrar={() => setChatAbierto(false)}
         />
       )}

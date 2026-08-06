@@ -41,8 +41,7 @@ export type Pedido = {
   mensajeroNombre?: string;
   mensajeroVehiculo?: "moto" | "bicicleta";
   mensajeroPlaca?: string;
-  mensajeroCelular?: string;
-  // Datos del cliente (visibles para el mensajero de la entrega)
+  // Nombre del cliente (visible para el mensajero de la entrega). El teléfono
+  // NO se expone a propósito: se hablan por el chat y la llamada de la app.
   clienteNombre?: string;
-  clienteCelular?: string;
 };

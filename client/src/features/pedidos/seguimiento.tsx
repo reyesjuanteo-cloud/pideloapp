@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Bike, CheckCircle2, MessageCircle, PackageSearch, Phone } from "lucide-react";
+import { ArrowLeft, Bike, CheckCircle2, MessageCircle, PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Banner } from "@/components/ui/banner";
 import { actualizarEstado, useEstadoPedidos } from "./almacen";
@@ -128,15 +128,6 @@ export function Seguimiento({ pedidoId }: { pedidoId: string }) {
             >
               <MessageCircle className="size-5" />
             </button>
-            {pedido.mensajeroCelular && (
-              <a
-                href={`tel:+57${pedido.mensajeroCelular}`}
-                aria-label="Llamar al mensajero"
-                className="flex size-11 items-center justify-center rounded-full bg-success/10 text-success"
-              >
-                <Phone className="size-5" />
-              </a>
-            )}
           </div>
         </div>
       )}
@@ -145,7 +136,6 @@ export function Seguimiento({ pedidoId }: { pedidoId: string }) {
         <ChatPedido
           pedidoId={pedido.id}
           titulo={pedido.mensajeroNombre ?? "Tu mensajero"}
-          telefono={pedido.mensajeroCelular}
           onCerrar={() => setChatAbierto(false)}
         />
       )}
