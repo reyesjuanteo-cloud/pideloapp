@@ -7,6 +7,7 @@ import { Banner } from "@/components/ui/banner";
 import { cerrarSesion } from "@/features/onboarding/actions";
 import { actualizarEstado, refrescarPedidos, usePedidos } from "@/features/pedidos/almacen";
 import { aceptarPedido as aceptarPedidoAccion } from "@/features/pedidos/acciones";
+import { crearRecargaBold } from "@/features/pagos/bold";
 import {
   COMISION_PEDIDO,
   NEQUI_PIDELO,
@@ -128,6 +129,22 @@ export function DriverDashboard() {
     }
   }
 
+  async function recargarConBold() {
+    if (ocupado) return;
+    setOcupado(true);
+    setAviso(null);
+    try {
+      const r = await crearRecargaBold();
+      if (r.ok && r.url) {
+        window.location.href = r.url; // checkout de Bold
+      } else {
+        setAviso(r.error ?? "No se pudo abrir el pago.");
+      }
+    } finally {
+      setOcupado(false);
+    }
+  }
+
   async function avanzar() {
     if (ocupado) return;
     setOcupado(true);
@@ -176,26 +193,38 @@ export function DriverDashboard() {
             Te quedaste sin saldo. Recarga para seguir recibiendo pedidos — cada pedido
             descuenta {currency.format(COMISION_PEDIDO)}.
           </Banner>
-          {/* ⚠️ TEMPORAL: recarga por transferencia hasta integrar la pasarela */}
-          <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface p-3">
+          <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-3">
             <p className="text-body font-semibold font-body text-ink">
-              Recarga desde {currency.format(RECARGA_VALOR)} ({RECARGA_PEDIDOS} pedidos)
+              Recarga {currency.format(RECARGA_VALOR)} y sigue trabajando (
+              {RECARGA_PEDIDOS} pedidos)
             </p>
-            <ol className="flex list-decimal flex-col gap-1 pl-4 text-caption font-body text-muted">
-              <li>
-                Envía el valor por Nequi a{" "}
-                <span className="font-mono text-ink">{NEQUI_PIDELO}</span> ({NEQUI_TITULAR}).
-              </li>
-              <li>Mándanos el comprobante por WhatsApp.</li>
-              <li>Te acreditamos el saldo y sigues recibiendo pedidos.</li>
-            </ol>
-            <Button
-              fullWidth
-              onClick={() => void refrescarSaldo()}
-              variant="secondary"
-            >
-              Ya transferí — actualizar mi saldo
+            <Button fullWidth pending={ocupado} onClick={recargarConBold}>
+              Pagar en línea · Nequi, PSE o tarjeta
             </Button>
+            <p className="text-caption font-body text-muted">
+              El saldo se acredita solo apenas se confirme el pago.
+            </p>
+
+            <details className="text-caption font-body text-muted">
+              <summary className="cursor-pointer">
+                Prefiero transferir por Nequi manualmente
+              </summary>
+              <ol className="mt-2 flex list-decimal flex-col gap-1 pl-4">
+                <li>
+                  Envía el valor a{" "}
+                  <span className="font-mono text-ink">{NEQUI_PIDELO}</span> (
+                  {NEQUI_TITULAR}).
+                </li>
+                <li>Mándanos el comprobante por WhatsApp.</li>
+                <li>Te acreditamos el saldo apenas lo veamos.</li>
+              </ol>
+              <button
+                onClick={() => void refrescarSaldo()}
+                className="mt-2 text-primary hover:text-primary-dark"
+              >
+                Ya transferí — actualizar mi saldo
+              </button>
+            </details>
           </div>
         </div>
       )}

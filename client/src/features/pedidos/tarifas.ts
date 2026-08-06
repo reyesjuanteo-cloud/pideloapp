@@ -10,5 +10,5 @@ export const RECARGA_PEDIDOS = RECARGA_VALOR / COMISION_PEDIDO;
 
 // ⚠️ TEMPORAL: la recarga se hace por transferencia manual mientras se
 // integra la pasarela de pagos. Cambiar aquí el número de Nequi del equipo.
-export const NEQUI_PIDELO = "3001234567";
+export const NEQUI_PIDELO = "3224435468";
 export const NEQUI_TITULAR = "Pídelo";
