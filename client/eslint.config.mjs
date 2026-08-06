@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Librería de terceros autohospedada (motor facial)
+    "public/motor/**",
   ]),
 ]);
 

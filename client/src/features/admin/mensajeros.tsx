@@ -98,6 +98,7 @@ export function AdminMensajeros() {
                   ["selfie", "Selfie"],
                   ["licencia", "Licencia"],
                   ["soat", "SOAT"],
+                  ["rostro", "Rostro en vivo"],
                 ] as const
               ).map(([nombre, etiqueta]) =>
                 perfil.fotos[nombre] ? (
@@ -126,6 +127,38 @@ export function AdminMensajeros() {
                 )
               )}
             </div>
+
+            {/* Puntajes de la verificación facial en el dispositivo */}
+            {perfil.verificacion ? (
+              <div className="flex flex-wrap gap-2 text-caption font-semibold font-body">
+                {(
+                  [
+                    ["Similitud con cédula", perfil.verificacion.similitud, 0.5, 0.35],
+                    ["Anti-spoofing", perfil.verificacion.antispoof, 0.7, 0.5],
+                    ["Vivacidad", perfil.verificacion.vivacidad, 0.7, 0.5],
+                  ] as const
+                ).map(([etiqueta, valor, bueno, medio]) => (
+                  <span
+                    key={etiqueta}
+                    className={`rounded-full px-2.5 py-1 ${
+                      valor === null
+                        ? "bg-bg text-muted"
+                        : valor >= bueno
+                          ? "bg-success/10 text-success"
+                          : valor >= medio
+                            ? "bg-accent/10 text-accent-deep"
+                            : "bg-error/10 text-error"
+                    }`}
+                  >
+                    {etiqueta}: {valor === null ? "—" : `${Math.round(valor * 100)}%`}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-caption font-body text-muted">
+                Sin verificación facial registrada.
+              </p>
+            )}
 
             <a
               href="https://www.runt.gov.co/consultaCiudadana/"

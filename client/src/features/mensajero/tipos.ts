@@ -6,6 +6,15 @@ export type EstadoMensajero = "en_revision" | "aprobado" | "rechazado";
 
 export type Municipio = "Girardot" | "Ricaurte" | "Flandes";
 
+// Resultado de la verificación facial hecha en el dispositivo del aspirante.
+export type ResultadoVerificacion = {
+  similitud: number | null; // rostro en vivo vs foto de la cédula (0-1)
+  antispoof: number | null; // probabilidad de rostro real (no foto/pantalla)
+  vivacidad: number | null; // probabilidad de video en vivo
+  rostroEnCedula: boolean;
+  fecha: string;
+};
+
 export type PerfilMensajero = {
   nombre: string;
   celular: string; // 10 dígitos

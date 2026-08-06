@@ -10,14 +10,24 @@ import { PhoneField, telefonoValido } from "@/components/ui/phone-field";
 import { FotoInput, comprimirImagen } from "@/components/ui/foto-input";
 import { asegurarSesion, supabase } from "@/lib/supabase/cliente";
 import { registrarMensajero, usePerfilMensajero } from "./perfil";
-import type { Municipio, Vehiculo } from "./tipos";
+import { VerificacionFacial } from "./verificacion-facial";
+import type { Municipio, ResultadoVerificacion, Vehiculo } from "./tipos";
+
+async function subirArchivo(
+  uid: string,
+  nombre: string,
+  contenido: Blob,
+  tipo: string
+): Promise<void> {
+  const { error } = await supabase()
+    .storage.from("documentos")
+    .upload(`${uid}/${nombre}`, contenido, { upsert: true, contentType: tipo });
+  if (error) throw new Error(`No se pudo subir ${nombre}: ${error.message}`);
+}
 
 async function subirFoto(uid: string, nombre: string, archivo: File): Promise<void> {
   const blob = await comprimirImagen(archivo);
-  const { error } = await supabase()
-    .storage.from("documentos")
-    .upload(`${uid}/${nombre}.jpg`, blob, { upsert: true, contentType: "image/jpeg" });
-  if (error) throw new Error(`No se pudo subir la foto (${nombre}): ${error.message}`);
+  await subirArchivo(uid, `${nombre}.jpg`, blob, "image/jpeg");
 }
 
 const municipios: Municipio[] = ["Girardot", "Ricaurte", "Flandes"];
@@ -40,6 +50,9 @@ export function RegistroMensajero() {
   const [fotoSelfie, setFotoSelfie] = useState<File | null>(null);
   const [fotoLicencia, setFotoLicencia] = useState<File | null>(null);
   const [fotoSoat, setFotoSoat] = useState<File | null>(null);
+  const [verificacion, setVerificacion] = useState<ResultadoVerificacion | null>(null);
+  const [capturaRostro, setCapturaRostro] = useState<Blob | null>(null);
+  const [verificando, setVerificando] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [errores, setErrores] = useState<Record<string, string>>({});
 
@@ -63,6 +76,7 @@ export function RegistroMensajero() {
     }
     if (!fotoCedula) e.fotoCedula = "Toma una foto de tu cédula por el frente.";
     if (!fotoSelfie) e.fotoSelfie = "Tómate una selfie sosteniendo tu cédula.";
+    if (!verificacion) e.verificacion = "Completa la verificación facial.";
     setErrores(e);
     if (Object.keys(e).length > 0) return;
 
@@ -76,6 +90,15 @@ export function RegistroMensajero() {
         await subirFoto(usuario.id, "licencia", fotoLicencia!);
         await subirFoto(usuario.id, "soat", fotoSoat!);
       }
+      if (capturaRostro) {
+        await subirArchivo(usuario.id, "rostro.jpg", capturaRostro, "image/jpeg");
+      }
+      await subirArchivo(
+        usuario.id,
+        "verificacion.json",
+        new Blob([JSON.stringify(verificacion)], { type: "application/json" }),
+        "application/json"
+      );
 
       const resultado = await registrarMensajero({
         nombre: nombre.trim(),
@@ -238,9 +261,44 @@ export function RegistroMensajero() {
           </>
         )}
 
+        {/* Verificación facial en vivo: requiere la foto de la cédula primero */}
+        <div className="flex flex-col gap-1.5">
+          <p className="text-label font-semibold uppercase tracking-wide text-muted font-body">
+            Verificación facial
+          </p>
+          {verificacion ? (
+            <div className="flex items-center gap-2.5 rounded-md border border-success bg-success/10 p-3 text-body font-body text-success">
+              ✓ Verificado — similitud con cédula:{" "}
+              {verificacion.similitud !== null
+                ? `${Math.round(verificacion.similitud * 100)}%`
+                : "sin rostro legible en la cédula"}
+            </div>
+          ) : (
+            <Button
+              variant="secondary"
+              onClick={() => {
+                if (!fotoCedula) {
+                  setErrores((prev) => ({
+                    ...prev,
+                    verificacion: "Primero toma la foto de tu cédula.",
+                  }));
+                  return;
+                }
+                setErrores((prev) => ({ ...prev, verificacion: "" }));
+                setVerificando(true);
+              }}
+            >
+              Iniciar verificación con la cámara
+            </Button>
+          )}
+          {errores.verificacion && (
+            <p className="text-caption text-error font-body">{errores.verificacion}</p>
+          )}
+        </div>
+
         <p className="text-caption font-body text-muted">
           Tus datos y documentos se usan solo para verificar tu registro y se tratan
-          según la Ley 1581 de 2012.
+          según la Ley 1581 de 2012. La verificación facial ocurre en tu celular.
         </p>
       </div>
 
@@ -252,6 +310,18 @@ export function RegistroMensajero() {
           Enviar registro
         </Button>
       </div>
+
+      {verificando && fotoCedula && (
+        <VerificacionFacial
+          fotoCedula={fotoCedula}
+          onCompletar={(resultado, captura) => {
+            setVerificacion(resultado);
+            setCapturaRostro(captura);
+            setVerificando(false);
+          }}
+          onCerrar={() => setVerificando(false)}
+        />
+      )}
     </div>
   );
 }

@@ -1,7 +1,11 @@
 "use server";
 
 import { clienteAdmin, claveAdminValida } from "@/lib/supabase/admin";
-import type { EstadoMensajero, PerfilMensajero } from "@/features/mensajero/tipos";
+import type {
+  EstadoMensajero,
+  PerfilMensajero,
+  ResultadoVerificacion,
+} from "@/features/mensajero/tipos";
 
 // Todas las operaciones del equipo verifican la clave del panel en el
 // servidor. ⚠️ TEMPORAL: clave fija hasta tener roles reales de Auth.
@@ -82,15 +86,17 @@ export type FotosMensajero = {
   selfie: string | null;
   licencia: string | null;
   soat: string | null;
+  rostro: string | null;
 };
 
 export type MensajeroAdmin = PerfilMensajero & {
   id: string;
   saldo: number;
   fotos: FotosMensajero;
+  verificacion: ResultadoVerificacion | null;
 };
 
-const NOMBRES_FOTOS = ["cedula", "selfie", "licencia", "soat"] as const;
+const NOMBRES_FOTOS = ["cedula", "selfie", "licencia", "soat", "rostro"] as const;
 
 export async function listarMensajeros(
   clave: string
@@ -114,6 +120,19 @@ export async function listarMensajeros(
         NOMBRES_FOTOS.map((n, i) => [n, firmas?.[i]?.signedUrl ?? null])
       ) as FotosMensajero;
 
+      // Resultado de la verificación facial hecha en el dispositivo
+      let verificacion: ResultadoVerificacion | null = null;
+      const { data: archivoV } = await admin.storage
+        .from("documentos")
+        .download(`${f.id}/verificacion.json`);
+      if (archivoV) {
+        try {
+          verificacion = JSON.parse(await archivoV.text()) as ResultadoVerificacion;
+        } catch {
+          verificacion = null;
+        }
+      }
+
       return {
         id: f.id,
         nombre: f.perfiles?.nombre ?? "Sin nombre",
@@ -127,6 +146,7 @@ export async function listarMensajeros(
         estado: f.estado,
         saldo: f.saldo,
         fotos,
+        verificacion,
         fechaRegistro: new Date(f.registrado_en).toLocaleDateString("es-CO"),
       };
     })
