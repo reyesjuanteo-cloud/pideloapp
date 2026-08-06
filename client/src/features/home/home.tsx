@@ -14,6 +14,7 @@ import {
 import { Rayo } from "@/components/ui/rayo";
 import { useEstadoComercios } from "@/features/comercios/store";
 import { useDireccion } from "@/features/onboarding/direccion";
+import { primerNombre, usePerfilCliente } from "@/features/onboarding/perfil-cliente";
 import { BottomNav } from "./bottom-nav";
 import { ComercioRow } from "./comercio-row";
 import { PedidoEnCurso } from "./pedido-en-curso";
@@ -29,6 +30,7 @@ const categorias = [
 export function HomeCliente() {
   const direccion = useDireccion();
   const { datos: comercios, cargado, error } = useEstadoComercios();
+  const nombre = primerNombre(usePerfilCliente()?.nombre);
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col gap-4 bg-white px-4 pb-20">
@@ -58,8 +60,8 @@ export function HomeCliente() {
           </Link>
         </div>
         <p className="relative mt-4 flex items-center gap-1.5 font-display text-h2 font-bold text-ink">
-          ¿Qué necesitas hoy?
-          <Rayo className="size-5" />
+          {nombre ? `Hola ${nombre}, ¿qué vas a pedir hoy?` : "¿Qué necesitas hoy?"}
+          <Rayo className="size-5 shrink-0" />
         </p>
       </div>
 

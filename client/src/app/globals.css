@@ -61,6 +61,18 @@ body {
   font-family: var(--font-body), sans-serif;
 }
 
+/* Entrada suave del texto rotativo de la bienvenida. */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Sacudida de una sola pasada para el error del código OTP — feedback puntual,
    no animación continua, permitida junto al punto "en camino". */
 @keyframes sacudida {

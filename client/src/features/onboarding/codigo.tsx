@@ -50,15 +50,25 @@ export function Codigo() {
     }
     if (resultado.ok) {
       // Identidad real del dispositivo (sesión anónima) + perfil con el celular.
+      let tieneNombre = false;
       try {
         const usuario = await asegurarSesion();
         await supabase()
           .from("perfiles")
           .upsert({ id: usuario.id, celular: telefono || null });
+        const { data } = await supabase()
+          .from("perfiles")
+          .select("nombre")
+          .eq("id", usuario.id)
+          .maybeSingle();
+        tieneNombre = Boolean(data?.nombre);
       } catch {
         // Sin conexión: la sesión demo permite seguir; se reintenta luego.
       }
-      router.replace(leerDireccion() ? "/home" : "/mapa");
+      // Cuenta nueva: primero sus datos, luego la dirección.
+      router.replace(
+        !tieneNombre ? "/tus-datos" : leerDireccion() ? "/home" : "/mapa"
+      );
       return;
     }
     verificandoRef.current = false;
