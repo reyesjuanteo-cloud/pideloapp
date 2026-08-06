@@ -28,8 +28,16 @@ export function Splash({ tieneSesion }: { tieneSesion: boolean }) {
   }, [router, tieneSesion]);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-primary">
-      <div className="flex size-18 items-center justify-center rounded-[22px] bg-white/15">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden bg-linear-to-br from-primary to-primary-dark">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-15 [background-image:radial-gradient(white_1px,transparent_1px)] [background-size:16px_16px]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-16 -right-16 size-48 rounded-full bg-accent/30 blur-2xl"
+      />
+      <div className="relative flex size-18 items-center justify-center rounded-[22px] bg-white/15 ring-1 ring-white/25">
         <Bike className="size-9 text-white" strokeWidth={2.2} />
       </div>
       <p className="mt-4 font-display text-display font-bold tracking-tight text-white">

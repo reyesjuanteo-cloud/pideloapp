@@ -29,8 +29,14 @@ export function BottomNav() {
                 activo ? "text-primary" : "text-muted hover:text-ink"
               }`}
             >
-              <Icono className="size-4.5" />
-              <span className="text-[10px]">{label}</span>
+              <span
+                className={`flex items-center justify-center rounded-full px-4 py-1 transition-colors duration-300 ease-in-out ${
+                  activo ? "bg-primary/10" : ""
+                }`}
+              >
+                <Icono className="size-4.5" />
+              </span>
+              <span className={`text-[10px] ${activo ? "font-semibold" : ""}`}>{label}</span>
             </Link>
           );
         })}

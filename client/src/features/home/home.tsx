@@ -3,7 +3,6 @@
 import Link from "next/link";
 import {
   ChevronDown,
-  Clock,
   MapPin,
   Package,
   Pill,
@@ -15,58 +14,66 @@ import {
 import { useComercios } from "@/features/comercios/store";
 import { useDireccion } from "@/features/onboarding/direccion";
 import { BottomNav } from "./bottom-nav";
+import { ComercioRow } from "./comercio-row";
 import { PedidoEnCurso } from "./pedido-en-curso";
 import { PedidoLibreCard } from "./pedido-libre-card";
 
 const categorias = [
-  { icono: UtensilsCrossed, label: "Comida" },
-  { icono: ShoppingCart, label: "Mercado" },
-  { icono: Pill, label: "Farmacia" },
-  { icono: Package, label: "Envíos" },
+  { icono: UtensilsCrossed, label: "Comida", tinte: "bg-accent/10 text-accent" },
+  { icono: ShoppingCart, label: "Mercado", tinte: "bg-primary/10 text-primary" },
+  { icono: Pill, label: "Farmacia", tinte: "bg-success/10 text-success" },
+  { icono: Package, label: "Envíos", tinte: "bg-primary/10 text-primary-dark" },
 ];
-
-const currency = new Intl.NumberFormat("es-CO", {
-  style: "currency",
-  currency: "COP",
-  maximumFractionDigits: 0,
-});
 
 export function HomeCliente() {
   const direccion = useDireccion();
   const comercios = useComercios();
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col gap-4 px-4 pb-20 pt-4">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-label font-semibold uppercase tracking-wide text-muted font-body">
-            Entregar en
-          </p>
+    <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col gap-4 px-4 pb-20">
+      {/* Hero de marca */}
+      <div className="relative -mx-4 overflow-hidden bg-linear-to-br from-primary to-primary-dark px-4 pb-12 pt-5">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-15 [background-image:radial-gradient(white_1px,transparent_1px)] [background-size:16px_16px]"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-12 -right-12 size-36 rounded-full bg-accent/30 blur-2xl"
+        />
+        <div className="relative flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-label font-semibold uppercase tracking-wide text-white/60 font-body">
+              Entregar en
+            </p>
+            <Link
+              href="/mapa"
+              className="flex max-w-full items-center gap-1 text-body font-semibold font-body text-white"
+            >
+              <MapPin className="size-4 shrink-0 text-white/80" />
+              <span className="truncate">{direccion?.texto ?? "Agrega tu dirección"}</span>
+              <ChevronDown className="size-3.5 shrink-0 text-white/60" />
+            </Link>
+          </div>
           <Link
-            href="/mapa"
-            className="flex max-w-full items-center gap-1 text-body font-semibold font-body text-ink"
+            href="/perfil"
+            aria-label="Tu perfil"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/15 text-white ring-1 ring-white/25"
           >
-            <MapPin className="size-4 shrink-0 text-primary" />
-            <span className="truncate">{direccion?.texto ?? "Agrega tu dirección"}</span>
-            <ChevronDown className="size-3.5 shrink-0 text-muted" />
+            <User className="size-4" />
           </Link>
         </div>
-        <Link
-          href="/perfil"
-          aria-label="Tu perfil"
-          className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
-        >
-          <User className="size-4" />
-        </Link>
+        <p className="relative mt-4 font-display text-h2 font-bold text-white">
+          ¿Qué necesitas hoy?
+        </p>
       </div>
 
-      {/* Buscador: navega a la pantalla de búsqueda */}
+      {/* Buscador flotando sobre el hero */}
       <Link
         href="/buscar"
-        className="flex min-h-11 items-center gap-2 rounded-md border border-border bg-surface px-3 text-body font-body text-muted"
+        className="relative z-10 -mt-10 flex min-h-12 items-center gap-2 rounded-lg border border-border bg-surface px-3 text-body font-body text-muted shadow-[0_12px_30px_rgba(22,35,31,0.12)]"
       >
-        <Search className="size-4" />
+        <Search className="size-4 text-primary" />
         Busca tiendas o productos
       </Link>
 
@@ -77,16 +84,18 @@ export function HomeCliente() {
       <div className="flex flex-col gap-2">
         <h2 className="font-display text-h3 font-semibold text-ink">Categorías</h2>
         <div className="grid grid-cols-4 gap-2">
-          {categorias.map(({ icono: Icono, label }) => (
+          {categorias.map(({ icono: Icono, label, tinte }) => (
             <Link
               key={label}
               href={`/buscar?categoria=${label}`}
               className="flex flex-col items-center gap-1.5"
             >
-              <span className="flex h-13 w-full items-center justify-center rounded-md border border-border bg-surface text-primary transition-colors duration-300 ease-in-out hover:bg-bg">
+              <span
+                className={`flex h-14 w-full items-center justify-center rounded-lg transition-transform duration-300 ease-in-out hover:-translate-y-0.5 ${tinte}`}
+              >
                 <Icono className="size-5" />
               </span>
-              <span className="text-caption font-body text-muted">{label}</span>
+              <span className="text-caption font-semibold font-body text-ink">{label}</span>
             </Link>
           ))}
         </div>
@@ -105,34 +114,7 @@ export function HomeCliente() {
         ) : (
           <div className="flex flex-col gap-2">
             {comercios.map((comercio) => (
-              <Link
-                key={comercio.id}
-                href={`/comercio/${comercio.id}`}
-                className={`flex items-center gap-3 rounded-lg border border-border bg-surface p-3 text-left transition-colors duration-300 ease-in-out hover:bg-bg ${
-                  comercio.abierto ? "" : "opacity-50"
-                }`}
-              >
-                <span className="flex size-10.5 shrink-0 items-center justify-center rounded-md bg-primary/10 font-display text-h3 font-semibold text-primary">
-                  {comercio.nombre[0]}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-body font-semibold font-body text-ink">
-                    {comercio.nombre}
-                    {!comercio.abierto && (
-                      <span className="ml-2 rounded-full bg-bg px-2 py-0.5 text-caption font-semibold text-muted">
-                        Cerrado
-                      </span>
-                    )}
-                  </p>
-                  <p className="flex items-center gap-2 text-caption font-body text-muted">
-                    <span className="flex items-center gap-1">
-                      <Clock className="size-3.5" />
-                      {comercio.tiempoMin}–{comercio.tiempoMax} min
-                    </span>
-                    <span>Envío {currency.format(comercio.costoDomicilio)}</span>
-                  </p>
-                </div>
-              </Link>
+              <ComercioRow key={comercio.id} comercio={comercio} />
             ))}
           </div>
         )}

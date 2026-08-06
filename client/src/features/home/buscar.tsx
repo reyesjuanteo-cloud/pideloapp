@@ -1,18 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Clock, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Chip } from "@/components/ui/chip";
 import { categorias } from "@/features/customer/mock-comercios";
 import { useComercios } from "@/features/comercios/store";
 import { BottomNav } from "./bottom-nav";
-
-const currency = new Intl.NumberFormat("es-CO", {
-  style: "currency",
-  currency: "COP",
-  maximumFractionDigits: 0,
-});
+import { ComercioRow } from "./comercio-row";
 
 function normalizar(texto: string): string {
   return texto
@@ -69,27 +63,7 @@ export function Buscar({ categoriaInicial }: { categoriaInicial?: string }) {
       ) : (
         <div className="flex flex-col gap-2">
           {resultados.map((comercio) => (
-            <Link
-              key={comercio.id}
-              href={`/comercio/${comercio.id}`}
-              className="flex items-center gap-3 rounded-lg border border-border bg-surface p-3 text-left transition-colors duration-300 ease-in-out hover:bg-bg"
-            >
-              <span className="flex size-10.5 shrink-0 items-center justify-center rounded-md bg-primary/10 font-display text-h3 font-semibold text-primary">
-                {comercio.nombre[0]}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-body font-semibold font-body text-ink">
-                  {comercio.nombre}
-                </p>
-                <p className="flex items-center gap-2 text-caption font-body text-muted">
-                  <span className="flex items-center gap-1">
-                    <Clock className="size-3.5" />
-                    {comercio.tiempoMin}–{comercio.tiempoMax} min
-                  </span>
-                  <span>Envío {currency.format(comercio.costoDomicilio)}</span>
-                </p>
-              </div>
-            </Link>
+            <ComercioRow key={comercio.id} comercio={comercio} />
           ))}
         </div>
       )}

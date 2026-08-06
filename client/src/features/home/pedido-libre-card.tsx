@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 const ejemplos = [
   "Un cargador tipo C",
@@ -22,14 +22,30 @@ export function PedidoLibreCard() {
   }, []);
 
   return (
-    <Link href="/pedido-libre" className="block rounded-lg bg-primary/10 p-3.5">
-      <p className="font-display text-h3 font-semibold text-primary">Pide lo que sea</p>
-      <p className="mt-0.5 text-caption font-body text-primary/80">
+    <Link
+      href="/pedido-libre"
+      className="relative block overflow-hidden rounded-lg bg-linear-to-br from-primary to-primary-dark p-4 transition-transform duration-300 ease-in-out hover:-translate-y-0.5"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-15 [background-image:radial-gradient(white_1px,transparent_1px)] [background-size:16px_16px]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-10 -right-8 size-28 rounded-full bg-accent/40 blur-2xl"
+      />
+      <p className="relative flex items-center gap-1.5 font-display text-h3 font-bold text-white">
+        <Sparkles className="size-4 text-accent" />
+        Pide lo que sea
+      </p>
+      <p className="relative mt-0.5 text-caption font-body text-white/70">
         Escríbelo y un mensajero lo consigue por ti
       </p>
-      <div className="mt-2.5 flex min-h-11 items-center justify-between gap-2 rounded-md bg-surface px-3">
+      <div className="relative mt-3 flex min-h-11 items-center justify-between gap-2 rounded-md bg-surface px-3">
         <span className="truncate text-body font-body text-muted">{ejemplos[indice]}</span>
-        <ArrowRight className="size-4 shrink-0 text-primary" />
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-white">
+          <ArrowRight className="size-4" />
+        </span>
       </div>
     </Link>
   );
