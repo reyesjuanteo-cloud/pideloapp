@@ -10,7 +10,7 @@ import {
   RADIO_COBERTURA_KM,
   distanciaKm,
 } from "@/components/ui/mapa-base";
-import { guardarDireccion } from "./direccion";
+import { guardarDireccion, useDireccion, type Direccion } from "./direccion";
 
 // Dirección aproximada si la geocodificación inversa no responde.
 function direccionDeRespaldo(lng: number, lat: number) {
@@ -20,13 +20,22 @@ function direccionDeRespaldo(lng: number, lat: number) {
 }
 
 export function Mapa() {
+  const guardada = useDireccion();
+  // key: cuando la dirección guardada aparece tras la hidratación, el selector
+  // se remonta y arranca centrado en ella (no en el centro fijo de la zona).
+  return <SelectorMapa key={guardada ? "guardada" : "nueva"} guardada={guardada} />;
+}
+
+function SelectorMapa({ guardada }: { guardada: Direccion | null }) {
   const router = useRouter();
-  const [centro, setCentro] = useState<[number, number]>(CENTRO_ZONA);
-  const [texto, setTexto] = useState("Mueve el mapa para ubicar el pin");
-  const [barrio, setBarrio] = useState("Centro");
-  const [ciudad, setCiudad] = useState("Girardot");
+  const [centro, setCentro] = useState<[number, number]>(
+    guardada ? [guardada.lng, guardada.lat] : CENTRO_ZONA
+  );
+  const [texto, setTexto] = useState(guardada?.texto ?? "Mueve el mapa para ubicar el pin");
+  const [barrio, setBarrio] = useState(guardada?.barrio ?? "Centro");
+  const [ciudad, setCiudad] = useState(guardada?.ciudad ?? "Girardot");
   const [buscando, setBuscando] = useState(false);
-  const [interactuado, setInteractuado] = useState(false);
+  const [interactuado, setInteractuado] = useState(guardada !== null);
   const abortRef = useRef<AbortController | null>(null);
 
   const fueraDeZona = distanciaKm(centro, CENTRO_ZONA) > RADIO_COBERTURA_KM;
@@ -42,16 +51,20 @@ export function Mapa() {
     const control = new AbortController();
     abortRef.current = control;
     try {
+      // zoom=17 pide resolución de CALLE (no de edificio): así no llegan
+      // nombres de conjuntos o locales en vez de la dirección.
       const respuesta = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${nuevoCentro[1]}&lon=${nuevoCentro[0]}&zoom=18&accept-language=es`,
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${nuevoCentro[1]}&lon=${nuevoCentro[0]}&zoom=17&accept-language=es`,
         { signal: control.signal }
       );
       const datos = await respuesta.json();
       const d = datos.address ?? {};
       const via = d.road ?? d.pedestrian ?? d.footway;
+      // Solo aceptamos nombres de vía; si no hay, dirección aproximada — nunca
+      // el nombre de un conjunto/edificio.
       const nuevoTexto = via
         ? `${via}${d.house_number ? ` #${d.house_number}` : ""}`
-        : (datos.display_name?.split(",")[0] ?? direccionDeRespaldo(...nuevoCentro).texto);
+        : direccionDeRespaldo(...nuevoCentro).texto;
       setTexto(nuevoTexto);
       setBarrio(d.suburb ?? d.neighbourhood ?? d.city_district ?? "Centro");
       setCiudad(d.city ?? d.town ?? d.village ?? d.municipality ?? "Girardot");
