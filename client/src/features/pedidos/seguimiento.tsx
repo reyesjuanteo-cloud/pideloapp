@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Bike, CheckCircle2, PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { actualizarEstado, usePedidos } from "./almacen";
+import { Banner } from "@/components/ui/banner";
+import { actualizarEstado, useEstadoPedidos } from "./almacen";
 import { MapaSeguimiento } from "./mapa-seguimiento";
 import type { EstadoPedido } from "./tipos";
 
@@ -32,8 +34,10 @@ const mensajePorEstado: Record<EstadoPedido, string> = {
 
 export function Seguimiento({ pedidoId }: { pedidoId: string }) {
   const router = useRouter();
-  const pedidos = usePedidos();
+  const { datos: pedidos, cargado, error } = useEstadoPedidos();
   const pedido = pedidos.find((p) => p.id === pedidoId);
+  const [confirmando, setConfirmando] = useState(false);
+  const [aviso, setAviso] = useState<string | null>(null);
 
   if (!pedido) {
     return (
@@ -42,16 +46,33 @@ export function Seguimiento({ pedidoId }: { pedidoId: string }) {
           <PackageSearch className="size-7 text-primary" />
         </div>
         <p className="text-body font-semibold font-body text-ink">
-          No encontramos ese pedido
+          {!cargado
+            ? "Cargando tu pedido…"
+            : error
+              ? "No pudimos conectarnos"
+              : "No encontramos ese pedido"}
         </p>
-        <Link
-          href="/pedidos"
-          className="text-body font-body text-primary hover:text-primary-dark"
-        >
-          Ver tus pedidos
-        </Link>
+        {cargado && (
+          <Link
+            href="/pedidos"
+            className="text-body font-body text-primary hover:text-primary-dark"
+          >
+            Ver tus pedidos
+          </Link>
+        )}
       </div>
     );
+  }
+
+  async function confirmarEntrega() {
+    setConfirmando(true);
+    setAviso(null);
+    try {
+      await actualizarEstado(pedido!.id, "entregado");
+    } catch {
+      setAviso("No pudimos confirmar. Revisa tu conexión e inténtalo de nuevo.");
+      setConfirmando(false);
+    }
   }
 
   const pasoActual = pasos.findIndex((p) => p.estados.includes(pedido.estado));
@@ -149,10 +170,13 @@ export function Seguimiento({ pedidoId }: { pedidoId: string }) {
 
       {/* Confirmación del cliente: el único que puede marcar "entregado" */}
       {pedido.estado === "llegue" && (
-        <Button fullWidth onClick={() => actualizarEstado(pedido.id, "entregado")}>
-          <CheckCircle2 className="size-4" />
-          Recibí mi pedido
-        </Button>
+        <div className="flex flex-col gap-2">
+          {aviso && <Banner tone="error">{aviso}</Banner>}
+          <Button fullWidth pending={confirmando} onClick={confirmarEntrega}>
+            <CheckCircle2 className="size-4" />
+            Recibí mi pedido
+          </Button>
+        </div>
       )}
 
       {pedido.estado === "entregado" && (

@@ -24,6 +24,7 @@ type FilaPedido = {
   estado: EstadoPedido;
   creado_en: string;
   entregado_en: string | null;
+  comercio_nombre: string | null;
   comercios: { nombre: string } | null;
   mensajeros: {
     vehiculo: "moto" | "bicicleta";
@@ -45,7 +46,11 @@ function aPedido(fila: FilaPedido): Pedido {
     id: fila.id,
     codigo: fila.codigo,
     tipo: fila.tipo,
-    comercio: fila.comercios?.nombre ?? "Pedido libre",
+    // El nombre queda guardado en el pedido: sobrevive si borran el comercio.
+    comercio:
+      fila.comercios?.nombre ??
+      fila.comercio_nombre ??
+      (fila.tipo === "libre" ? "Pedido libre" : "Comercio"),
     items: fila.items ?? [],
     descripcionLibre: fila.descripcion_libre ?? undefined,
     subtotal: fila.subtotal,

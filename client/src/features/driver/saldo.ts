@@ -27,4 +27,9 @@ export function useSaldo(): number {
   return recurso.useRecurso();
 }
 
+// `cargado` evita mostrar "te quedaste sin saldo" mientras aún se consulta.
+export function useEstadoSaldo() {
+  return recurso.useEstado();
+}
+
 export const refrescarSaldo = recurso.refrescar;

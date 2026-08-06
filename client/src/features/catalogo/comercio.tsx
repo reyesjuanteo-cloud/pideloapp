@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Clock, Minus, Plus, ShoppingBag } from "lucide-react";
-import { useComercios } from "@/features/comercios/store";
+import { useEstadoComercios } from "@/features/comercios/store";
 import { useProductos } from "@/features/comercios/productos-store";
 import { Banner } from "@/components/ui/banner";
 import { cambiarCantidad, useCarrito } from "./carrito";
@@ -17,14 +17,15 @@ const currency = new Intl.NumberFormat("es-CO", {
 export function FichaComercio({ comercioId }: { comercioId: string }) {
   const router = useRouter();
   const carrito = useCarrito();
-  const comercio = useComercios().find((c) => c.id === comercioId);
+  const { datos: comercios, cargado } = useEstadoComercios();
+  const comercio = comercios.find((c) => c.id === comercioId);
   const productos = useProductos().filter((p) => p.comercioId === comercioId);
 
   if (!comercio) {
     return (
       <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col items-center justify-center gap-3 px-4 text-center">
         <p className="text-body font-semibold font-body text-ink">
-          Este comercio ya no está disponible
+          {cargado ? "Este comercio ya no está disponible" : "Cargando el comercio…"}
         </p>
         <Link href="/home" className="text-body font-body text-primary hover:text-primary-dark">
           Volver al inicio

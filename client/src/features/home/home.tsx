@@ -12,7 +12,7 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { Rayo } from "@/components/ui/rayo";
-import { useComercios } from "@/features/comercios/store";
+import { useEstadoComercios } from "@/features/comercios/store";
 import { useDireccion } from "@/features/onboarding/direccion";
 import { BottomNav } from "./bottom-nav";
 import { ComercioRow } from "./comercio-row";
@@ -28,7 +28,7 @@ const categorias = [
 
 export function HomeCliente() {
   const direccion = useDireccion();
-  const comercios = useComercios();
+  const { datos: comercios, cargado, error } = useEstadoComercios();
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col gap-4 bg-white px-4 pb-20">
@@ -103,8 +103,11 @@ export function HomeCliente() {
         </h2>
         {comercios.length === 0 ? (
           <p className="rounded-lg border border-border bg-surface p-4 text-body font-body text-muted">
-            No hay tiendas cerca todavía. Escribe lo que necesitas en «Pide lo que sea» y
-            un mensajero lo consigue.
+            {!cargado
+              ? "Buscando comercios cerca de ti…"
+              : error
+                ? "No pudimos conectarnos. Revisa tu internet y vuelve a entrar."
+                : "No hay tiendas cerca todavía. Escribe lo que necesitas en «Pide lo que sea» y un mensajero lo consigue."}
           </p>
         ) : (
           <div className="flex flex-col gap-2">

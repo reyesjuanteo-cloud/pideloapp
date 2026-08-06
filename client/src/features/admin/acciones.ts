@@ -169,14 +169,16 @@ export async function listarPedidos(clave: string): Promise<PedidoAdmin[]> {
   if (!claveAdminValida(clave)) return [];
   const { data, error } = await clienteAdmin()
     .from("pedidos")
-    .select("id, codigo, barrio, total, estado, creado_en, comercios(nombre)")
+    .select("id, codigo, barrio, total, estado, creado_en, comercio_nombre, comercios(nombre)")
     .order("creado_en", { ascending: false });
   if (error || !data) return [];
   return data.map((p) => ({
     id: p.id as string,
     codigo: p.codigo as string,
     comercio:
-      (p.comercios as unknown as { nombre: string } | null)?.nombre ?? "Pedido libre",
+      (p.comercios as unknown as { nombre: string } | null)?.nombre ??
+      (p.comercio_nombre as string | null) ??
+      "Pedido libre",
     barrio: p.barrio as string | null,
     total: p.total as number,
     estado: p.estado as string,

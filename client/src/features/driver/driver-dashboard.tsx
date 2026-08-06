@@ -9,7 +9,7 @@ import { actualizarEstado, refrescarPedidos, usePedidos } from "@/features/pedid
 import { aceptarPedido as aceptarPedidoAccion, recargarSaldo } from "@/features/pedidos/acciones";
 import { COMISION_PEDIDO, RECARGA_PEDIDOS, RECARGA_VALOR } from "@/features/pedidos/tarifas";
 import type { Pedido } from "@/features/pedidos/tipos";
-import { refrescarSaldo, useSaldo } from "./saldo";
+import { refrescarSaldo, useEstadoSaldo } from "./saldo";
 import { usePerfilMensajero } from "@/features/mensajero/perfil";
 import Link from "next/link";
 import { PedidoCard } from "./pedido-card";
@@ -57,10 +57,11 @@ const currency = new Intl.NumberFormat("es-CO", {
 export function DriverDashboard() {
   const [available, setAvailable] = useState(true);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [ocupado, setOcupado] = useState(false);
   const pedidos = usePedidos();
-  const saldo = useSaldo();
+  const { datos: saldo, cargado: saldoCargado } = useEstadoSaldo();
   const perfil = usePerfilMensajero();
-  const sinSaldo = saldo < COMISION_PEDIDO;
+  const sinSaldo = saldoCargado && saldo < COMISION_PEDIDO;
 
   // Solo mensajeros aprobados pueden operar el panel.
   if (!perfil || perfil.estado !== "aprobado") {
@@ -97,24 +98,54 @@ export function DriverDashboard() {
     }));
 
   async function aceptarPedido(id: string) {
-    // El servidor verifica saldo, asigna el pedido y descuenta la comisión.
-    const resultado = await aceptarPedidoAccion(id);
-    if (!resultado.ok) setAviso(resultado.error ?? "No se pudo aceptar.");
-    void refrescarSaldo();
-    void refrescarPedidos();
+    if (ocupado) return; // evita doble toque
+    setOcupado(true);
+    setAviso(null);
+    try {
+      // El servidor verifica saldo, asigna el pedido y descuenta la comisión.
+      const resultado = await aceptarPedidoAccion(id);
+      if (!resultado.ok) setAviso(resultado.error ?? "No se pudo aceptar.");
+    } catch {
+      setAviso("Sin conexión. Revisa tu internet e inténtalo de nuevo.");
+    } finally {
+      setOcupado(false);
+      void refrescarSaldo();
+      void refrescarPedidos();
+    }
   }
 
   async function recargar() {
-    await recargarSaldo();
-    void refrescarSaldo();
+    if (ocupado) return;
+    setOcupado(true);
+    try {
+      await recargarSaldo();
+    } catch {
+      setAviso("No se pudo recargar. Inténtalo de nuevo.");
+    } finally {
+      setOcupado(false);
+      void refrescarSaldo();
+    }
   }
 
-  function avanzarEntrega() {
+  async function avanzar() {
+    if (ocupado) return;
+    setOcupado(true);
+    setAviso(null);
+    try {
+      await avanzarEntrega();
+    } catch {
+      setAviso("No se pudo actualizar el pedido. Revisa tu conexión.");
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  async function avanzarEntrega() {
     if (!activo) return;
     const siguiente = siguienteEstado[activo.estado];
     // "llegue" → "entregado" no está aquí a propósito: esa transición
     // la dispara el cliente al confirmar que recibió el pedido.
-    if (siguiente) actualizarEstado(activo.id, siguiente);
+    if (siguiente) await actualizarEstado(activo.id, siguiente);
   }
 
   return (
@@ -159,7 +190,7 @@ export function DriverDashboard() {
             pedido: comoDisponible(activo),
             estado: estadoEntregaPorPedido[activo.estado] ?? "recogiendo",
           }}
-          onAvanzar={avanzarEntrega}
+          onAvanzar={avanzar}
         />
       )}
 
