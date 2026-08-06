@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Rayo } from "@/components/ui/rayo";
 import { leerDireccion } from "./direccion";
 
 export function Splash({ tieneSesion }: { tieneSesion: boolean }) {
@@ -28,15 +29,10 @@ export function Splash({ tieneSesion }: { tieneSesion: boolean }) {
   }, [router, tieneSesion]);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden bg-surface">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-25 [background-image:radial-gradient(var(--color-accent)_1.5px,transparent_1.5px)] [background-size:18px_18px]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-16 -right-16 size-48 rounded-full bg-accent/15 blur-3xl"
-      />
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden bg-white">
+      <Rayo className="absolute -left-3 top-20 size-20 -rotate-12 opacity-10" />
+      <Rayo className="absolute right-8 top-36 size-6 rotate-12 opacity-25" />
+      <Rayo className="absolute -right-5 bottom-40 size-16 rotate-6 opacity-10" />
       <Image
         src="/marca-p.png"
         alt="Pídelo"

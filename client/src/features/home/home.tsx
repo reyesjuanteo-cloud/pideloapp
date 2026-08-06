@@ -11,6 +11,7 @@ import {
   User,
   UtensilsCrossed,
 } from "lucide-react";
+import { Rayo } from "@/components/ui/rayo";
 import { useComercios } from "@/features/comercios/store";
 import { useDireccion } from "@/features/onboarding/direccion";
 import { BottomNav } from "./bottom-nav";
@@ -30,48 +31,42 @@ export function HomeCliente() {
   const comercios = useComercios();
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col gap-4 px-4 pb-20">
-      {/* Hero de marca */}
-      <div className="relative -mx-4 overflow-hidden bg-linear-to-br from-primary to-primary-dark px-4 pb-12 pt-5">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-15 [background-image:radial-gradient(white_1px,transparent_1px)] [background-size:16px_16px]"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-12 -right-12 size-36 rounded-full bg-accent/30 blur-2xl"
-        />
+    <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col gap-4 bg-white px-4 pb-20">
+      {/* Cabecera blanca con el rayo de la marca */}
+      <div className="relative pt-5">
+        <Rayo className="pointer-events-none absolute -right-2 top-6 size-20 rotate-12 opacity-10" />
         <div className="relative flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-label font-semibold uppercase tracking-wide text-white/60 font-body">
+            <p className="text-label font-semibold uppercase tracking-wide text-muted font-body">
               Entregar en
             </p>
             <Link
               href="/mapa"
-              className="flex max-w-full items-center gap-1 text-body font-semibold font-body text-white"
+              className="flex max-w-full items-center gap-1 text-body font-semibold font-body text-ink"
             >
-              <MapPin className="size-4 shrink-0 text-white/80" />
+              <MapPin className="size-4 shrink-0 text-primary" />
               <span className="truncate">{direccion?.texto ?? "Agrega tu dirección"}</span>
-              <ChevronDown className="size-3.5 shrink-0 text-white/60" />
+              <ChevronDown className="size-3.5 shrink-0 text-muted" />
             </Link>
           </div>
           <Link
             href="/perfil"
             aria-label="Tu perfil"
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/15 text-white ring-1 ring-white/25"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
           >
             <User className="size-4" />
           </Link>
         </div>
-        <p className="relative mt-4 font-display text-h2 font-bold text-white">
+        <p className="relative mt-4 flex items-center gap-1.5 font-display text-h2 font-bold text-ink">
           ¿Qué necesitas hoy?
+          <Rayo className="size-5" />
         </p>
       </div>
 
-      {/* Buscador flotando sobre el hero */}
+      {/* Buscador */}
       <Link
         href="/buscar"
-        className="relative z-10 -mt-10 flex min-h-12 items-center gap-2 rounded-lg border border-border bg-surface px-3 text-body font-body text-muted shadow-[0_12px_30px_rgba(22,35,31,0.12)]"
+        className="flex min-h-12 items-center gap-2 rounded-lg border border-border bg-white px-3 text-body font-body text-muted shadow-[0_8px_24px_rgba(36,26,20,0.08)]"
       >
         <Search className="size-4 text-primary" />
         Busca tiendas o productos

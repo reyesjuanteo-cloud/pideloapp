@@ -1,26 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Rayo } from "@/components/ui/rayo";
 
-// Pantalla de bienvenida: fondo blanco con puntos naranjas, el logo como
-// protagonista, y solo las dos acciones.
+// Bienvenida: fondo completamente blanco, el logo como protagonista y
+// rayos de la marca como único detalle decorativo.
 export function Landing() {
   return (
-    <div className="relative flex min-h-dvh flex-col overflow-hidden bg-surface">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-25 [background-image:radial-gradient(var(--color-accent)_1.5px,transparent_1.5px)] [background-size:18px_18px]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-20 -right-20 size-64 rounded-full bg-accent/15 blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-24 -left-20 size-56 rounded-full bg-primary/10 blur-3xl"
-      />
+    <div className="relative flex min-h-dvh flex-col overflow-hidden bg-white">
+      <Rayo className="absolute -left-4 top-16 size-24 -rotate-12 opacity-10" />
+      <Rayo className="absolute right-6 top-32 size-8 rotate-12 opacity-25" />
+      <Rayo className="absolute -right-6 bottom-48 size-20 rotate-6 opacity-10" />
+      <Rayo className="absolute left-8 bottom-40 size-5 -rotate-6 opacity-30" />
 
       <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col items-center justify-center px-6 text-center">
-        <Image src="/marca-p.png" alt="PideloApp" width={170} height={170} priority />
+        <Image src="/marca-p.png" alt="PideloApp" width={180} height={180} priority />
         <p className="mt-2 font-display text-display font-bold tracking-tight text-primary">
           PideloApp
         </p>
@@ -41,7 +34,7 @@ export function Landing() {
         </Link>
         <Link
           href="/ingreso"
-          className="rounded-md border border-border bg-surface py-3.5 text-center text-body font-body font-semibold text-ink transition-colors duration-300 ease-in-out hover:bg-bg"
+          className="rounded-md border border-border bg-white py-3.5 text-center text-body font-body font-semibold text-ink transition-colors duration-300 ease-in-out hover:bg-bg"
         >
           Iniciar sesión
         </Link>
