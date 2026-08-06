@@ -25,8 +25,14 @@ export const metadata: Metadata = {
   description: "PideloApp — pide ahora, recíbelo en minutos.",
 };
 
+// maximumScale/userScalable: evita el zoom del navegador (al enfocar campos
+// en iOS y el pellizco accidental) — la app se comporta como app nativa.
 export const viewport = {
   themeColor: "#e8380d",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

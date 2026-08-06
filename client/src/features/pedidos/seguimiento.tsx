@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, CheckCircle2, PackageSearch } from "lucide-react";
+import { ArrowLeft, Bike, CheckCircle2, PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { actualizarEstado, usePedidos } from "./almacen";
 import { MapaSeguimiento } from "./mapa-seguimiento";
@@ -79,6 +79,26 @@ export function Seguimiento({ pedidoId }: { pedidoId: string }) {
 
       {/* Mapa en vivo del mensajero (simulado hasta conectar Supabase) */}
       <MapaSeguimiento pedido={pedido} />
+
+      {/* Quién es tu mensajero */}
+      {pedido.mensajeroNombre && pedido.estado !== "entregado" && (
+        <div className="flex items-center gap-3 rounded-lg border border-border bg-surface p-3">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10">
+            <Bike className="size-5 text-primary" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-caption font-body text-muted">Tu mensajero</p>
+            <p className="truncate text-body font-semibold font-body text-ink">
+              {pedido.mensajeroNombre}
+            </p>
+            <p className="text-caption font-body text-muted">
+              {pedido.mensajeroVehiculo === "moto"
+                ? `Moto · Placa ${pedido.mensajeroPlaca}`
+                : "Bicicleta"}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Tracker */}
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-3">

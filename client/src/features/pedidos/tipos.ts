@@ -37,4 +37,8 @@ export type Pedido = {
   estado: EstadoPedido;
   horaCreacion: string;
   horaEntrega?: string;
+  // Datos del mensajero asignado (visibles para el cliente de este pedido)
+  mensajeroNombre?: string;
+  mensajeroVehiculo?: "moto" | "bicicleta";
+  mensajeroPlaca?: string;
 };

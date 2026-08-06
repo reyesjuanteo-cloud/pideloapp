@@ -77,31 +77,60 @@ type FilaMensajero = {
   perfiles: { nombre: string | null; celular: string | null } | null;
 };
 
-export type MensajeroAdmin = PerfilMensajero & { id: string; saldo: number };
+export type FotosMensajero = {
+  cedula: string | null;
+  selfie: string | null;
+  licencia: string | null;
+  soat: string | null;
+};
+
+export type MensajeroAdmin = PerfilMensajero & {
+  id: string;
+  saldo: number;
+  fotos: FotosMensajero;
+};
+
+const NOMBRES_FOTOS = ["cedula", "selfie", "licencia", "soat"] as const;
 
 export async function listarMensajeros(
   clave: string
 ): Promise<MensajeroAdmin[]> {
   if (!claveAdminValida(clave)) return [];
-  const { data, error } = await clienteAdmin()
+  const admin = clienteAdmin();
+  const { data, error } = await admin
     .from("mensajeros")
     .select("*, perfiles(nombre, celular)")
     .order("registrado_en", { ascending: false });
   if (error || !data) return [];
-  return (data as FilaMensajero[]).map((f) => ({
-    id: f.id,
-    nombre: f.perfiles?.nombre ?? "Sin nombre",
-    celular: f.perfiles?.celular ?? "",
-    documento: f.documento,
-    municipio: f.municipio,
-    vehiculo: f.vehiculo,
-    placa: f.placa ?? undefined,
-    licencia: f.licencia ?? undefined,
-    soatVigente: f.soat_vigente ?? undefined,
-    estado: f.estado,
-    saldo: f.saldo,
-    fechaRegistro: new Date(f.registrado_en).toLocaleDateString("es-CO"),
-  }));
+
+  return Promise.all(
+    (data as FilaMensajero[]).map(async (f) => {
+      // URLs firmadas (1 hora) para revisar los documentos del aspirante.
+      const rutas = NOMBRES_FOTOS.map((n) => `${f.id}/${n}.jpg`);
+      const { data: firmas } = await admin.storage
+        .from("documentos")
+        .createSignedUrls(rutas, 3600);
+      const fotos = Object.fromEntries(
+        NOMBRES_FOTOS.map((n, i) => [n, firmas?.[i]?.signedUrl ?? null])
+      ) as FotosMensajero;
+
+      return {
+        id: f.id,
+        nombre: f.perfiles?.nombre ?? "Sin nombre",
+        celular: f.perfiles?.celular ?? "",
+        documento: f.documento,
+        municipio: f.municipio,
+        vehiculo: f.vehiculo,
+        placa: f.placa ?? undefined,
+        licencia: f.licencia ?? undefined,
+        soatVigente: f.soat_vigente ?? undefined,
+        estado: f.estado,
+        saldo: f.saldo,
+        fotos,
+        fechaRegistro: new Date(f.registrado_en).toLocaleDateString("es-CO"),
+      };
+    })
+  );
 }
 
 export async function cambiarEstadoMensajero(

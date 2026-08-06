@@ -25,6 +25,11 @@ type FilaPedido = {
   creado_en: string;
   entregado_en: string | null;
   comercios: { nombre: string } | null;
+  mensajeros: {
+    vehiculo: "moto" | "bicicleta";
+    placa: string | null;
+    perfiles: { nombre: string | null } | null;
+  } | null;
 };
 
 function hora(iso: string): string {
@@ -53,13 +58,16 @@ function aPedido(fila: FilaPedido): Pedido {
     estado: fila.estado,
     horaCreacion: hora(fila.creado_en),
     horaEntrega: fila.entregado_en ? hora(fila.entregado_en) : undefined,
+    mensajeroNombre: fila.mensajeros?.perfiles?.nombre ?? undefined,
+    mensajeroVehiculo: fila.mensajeros?.vehiculo,
+    mensajeroPlaca: fila.mensajeros?.placa ?? undefined,
   };
 }
 
 async function cargarPedidos(): Promise<Pedido[]> {
   const { data, error } = await supabase()
     .from("pedidos")
-    .select("*, comercios(nombre)")
+    .select("*, comercios(nombre), mensajeros(vehiculo, placa, perfiles(nombre))")
     .order("creado_en", { ascending: true });
   if (error) throw error;
   return (data as FilaPedido[]).map(aPedido);

@@ -7,8 +7,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Chip } from "@/components/ui/chip";
 import { PhoneField, telefonoValido } from "@/components/ui/phone-field";
+import { FotoInput, comprimirImagen } from "@/components/ui/foto-input";
+import { asegurarSesion, supabase } from "@/lib/supabase/cliente";
 import { registrarMensajero, usePerfilMensajero } from "./perfil";
 import type { Municipio, Vehiculo } from "./tipos";
+
+async function subirFoto(uid: string, nombre: string, archivo: File): Promise<void> {
+  const blob = await comprimirImagen(archivo);
+  const { error } = await supabase()
+    .storage.from("documentos")
+    .upload(`${uid}/${nombre}.jpg`, blob, { upsert: true, contentType: "image/jpeg" });
+  if (error) throw new Error(`No se pudo subir la foto (${nombre}): ${error.message}`);
+}
 
 const municipios: Municipio[] = ["Girardot", "Ricaurte", "Flandes"];
 
@@ -26,6 +36,10 @@ export function RegistroMensajero() {
   const [placa, setPlaca] = useState("");
   const [licencia, setLicencia] = useState("");
   const [soat, setSoat] = useState(false);
+  const [fotoCedula, setFotoCedula] = useState<File | null>(null);
+  const [fotoSelfie, setFotoSelfie] = useState<File | null>(null);
+  const [fotoLicencia, setFotoLicencia] = useState<File | null>(null);
+  const [fotoSoat, setFotoSoat] = useState<File | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [errores, setErrores] = useState<Record<string, string>>({});
 
@@ -44,25 +58,45 @@ export function RegistroMensajero() {
       if (!PLACA_MOTO.test(placa)) e.placa = "Placa de moto: 3 letras, 2 números y 1 letra. Ej: ABC12D";
       if (!/^\d{6,12}$/.test(licencia)) e.licencia = "Escribe el número de tu licencia de conducción.";
       if (!soat) e.soat = "Necesitas SOAT vigente para trabajar en moto.";
+      if (!fotoLicencia) e.fotoLicencia = "Toma una foto de tu licencia.";
+      if (!fotoSoat) e.fotoSoat = "Toma una foto de tu SOAT vigente.";
     }
+    if (!fotoCedula) e.fotoCedula = "Toma una foto de tu cédula por el frente.";
+    if (!fotoSelfie) e.fotoSelfie = "Tómate una selfie sosteniendo tu cédula.";
     setErrores(e);
     if (Object.keys(e).length > 0) return;
 
     setEnviando(true);
-    const resultado = await registrarMensajero({
-      nombre: nombre.trim(),
-      documento,
-      celular,
-      municipio,
-      vehiculo,
-      ...(vehiculo === "moto" ? { placa, licencia, soatVigente: soat } : {}),
-    });
-    setEnviando(false);
-    if (!resultado.ok) {
-      setErrores({ envio: resultado.error ?? "No se pudo enviar. Intenta de nuevo." });
-      return;
+    try {
+      // Fotos primero: sin documentos no se crea el registro.
+      const usuario = await asegurarSesion();
+      await subirFoto(usuario.id, "cedula", fotoCedula!);
+      await subirFoto(usuario.id, "selfie", fotoSelfie!);
+      if (vehiculo === "moto") {
+        await subirFoto(usuario.id, "licencia", fotoLicencia!);
+        await subirFoto(usuario.id, "soat", fotoSoat!);
+      }
+
+      const resultado = await registrarMensajero({
+        nombre: nombre.trim(),
+        documento,
+        celular,
+        municipio,
+        vehiculo,
+        ...(vehiculo === "moto" ? { placa, licencia, soatVigente: soat } : {}),
+      });
+      if (!resultado.ok) {
+        setErrores({ envio: resultado.error ?? "No se pudo enviar. Intenta de nuevo." });
+        return;
+      }
+      router.replace("/mensajero/estado");
+    } catch (err) {
+      setErrores({
+        envio: err instanceof Error ? err.message : "No se pudo enviar. Intenta de nuevo.",
+      });
+    } finally {
+      setEnviando(false);
     }
-    router.replace("/mensajero/estado");
   }
 
   return (
@@ -172,9 +206,41 @@ export function RegistroMensajero() {
           </>
         )}
 
+        <FotoInput
+          label="Foto de tu cédula (frente)"
+          ayuda="Que se lean bien los datos"
+          valor={fotoCedula}
+          onChange={setFotoCedula}
+          error={errores.fotoCedula}
+        />
+        <FotoInput
+          label="Selfie sosteniendo tu cédula"
+          ayuda="Tu cara y la cédula visibles en la misma foto"
+          valor={fotoSelfie}
+          onChange={setFotoSelfie}
+          error={errores.fotoSelfie}
+        />
+        {vehiculo === "moto" && (
+          <>
+            <FotoInput
+              label="Foto de tu licencia de conducción"
+              valor={fotoLicencia}
+              onChange={setFotoLicencia}
+              error={errores.fotoLicencia}
+            />
+            <FotoInput
+              label="Foto de tu SOAT vigente"
+              ayuda="Que se vea la fecha de vencimiento"
+              valor={fotoSoat}
+              onChange={setFotoSoat}
+              error={errores.fotoSoat}
+            />
+          </>
+        )}
+
         <p className="text-caption font-body text-muted">
-          Al aprobarte te pediremos fotos de tus documentos. Tus datos se tratan según la
-          Ley 1581 de 2012.
+          Tus datos y documentos se usan solo para verificar tu registro y se tratan
+          según la Ley 1581 de 2012.
         </p>
       </div>
 

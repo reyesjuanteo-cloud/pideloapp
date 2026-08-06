@@ -90,6 +90,53 @@ export function AdminMensajeros() {
               </span>
             </div>
 
+            {/* Documentos del aspirante (URLs firmadas, abren en pestaña nueva) */}
+            <div className="flex flex-wrap gap-2">
+              {(
+                [
+                  ["cedula", "Cédula"],
+                  ["selfie", "Selfie"],
+                  ["licencia", "Licencia"],
+                  ["soat", "SOAT"],
+                ] as const
+              ).map(([nombre, etiqueta]) =>
+                perfil.fotos[nombre] ? (
+                  <a
+                    key={nombre}
+                    href={perfil.fotos[nombre]!}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex flex-col items-center gap-1"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element -- URL firmada temporal de Storage */}
+                    <img
+                      src={perfil.fotos[nombre]!}
+                      alt={etiqueta}
+                      className="size-16 rounded-md border border-border object-cover"
+                    />
+                    <span className="text-caption font-body text-muted">{etiqueta}</span>
+                  </a>
+                ) : (
+                  <div key={nombre} className="flex flex-col items-center gap-1 opacity-40">
+                    <div className="flex size-16 items-center justify-center rounded-md border border-dashed border-border text-caption font-body text-muted">
+                      Sin foto
+                    </div>
+                    <span className="text-caption font-body text-muted">{etiqueta}</span>
+                  </div>
+                )
+              )}
+            </div>
+
+            <a
+              href="https://www.runt.gov.co/consultaCiudadana/"
+              target="_blank"
+              rel="noreferrer"
+              className="text-caption font-body text-primary hover:text-primary-dark"
+            >
+              Verificar SOAT y licencia en el RUNT ↗ (cédula {perfil.documento}
+              {perfil.placa ? ` · placa ${perfil.placa}` : ""})
+            </a>
+
             {perfil.estado === "en_revision" ? (
               <div className="flex gap-2">
                 <Button fullWidth onClick={() => cambiar(perfil.id, "aprobado")}>
