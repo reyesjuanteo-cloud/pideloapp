@@ -21,8 +21,12 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pídelo",
-  description: "Pídelo — pide y sigue tu domicilio en tiempo real.",
+  title: "PideloApp",
+  description: "PideloApp — pide ahora, recíbelo en minutos.",
+};
+
+export const viewport = {
+  themeColor: "#e8380d",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
