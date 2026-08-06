@@ -2,6 +2,7 @@
 
 import { clienteAdmin, claveAdminValida } from "@/lib/supabase/admin";
 import { enviarCorreoMensajero } from "@/features/mensajero/correo";
+import { COMISION_PEDIDO, RECARGA_VALOR } from "@/features/pedidos/tarifas";
 import type {
   EstadoMensajero,
   PerfilMensajero,
@@ -149,6 +150,33 @@ export async function listarMensajeros(
   );
 }
 
+// Recarga manual: el mensajero transfiere por Nequi y el equipo le acredita
+// el saldo aquí. Cuando entre la pasarela de pagos, esto será automático.
+export async function acreditarRecarga(
+  clave: string,
+  id: string,
+  monto: number = RECARGA_VALOR
+): Promise<{ ok: boolean }> {
+  if (!claveAdminValida(clave)) return { ok: false };
+  if (monto < RECARGA_VALOR || monto > 200000) return { ok: false };
+  const admin = clienteAdmin();
+  const { data: m } = await admin
+    .from("mensajeros")
+    .select("saldo")
+    .eq("id", id)
+    .single();
+  if (!m) return { ok: false };
+  const { error } = await admin
+    .from("mensajeros")
+    .update({ saldo: m.saldo + monto })
+    .eq("id", id);
+  if (error) return { ok: false };
+  await admin
+    .from("movimientos_saldo")
+    .insert({ mensajero_id: id, tipo: "recarga", valor: monto });
+  return { ok: true };
+}
+
 export type PedidoAdmin = {
   id: string;
   codigo: string;
@@ -195,6 +223,31 @@ export async function cambiarEstadoMensajero(
   const admin = clienteAdmin();
   const { error } = await admin.from("mensajeros").update({ estado }).eq("id", id);
   if (error) return { ok: false };
+
+  // Al aprobar: primer domicilio de cortesía (una sola vez por mensajero)
+  if (estado === "aprobado") {
+    const { data: previos } = await admin
+      .from("movimientos_saldo")
+      .select("id")
+      .eq("mensajero_id", id)
+      .eq("tipo", "cortesia");
+    if ((previos ?? []).length === 0) {
+      const { data: m } = await admin
+        .from("mensajeros")
+        .select("saldo")
+        .eq("id", id)
+        .single();
+      await admin
+        .from("mensajeros")
+        .update({ saldo: (m?.saldo ?? 0) + COMISION_PEDIDO })
+        .eq("id", id);
+      await admin.from("movimientos_saldo").insert({
+        mensajero_id: id,
+        tipo: "cortesia",
+        valor: COMISION_PEDIDO,
+      });
+    }
+  }
 
   // Notificación por correo: programada pero inactiva hasta que haya dominio
   // (ver features/mensajero/correo.ts). Nunca bloquea la decisión del equipo.

@@ -61,6 +61,30 @@ body {
   font-family: var(--font-body), sans-serif;
 }
 
+/* Radar de "buscando mensajero": ondas que se expanden y puntos que laten. */
+@keyframes onda {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes latido {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
 /* Entrada suave del texto rotativo de la bienvenida. */
 @keyframes aparecer {
   from {

@@ -6,6 +6,11 @@ export type PedidoDisponible = {
   direccion: string;
   distanciaKm: number;
   pago: number;
+  // Qué tiene que llevar: productos del catálogo o el encargo escrito
+  tipo: "catalogo" | "libre";
+  items: { nombre: string; cantidad: number }[];
+  descripcionLibre?: string;
+  totalPedido: number;
 };
 
 export type EstadoEntrega = "recogiendo" | "en_ruta" | "llegue" | "entregado";

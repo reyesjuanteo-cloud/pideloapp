@@ -7,3 +7,8 @@ export const TARIFA_ENVIO = 5000;
 export const COMISION_PEDIDO = 1000;
 export const RECARGA_VALOR = 5000;
 export const RECARGA_PEDIDOS = RECARGA_VALOR / COMISION_PEDIDO;
+
+// ⚠️ TEMPORAL: la recarga se hace por transferencia manual mientras se
+// integra la pasarela de pagos. Cambiar aquí el número de Nequi del equipo.
+export const NEQUI_PIDELO = "3001234567";
+export const NEQUI_TITULAR = "Pídelo";

@@ -3,16 +3,19 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Apple, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PhoneField, telefonoValido } from "@/components/ui/phone-field";
 import { guardarTelefono } from "./telefono";
+import { IngresoMensajero } from "./ingreso-mensajero";
 
 export function Ingreso() {
   const router = useRouter();
   const [digitos, setDigitos] = useState("");
   const [error, setError] = useState<string | undefined>();
   const [enviando, setEnviando] = useState(false);
+  // Por defecto entra el cliente; el mensajero cambia de pestaña.
+  const [pestana, setPestana] = useState<"cliente" | "mensajero">("cliente");
 
   function continuar() {
     if (!telefonoValido(digitos)) {
@@ -37,13 +40,36 @@ export function Ingreso() {
         <ArrowLeft className="size-5" />
       </button>
 
-      <h1 className="mt-2 font-display text-h2 font-semibold text-ink">
-        Ingresa o crea tu cuenta
-      </h1>
-      <p className="mt-1 text-body font-body text-muted">
-        Te enviamos un código por SMS. Sin contraseñas.
-      </p>
+      {/* Dos formas de entrar: cliente (por defecto) o mensajero */}
+      <div className="mt-2 flex gap-2 rounded-full bg-bg p-1">
+        {(["cliente", "mensajero"] as const).map((valor) => (
+          <button
+            key={valor}
+            onClick={() => setPestana(valor)}
+            className={`flex-1 rounded-full py-2 text-caption font-semibold font-body transition-colors duration-300 ease-in-out ${
+              pestana === valor ? "bg-primary text-white" : "text-muted hover:text-ink"
+            }`}
+          >
+            {valor === "cliente" ? "Soy cliente" : "Soy domiciliario"}
+          </button>
+        ))}
+      </div>
 
+      <h1 className="mt-5 font-display text-h2 font-semibold text-ink">
+        {pestana === "cliente" ? "Ingresa o crea tu cuenta" : "Entra a tu panel"}
+      </h1>
+      {pestana === "cliente" && (
+        <p className="mt-1 text-body font-body text-muted">
+          Te enviamos un código por SMS. Sin contraseñas.
+        </p>
+      )}
+
+      {pestana === "mensajero" ? (
+        <div className="mt-6">
+          <IngresoMensajero />
+        </div>
+      ) : (
+      <>
       <div className="mt-6 flex flex-col gap-4">
         <PhoneField
           digitos={digitos}
@@ -58,22 +84,9 @@ export function Ingreso() {
         </Button>
       </div>
 
-      <div className="my-6 flex items-center gap-3">
-        <span className="h-px flex-1 bg-border" />
-        <span className="text-caption font-body text-muted">o</span>
-        <span className="h-px flex-1 bg-border" />
-      </div>
 
-      <div className="flex flex-col gap-2.5">
-        <Button fullWidth variant="secondary" disabled title="Disponible pronto">
-          <span className="font-semibold">G</span>
-          Continuar con Google
-        </Button>
-        <Button fullWidth variant="secondary" disabled title="Disponible pronto">
-          <Apple className="size-4" />
-          Continuar con Apple
-        </Button>
-      </div>
+      </>
+      )}
 
       <div className="mt-auto flex flex-col gap-3 pb-4 pt-8 text-center">
         <Link
@@ -81,12 +94,6 @@ export function Ingreso() {
           className="text-body font-body text-primary hover:text-primary-dark"
         >
           Explorar sin cuenta
-        </Link>
-        <Link
-          href="/mensajero/registro"
-          className="text-body font-body text-primary hover:text-primary-dark"
-        >
-          ¿Quieres trabajar con nosotros? Sé mensajero
         </Link>
         <p className="text-caption font-body text-muted">
           Al continuar aceptas los términos y la política de tratamiento de datos

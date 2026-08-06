@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Bike, CheckCircle2, MessageCircle, PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Banner } from "@/components/ui/banner";
-import { actualizarEstado, useEstadoPedidos } from "./almacen";
+import { actualizarEstado, cancelarPedido, useEstadoPedidos } from "./almacen";
 import { MapaSeguimiento } from "./mapa-seguimiento";
+import { BuscandoMensajero } from "./buscando-mensajero";
 import { ChatPedido } from "@/features/chat/chat-pedido";
 import type { EstadoPedido } from "./tipos";
 
@@ -31,6 +32,7 @@ const mensajePorEstado: Record<EstadoPedido, string> = {
   en_camino: "Tu pedido va en camino.",
   llegue: "El mensajero llegó. Confirma cuando lo tengas en tus manos.",
   entregado: "Pedido entregado. ¡Buen provecho!",
+  cancelado: "Este pedido fue cancelado.",
 };
 
 export function Seguimiento({ pedidoId }: { pedidoId: string }) {
@@ -100,8 +102,11 @@ export function Seguimiento({ pedidoId }: { pedidoId: string }) {
         <span className="font-mono text-mono text-muted">{pedido.codigo}</span>
       </div>
 
-      {/* Mapa en vivo del mensajero (simulado hasta conectar Supabase) */}
-      <MapaSeguimiento pedido={pedido} />
+      {pedido.estado === "buscando" ? (
+        <BuscandoMensajero />
+      ) : (
+        <MapaSeguimiento pedido={pedido} />
+      )}
 
       {/* Quién es tu mensajero */}
       {pedido.mensajeroNombre && pedido.estado !== "entregado" && (
@@ -202,6 +207,25 @@ export function Seguimiento({ pedidoId }: { pedidoId: string }) {
         <div className="flex items-center gap-2 rounded-md bg-success/10 p-3 text-caption font-body text-success">
           <CheckCircle2 className="size-4 shrink-0" />
           Entregado a las {pedido.horaEntrega}. Gracias por pedir con Pídelo.
+        </div>
+      )}
+
+      {/* Cancelar: mientras nadie va en camino */}
+      {(pedido.estado === "buscando" || pedido.estado === "preparando") && (
+        <button
+          onClick={async () => {
+            const r = await cancelarPedido(pedido.id);
+            if (!r.ok) setAviso(r.error ?? "No se pudo cancelar.");
+          }}
+          className="text-center text-body font-body text-error hover:underline"
+        >
+          Cancelar pedido
+        </button>
+      )}
+
+      {pedido.estado === "cancelado" && (
+        <div className="rounded-md bg-bg p-3 text-center text-caption font-body text-muted">
+          Pedido cancelado. No se te cobró nada.
         </div>
       )}
 

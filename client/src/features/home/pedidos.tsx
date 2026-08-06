@@ -13,8 +13,9 @@ const currency = new Intl.NumberFormat("es-CO", {
 
 export function Pedidos() {
   const pedidos = usePedidos();
-  const enCurso = pedidos.filter((p) => p.estado !== "entregado");
-  const anteriores = pedidos.filter((p) => p.estado === "entregado");
+  const cerrados = ["entregado", "cancelado"];
+  const enCurso = pedidos.filter((p) => !cerrados.includes(p.estado));
+  const anteriores = pedidos.filter((p) => cerrados.includes(p.estado));
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col gap-4 px-4 pb-20 pt-4">
@@ -80,13 +81,15 @@ export function Pedidos() {
                       i > 0 ? "border-t border-border" : ""
                     }`}
                   >
-                    <CheckCircle2 className="size-4 shrink-0 text-success" />
+                    <CheckCircle2
+                      className={`size-4 shrink-0 ${pedido.estado === "cancelado" ? "text-muted" : "text-success"}`}
+                    />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-body font-semibold font-body text-ink">
                         {pedido.comercio}
                       </p>
                       <p className="text-caption font-body text-muted">
-                        Entregado {pedido.horaEntrega} ·{" "}
+                        {pedido.estado === "cancelado" ? "Cancelado" : `Entregado ${pedido.horaEntrega}`} ·{" "}
                         <span className="font-mono text-mono">{pedido.codigo}</span>
                       </p>
                     </div>

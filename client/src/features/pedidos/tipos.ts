@@ -10,7 +10,8 @@ export type EstadoPedido =
   | "preparando"
   | "en_camino"
   | "llegue"
-  | "entregado";
+  | "entregado"
+  | "cancelado";
 
 export type ItemPedido = {
   productoId: string;

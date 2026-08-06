@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { crearRecursoRemoto } from "@/lib/recurso-remoto";
 import type { EstadoMensajero } from "@/features/mensajero/tipos";
 import {
+  acreditarRecarga,
   cambiarEstadoMensajero,
   listarMensajeros,
   type MensajeroAdmin,
@@ -45,6 +46,12 @@ export function AdminMensajeros() {
   const mensajeros = useMensajerosAdmin();
 
   const [avisoCorreo, setAvisoCorreo] = useState<string | null>(null);
+
+  async function recargar(id: string) {
+    const r = await acreditarRecarga(leerClaveAdmin(), id);
+    setAvisoCorreo(r.ok ? "Saldo acreditado." : "No se pudo acreditar el saldo.");
+    void recurso.refrescar();
+  }
 
   async function cambiar(id: string, estado: EstadoMensajero) {
     const r = await cambiarEstadoMensajero(leerClaveAdmin(), id, estado);
@@ -187,6 +194,12 @@ export function AdminMensajeros() {
               <MessageCircle className="size-3.5" />
               Escribirle por WhatsApp
             </a>
+
+            {perfil.estado === "aprobado" && (
+              <Button variant="secondary" fullWidth onClick={() => recargar(perfil.id)}>
+                Acreditar recarga de $5.000 (Nequi recibido)
+              </Button>
+            )}
 
             {perfil.estado === "en_revision" ? (
               <div className="flex gap-2">

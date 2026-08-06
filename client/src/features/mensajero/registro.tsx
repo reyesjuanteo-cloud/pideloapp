@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Bike, CheckCircle2, IdCard, Mail, MapPin, User } from "lucide-react";
+import { ArrowLeft, Bike, CheckCircle2, IdCard, Lock, Mail, MapPin, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Chip } from "@/components/ui/chip";
 import { PhoneField, telefonoValido } from "@/components/ui/phone-field";
 import { CamaraDocumento } from "@/components/ui/camara-documento";
 import { comprimirImagen } from "@/components/ui/foto-input";
-import { asegurarSesion, supabase } from "@/lib/supabase/cliente";
+import { supabase } from "@/lib/supabase/cliente";
+import { correoInterno, crearCuentaMensajero } from "./cuenta";
 import { registrarMensajero, usePerfilMensajero } from "./perfil";
 import { VerificacionFacial } from "./verificacion-facial";
 import type { Municipio, ResultadoVerificacion, Vehiculo } from "./tipos";
@@ -43,6 +44,8 @@ export function RegistroMensajero() {
   const [documento, setDocumento] = useState("");
   const [celular, setCelular] = useState("");
   const [correo, setCorreo] = useState("");
+  const [clave, setClave] = useState("");
+  const [clave2, setClave2] = useState("");
   const [municipio, setMunicipio] = useState<Municipio>("Girardot");
   const [vehiculo, setVehiculo] = useState<Vehiculo>("moto");
   const [placa, setPlaca] = useState("");
@@ -67,6 +70,8 @@ export function RegistroMensajero() {
     if (!/^\d{6,10}$/.test(documento)) e.documento = "Escribe tu cédula sin puntos ni espacios.";
     if (!telefonoValido(celular)) e.celular = "Escribe un celular de 10 dígitos que empiece por 3.";
     if (!CORREO.test(correo.trim())) e.correo = "Escribe un correo válido para enviarte la confirmación.";
+    if (clave.length < 6) e.clave = "Crea una clave de al menos 6 caracteres.";
+    else if (clave !== clave2) e.clave2 = "Las claves no coinciden.";
     if (vehiculo === "moto" && !PLACA_MOTO.test(placa)) {
       e.placa = "Placa de moto: 3 letras, 2 números y 1 letra. Ej: ABC12D";
     }
@@ -77,7 +82,23 @@ export function RegistroMensajero() {
 
     setEnviando(true);
     try {
-      const usuario = await asegurarSesion();
+      // 1. Cuenta propia (cédula + clave): así puede volver a entrar después
+      const cuenta = await crearCuentaMensajero(documento, clave);
+      if (!cuenta.ok) {
+        setErrores({ envio: cuenta.error ?? "No pudimos crear tu cuenta." });
+        return;
+      }
+      // 2. Iniciar sesión con esa cuenta antes de guardar nada
+      const sb = supabase();
+      const { data: sesion, error: eSesion } = await sb.auth.signInWithPassword({
+        email: await correoInterno(documento),
+        password: clave,
+      });
+      if (eSesion || !sesion.user) {
+        setErrores({ envio: "No pudimos iniciar tu sesión. Inténtalo de nuevo." });
+        return;
+      }
+      const usuario = sesion.user;
       await subirFoto(usuario.id, "cedula", fotoCedula!);
       if (capturaRostro) {
         await subirArchivo(usuario.id, "rostro.jpg", capturaRostro, "image/jpeg");
@@ -163,6 +184,32 @@ export function RegistroMensajero() {
           onChange={(e) => setCorreo(e.target.value)}
           error={errores.correo}
         />
+
+        <Input
+          label="Crea tu clave"
+          name="clave"
+          type="password"
+          autoComplete="new-password"
+          placeholder="Mínimo 6 caracteres"
+          icon={<Lock className="size-4" />}
+          value={clave}
+          onChange={(e) => setClave(e.target.value)}
+          error={errores.clave}
+        />
+        <Input
+          label="Repite tu clave"
+          name="clave2"
+          type="password"
+          autoComplete="new-password"
+          placeholder="••••••"
+          icon={<Lock className="size-4" />}
+          value={clave2}
+          onChange={(e) => setClave2(e.target.value)}
+          error={errores.clave2}
+        />
+        <p className="-mt-2 text-caption font-body text-muted">
+          Con tu cédula y esta clave entrarás después a tu panel de mensajero.
+        </p>
 
         <div className="flex flex-col gap-1.5">
           <p className="text-label font-semibold uppercase tracking-wide text-muted font-body">

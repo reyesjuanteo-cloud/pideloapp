@@ -5,7 +5,7 @@ import { Bike, ChevronRight } from "lucide-react";
 import { usePedidos } from "@/features/pedidos/almacen";
 import type { EstadoPedido } from "@/features/pedidos/tipos";
 
-const textoPorEstado: Record<Exclude<EstadoPedido, "entregado">, string> = {
+const textoPorEstado: Partial<Record<EstadoPedido, string>> = {
   buscando: "Buscando mensajero",
   preparando: "Preparando tu pedido",
   en_camino: "Tu pedido va en camino",
@@ -15,7 +15,9 @@ const textoPorEstado: Record<Exclude<EstadoPedido, "entregado">, string> = {
 // Banner sticky sobre el nav inferior cuando hay un pedido activo.
 export function PedidoEnCurso() {
   const pedidos = usePedidos();
-  const activos = pedidos.filter((p) => p.estado !== "entregado");
+  const activos = pedidos.filter(
+    (p) => p.estado !== "entregado" && p.estado !== "cancelado"
+  );
   const activo = activos[activos.length - 1];
 
   if (!activo) return null;
@@ -30,7 +32,7 @@ export function PedidoEnCurso() {
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-body font-semibold font-body text-success">
-          {textoPorEstado[activo.estado as Exclude<EstadoPedido, "entregado">]}
+          {textoPorEstado[activo.estado] ?? "Pedido en curso"}
         </p>
         <p className="text-caption font-body text-success/80">
           {activo.comercio} · <span className="font-mono">{activo.codigo}</span>

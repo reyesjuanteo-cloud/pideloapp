@@ -88,18 +88,52 @@ async function cargarPedidos(): Promise<Pedido[]> {
 const recurso = crearRecursoRemoto<Pedido[]>([], cargarPedidos);
 
 // Realtime: cualquier cambio en la tabla refresca el almacén.
+//
+// Dos detalles que lo hacían fallar en el panel del mensajero:
+//   · Realtime aplica RLS con el token de la sesión: hay que pasárselo, si no
+//     el mensajero no recibe los pedidos nuevos de otros clientes.
+//   · Si el canal se cae (pantalla en segundo plano, cambio de red) hay que
+//     reconectar y volver a consultar, o se queda con datos viejos.
 let canalIniciado = false;
-function iniciarRealtime() {
+
+async function iniciarRealtime() {
   if (canalIniciado || typeof window === "undefined") return;
   canalIniciado = true;
-  supabase()
+  const sb = supabase();
+
+  const {
+    data: { session },
+  } = await sb.auth.getSession();
+  if (session) sb.realtime.setAuth(session.access_token);
+
+  const canal = sb
     .channel("pedidos-cambios")
     .on(
       "postgres_changes",
       { event: "*", schema: "public", table: "pedidos" },
       () => void recurso.refrescar()
     )
-    .subscribe();
+    .subscribe((estado) => {
+      // Al (re)conectar, traer lo que haya pasado mientras no escuchábamos.
+      if (estado === "SUBSCRIBED") void recurso.refrescar();
+    });
+
+  // La sesión cambia (registro del mensajero, cierre de sesión): el canal
+  // necesita el token nuevo para seguir viendo lo que le corresponde.
+  sb.auth.onAuthStateChange((_evento, sesion) => {
+    if (sesion) {
+      sb.realtime.setAuth(sesion.access_token);
+      void recurso.refrescar();
+    }
+  });
+
+  // Red intermitente o app en segundo plano: refrescar al volver.
+  window.addEventListener("online", () => void recurso.refrescar());
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") void recurso.refrescar();
+  });
+
+  void canal;
 }
 
 export function usePedidos(): Pedido[] {
@@ -162,6 +196,23 @@ export async function crearPedido(datos: {
   if (error || !data) throw error ?? new Error("No se pudo crear el pedido");
   void recurso.refrescar();
   return { id: data.id as string };
+}
+
+// Cancelar: el cliente mientras nadie va en camino; el mensajero libera el
+// pedido y la base le devuelve la comisión automáticamente.
+export async function cancelarPedido(id: string): Promise<{ ok: boolean; error?: string }> {
+  const { error } = await supabase()
+    .from("pedidos")
+    .update({ estado: "cancelado" })
+    .eq("id", id);
+  void recurso.refrescar();
+  if (!error) return { ok: true };
+  return {
+    ok: false,
+    error: error.message.includes("va en camino")
+      ? "Tu mensajero ya va en camino: escríbele por el chat."
+      : "No se pudo cancelar. Inténtalo de nuevo.",
+  };
 }
 
 // Transiciones del mensajero (en_camino, llegue) y del cliente (entregado).
