@@ -9,6 +9,8 @@ import { actualizarEstado, usePedidos } from "@/features/pedidos/almacen";
 import { COMISION_PEDIDO, RECARGA_PEDIDOS, RECARGA_VALOR } from "@/features/pedidos/tarifas";
 import type { Pedido } from "@/features/pedidos/tipos";
 import { descontarComision, recargar, useSaldo } from "./saldo";
+import { usePerfilMensajero } from "@/features/mensajero/perfil";
+import Link from "next/link";
 import { PedidoCard } from "./pedido-card";
 import { AvailabilityToggle } from "./availability-toggle";
 import { EntregaActiva } from "./entrega-activa";
@@ -55,7 +57,27 @@ export function DriverDashboard() {
   const [available, setAvailable] = useState(true);
   const pedidos = usePedidos();
   const saldo = useSaldo();
+  const perfil = usePerfilMensajero();
   const sinSaldo = saldo < COMISION_PEDIDO;
+
+  // Solo mensajeros aprobados pueden operar el panel.
+  if (!perfil || perfil.estado !== "aprobado") {
+    return (
+      <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col items-center justify-center gap-3 p-4 text-center">
+        <p className="text-body font-semibold font-body text-ink">
+          {perfil
+            ? "Tu registro aún no está aprobado"
+            : "Para trabajar con Pídelo, regístrate como mensajero"}
+        </p>
+        <Link
+          href={perfil ? "/mensajero/estado" : "/mensajero/registro"}
+          className="rounded-md bg-primary px-5 py-3 text-body font-semibold font-body text-white transition-colors duration-300 ease-in-out hover:bg-primary-dark"
+        >
+          {perfil ? "Ver estado de mi registro" : "Registrarme"}
+        </Link>
+      </div>
+    );
+  }
 
   const disponibles = pedidos.filter((p) => p.estado === "buscando");
   const activo = pedidos.find((p) =>

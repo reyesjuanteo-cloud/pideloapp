@@ -82,6 +82,12 @@ export function Ingreso() {
         >
           Explorar sin cuenta
         </Link>
+        <Link
+          href="/mensajero/registro"
+          className="text-body font-body text-primary hover:text-primary-dark"
+        >
+          ¿Quieres trabajar con nosotros? Sé mensajero
+        </Link>
         <p className="text-caption font-body text-muted">
           Al continuar aceptas los términos y la política de tratamiento de datos
           (Ley 1581 de 2012).
