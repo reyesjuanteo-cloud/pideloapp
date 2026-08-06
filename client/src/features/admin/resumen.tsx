@@ -11,7 +11,7 @@ import {
 import { usePedidos } from "@/features/pedidos/almacen";
 import { COMISION_PEDIDO } from "@/features/pedidos/tarifas";
 import { useComercios } from "@/features/comercios/store";
-import { usePerfilMensajero } from "@/features/mensajero/perfil";
+import { useMensajerosAdmin } from "./mensajeros";
 
 const currency = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -22,12 +22,12 @@ const currency = new Intl.NumberFormat("es-CO", {
 export function AdminResumen() {
   const pedidos = usePedidos();
   const comercios = useComercios();
-  const mensajero = usePerfilMensajero();
+  const mensajeros = useMensajerosAdmin();
 
   const activos = pedidos.filter((p) => p.estado !== "entregado").length;
   const ingresos =
     pedidos.filter((p) => p.estado !== "buscando").length * COMISION_PEDIDO;
-  const pendientes = mensajero?.estado === "en_revision" ? 1 : 0;
+  const pendientes = mensajeros.filter((m) => m.estado === "en_revision").length;
 
   const secciones = [
     {
@@ -41,7 +41,7 @@ export function AdminResumen() {
       icono: UserCheck,
       titulo: "Mensajeros",
       detalle: pendientes
-        ? `${pendientes} registro por revisar`
+        ? `${pendientes} ${pendientes === 1 ? "registro" : "registros"} por revisar`
         : "Sin registros pendientes",
       alerta: pendientes > 0,
     },

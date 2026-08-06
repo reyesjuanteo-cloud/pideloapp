@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Chip } from "@/components/ui/chip";
 import { PhoneField, telefonoValido } from "@/components/ui/phone-field";
-import { guardarPerfilMensajero, usePerfilMensajero } from "./perfil";
+import { registrarMensajero, usePerfilMensajero } from "./perfil";
 import type { Municipio, Vehiculo } from "./tipos";
 
 const municipios: Municipio[] = ["Girardot", "Ricaurte", "Flandes"];
@@ -26,6 +26,7 @@ export function RegistroMensajero() {
   const [placa, setPlaca] = useState("");
   const [licencia, setLicencia] = useState("");
   const [soat, setSoat] = useState(false);
+  const [enviando, setEnviando] = useState(false);
   const [errores, setErrores] = useState<Record<string, string>>({});
 
   if (existente) {
@@ -34,7 +35,7 @@ export function RegistroMensajero() {
     return null;
   }
 
-  function enviar() {
+  async function enviar() {
     const e: Record<string, string> = {};
     if (nombre.trim().length < 5) e.nombre = "Escribe tu nombre completo.";
     if (!/^\d{6,10}$/.test(documento)) e.documento = "Escribe tu cédula sin puntos ni espacios.";
@@ -47,16 +48,20 @@ export function RegistroMensajero() {
     setErrores(e);
     if (Object.keys(e).length > 0) return;
 
-    guardarPerfilMensajero({
+    setEnviando(true);
+    const resultado = await registrarMensajero({
       nombre: nombre.trim(),
       documento,
       celular,
       municipio,
       vehiculo,
       ...(vehiculo === "moto" ? { placa, licencia, soatVigente: soat } : {}),
-      estado: "en_revision",
-      fechaRegistro: new Date().toLocaleDateString("es-CO"),
     });
+    setEnviando(false);
+    if (!resultado.ok) {
+      setErrores({ envio: resultado.error ?? "No se pudo enviar. Intenta de nuevo." });
+      return;
+    }
     router.replace("/mensajero/estado");
   }
 
@@ -173,8 +178,11 @@ export function RegistroMensajero() {
         </p>
       </div>
 
-      <div className="mt-auto pb-4 pt-6">
-        <Button fullWidth onClick={enviar}>
+      <div className="mt-auto flex flex-col gap-2 pb-4 pt-6">
+        {errores.envio && (
+          <p className="text-caption text-error font-body">{errores.envio}</p>
+        )}
+        <Button fullWidth pending={enviando} onClick={enviar}>
           Enviar registro
         </Button>
       </div>

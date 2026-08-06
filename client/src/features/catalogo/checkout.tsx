@@ -42,31 +42,35 @@ export function Checkout() {
   const subtotal = lineas.reduce((s, l) => s + l.producto.precio * l.cantidad, 0);
   const envio = comercio.costoDomicilio;
 
-  function hacerPedido() {
+  async function hacerPedido() {
     if (!direccion) {
       router.push("/mapa");
       return;
     }
     setConfirmando(true);
-    const pedido = crearPedido({
-      tipo: "catalogo",
-      comercio: comercio!.nombre,
-      items: lineas.map(({ producto, cantidad }) => ({
-        productoId: producto.id,
-        nombre: producto.nombre,
-        precio: producto.precio,
-        cantidad,
-      })),
-      subtotal,
-      envio,
-      total: subtotal + envio,
-      direccion: `${direccion.texto}${direccion.detalle ? `, ${direccion.detalle}` : ""}`,
-      barrio: direccion.barrio,
-      lat: direccion.lat,
-      lng: direccion.lng,
-    });
-    vaciarCarrito();
-    router.replace(`/pedido/${pedido.id}`);
+    try {
+      const pedido = await crearPedido({
+        tipo: "catalogo",
+        comercioId: comercio!.id,
+        items: lineas.map(({ producto, cantidad }) => ({
+          productoId: producto.id,
+          nombre: producto.nombre,
+          precio: producto.precio,
+          cantidad,
+        })),
+        subtotal,
+        envio,
+        total: subtotal + envio,
+        direccion: `${direccion.texto}${direccion.detalle ? `, ${direccion.detalle}` : ""}`,
+        barrio: direccion.barrio,
+        lat: direccion.lat,
+        lng: direccion.lng,
+      });
+      vaciarCarrito();
+      router.replace(`/pedido/${pedido.id}`);
+    } catch {
+      setConfirmando(false);
+    }
   }
 
   return (

@@ -2,11 +2,25 @@
 
 import { Bike, CheckCircle2, Clock, ShieldCheck, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cambiarEstadoMensajero, usePerfilMensajero } from "@/features/mensajero/perfil";
+import { crearRecursoRemoto } from "@/lib/recurso-remoto";
 import type { EstadoMensajero } from "@/features/mensajero/tipos";
+import {
+  cambiarEstadoMensajero,
+  listarMensajeros,
+  type MensajeroAdmin,
+} from "./acciones";
+import { leerClaveAdmin } from "./gate";
 
-// ⚠️ TEMPORAL: panel mínimo de aprobación. Hoy solo ve el registro guardado en
-// este navegador; con Supabase listará todos los mensajeros registrados.
+// Lista real de aspirantes desde Supabase (vía server action con la clave).
+const recurso = crearRecursoRemoto<MensajeroAdmin[]>([], () =>
+  listarMensajeros(leerClaveAdmin())
+);
+
+export const refrescarMensajerosAdmin = recurso.refrescar;
+
+export function useMensajerosAdmin(): MensajeroAdmin[] {
+  return recurso.useRecurso();
+}
 
 const badge: Record<EstadoMensajero, { texto: string; clase: string; icono: React.ReactNode }> = {
   en_revision: {
@@ -27,7 +41,12 @@ const badge: Record<EstadoMensajero, { texto: string; clase: string; icono: Reac
 };
 
 export function AdminMensajeros() {
-  const perfil = usePerfilMensajero();
+  const mensajeros = useMensajerosAdmin();
+
+  async function cambiar(id: string, estado: EstadoMensajero) {
+    await cambiarEstadoMensajero(leerClaveAdmin(), id, estado);
+    void recurso.refrescar();
+  }
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col gap-4 p-4">
@@ -37,64 +56,65 @@ export function AdminMensajeros() {
           Mensajeros — aprobación
         </h1>
       </div>
-      <p className="text-caption font-body text-muted">
-        Panel del equipo Pídelo. Por ahora muestra el registro de este navegador; con la
-        base de datos listará todos los aspirantes.
-      </p>
 
-      {!perfil ? (
+      {mensajeros.length === 0 ? (
         <p className="rounded-lg border border-border bg-surface p-4 text-body font-body text-muted">
           No hay registros de mensajeros todavía.
         </p>
       ) : (
-        <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <p className="text-body font-semibold font-body text-ink">{perfil.nombre}</p>
-              <p className="text-caption font-body text-muted">
-                CC {perfil.documento} · +57 {perfil.celular} · {perfil.municipio}
-              </p>
-              <p className="flex items-center gap-1 text-caption font-body text-muted">
-                <Bike className="size-3.5" />
-                {perfil.vehiculo === "moto"
-                  ? `Moto ${perfil.placa} · Lic. ${perfil.licencia} · SOAT ${perfil.soatVigente ? "declarado" : "sin declarar"}`
-                  : "Bicicleta"}
-                {" · "}Registrado {perfil.fechaRegistro}
-              </p>
+        mensajeros.map((perfil) => (
+          <div
+            key={perfil.id}
+            className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-body font-semibold font-body text-ink">{perfil.nombre}</p>
+                <p className="text-caption font-body text-muted">
+                  CC {perfil.documento} · +57 {perfil.celular} · {perfil.municipio}
+                </p>
+                <p className="flex items-center gap-1 text-caption font-body text-muted">
+                  <Bike className="size-3.5" />
+                  {perfil.vehiculo === "moto"
+                    ? `Moto ${perfil.placa} · Lic. ${perfil.licencia} · SOAT ${perfil.soatVigente ? "declarado" : "sin declarar"}`
+                    : "Bicicleta"}
+                  {" · "}Registrado {perfil.fechaRegistro} · Saldo $
+                  {perfil.saldo.toLocaleString("es-CO")}
+                </p>
+              </div>
+              <span
+                className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-caption font-semibold font-body ${badge[perfil.estado].clase}`}
+              >
+                {badge[perfil.estado].icono}
+                {badge[perfil.estado].texto}
+              </span>
             </div>
-            <span
-              className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-caption font-semibold font-body ${badge[perfil.estado].clase}`}
-            >
-              {badge[perfil.estado].icono}
-              {badge[perfil.estado].texto}
-            </span>
-          </div>
 
-          {perfil.estado === "en_revision" && (
-            <div className="flex gap-2">
-              <Button fullWidth onClick={() => cambiarEstadoMensajero("aprobado")}>
-                Aprobar
-              </Button>
+            {perfil.estado === "en_revision" ? (
+              <div className="flex gap-2">
+                <Button fullWidth onClick={() => cambiar(perfil.id, "aprobado")}>
+                  Aprobar
+                </Button>
+                <Button
+                  fullWidth
+                  variant="secondary"
+                  className="text-error"
+                  onClick={() => cambiar(perfil.id, "rechazado")}
+                >
+                  Rechazar
+                </Button>
+              </div>
+            ) : (
               <Button
                 fullWidth
                 variant="secondary"
-                className="text-error"
-                onClick={() => cambiarEstadoMensajero("rechazado")}
+                onClick={() => cambiar(perfil.id, "en_revision")}
               >
-                Rechazar
+                Volver a revisión
               </Button>
-            </div>
-          )}
-          {perfil.estado !== "en_revision" && (
-            <Button
-              fullWidth
-              variant="secondary"
-              onClick={() => cambiarEstadoMensajero("en_revision")}
-            >
-              Volver a revisión
-            </Button>
-          )}
-        </div>
+            )}
+          </div>
+        ))
       )}
     </div>
   );

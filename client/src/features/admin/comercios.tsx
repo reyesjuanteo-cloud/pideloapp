@@ -5,17 +5,16 @@ import { ChevronDown, ChevronUp, Plus, Store, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Chip } from "@/components/ui/chip";
+import { refrescarComercios, useComercios } from "@/features/comercios/store";
+import { refrescarProductos, useProductos } from "@/features/comercios/productos-store";
 import {
-  alternarAbierto,
+  alternarComercio,
   crearComercio,
-  eliminarComercio,
-  useComercios,
-} from "@/features/comercios/store";
-import {
   crearProducto,
+  eliminarComercio,
   eliminarProducto,
-  useProductos,
-} from "@/features/comercios/productos-store";
+} from "./acciones";
+import { leerClaveAdmin } from "./gate";
 
 const currency = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -32,19 +31,17 @@ function FormularioNuevoComercio({ alCrear }: { alCrear: () => void }) {
   const [zona, setZona] = useState("Centro, Girardot");
   const [error, setError] = useState<string | undefined>();
 
-  function crear() {
+  async function crear() {
     if (nombre.trim().length < 3) {
       setError("Escribe el nombre del comercio.");
       return;
     }
-    crearComercio({
+    await crearComercio(leerClaveAdmin(), {
       nombre: nombre.trim(),
       categoria,
       zona,
-      tiempoMin: 20,
-      tiempoMax: 40,
-      costoDomicilio: 5000,
     });
+    void refrescarComercios();
     setNombre("");
     alCrear();
   }
@@ -88,15 +85,15 @@ function ProductosDeComercio({ comercioId }: { comercioId: string }) {
   const [nombre, setNombre] = useState("");
   const [precio, setPrecio] = useState("");
 
-  function agregar() {
+  async function agregar() {
     const valor = Number(precio);
     if (nombre.trim().length < 2 || !valor || valor < 100) return;
-    crearProducto({
+    await crearProducto(leerClaveAdmin(), {
       comercioId,
       nombre: nombre.trim(),
-      descripcion: "",
       precio: valor,
     });
+    void refrescarProductos();
     setNombre("");
     setPrecio("");
   }
@@ -113,7 +110,10 @@ function ProductosDeComercio({ comercioId }: { comercioId: string }) {
           <span className="flex-1 truncate text-ink">{p.nombre}</span>
           <span className="text-muted">{currency.format(p.precio)}</span>
           <button
-            onClick={() => eliminarProducto(p.id)}
+            onClick={async () => {
+              await eliminarProducto(leerClaveAdmin(), p.id);
+              void refrescarProductos();
+            }}
             aria-label={`Eliminar ${p.nombre}`}
             className="text-muted transition-colors duration-300 ease-in-out hover:text-error"
           >
@@ -184,7 +184,10 @@ export function AdminComercios() {
                   </p>
                 </div>
                 <button
-                  onClick={() => alternarAbierto(comercio.id)}
+                  onClick={async () => {
+                    await alternarComercio(leerClaveAdmin(), comercio.id, !comercio.abierto);
+                    void refrescarComercios();
+                  }}
                   className={`rounded-full border px-2.5 py-1 text-caption font-semibold font-body transition-colors duration-300 ease-in-out ${
                     comercio.abierto
                       ? "border-success bg-success/10 text-success"
@@ -194,7 +197,10 @@ export function AdminComercios() {
                   {comercio.abierto ? "Abierto" : "Cerrado"}
                 </button>
                 <button
-                  onClick={() => eliminarComercio(comercio.id)}
+                  onClick={async () => {
+                    await eliminarComercio(leerClaveAdmin(), comercio.id);
+                    void refrescarComercios();
+                  }}
                   aria-label={`Eliminar ${comercio.nombre}`}
                   className="text-muted transition-colors duration-300 ease-in-out hover:text-error"
                 >

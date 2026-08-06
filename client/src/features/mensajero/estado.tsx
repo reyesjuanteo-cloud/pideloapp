@@ -1,14 +1,21 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Clock, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { usePerfilMensajero } from "./perfil";
+import { refrescarPerfilMensajero, usePerfilMensajero } from "./perfil";
 
 export function EstadoMensajero() {
   const router = useRouter();
   const perfil = usePerfilMensajero();
+
+  // La aprobación llega del panel del equipo: consultar cada pocos segundos.
+  useEffect(() => {
+    const intervalo = setInterval(() => void refrescarPerfilMensajero(), 8000);
+    return () => clearInterval(intervalo);
+  }, []);
 
   if (!perfil) {
     return (

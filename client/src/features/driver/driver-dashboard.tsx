@@ -5,10 +5,11 @@ import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Banner } from "@/components/ui/banner";
 import { cerrarSesion } from "@/features/onboarding/actions";
-import { actualizarEstado, usePedidos } from "@/features/pedidos/almacen";
+import { actualizarEstado, refrescarPedidos, usePedidos } from "@/features/pedidos/almacen";
+import { aceptarPedido as aceptarPedidoAccion, recargarSaldo } from "@/features/pedidos/acciones";
 import { COMISION_PEDIDO, RECARGA_PEDIDOS, RECARGA_VALOR } from "@/features/pedidos/tarifas";
 import type { Pedido } from "@/features/pedidos/tipos";
-import { descontarComision, recargar, useSaldo } from "./saldo";
+import { refrescarSaldo, useSaldo } from "./saldo";
 import { usePerfilMensajero } from "@/features/mensajero/perfil";
 import Link from "next/link";
 import { PedidoCard } from "./pedido-card";
@@ -31,7 +32,7 @@ function comoDisponible(pedido: Pedido): PedidoDisponible {
     zona: pedido.barrio,
     direccion: pedido.direccion,
     // Distancia simulada determinista hasta tener geolocalización real.
-    distanciaKm: ((Number(pedido.id) % 30) + 5) / 10,
+    distanciaKm: (((parseInt(pedido.codigo.replace(/\D/g, ""), 10) || 7) % 30) + 5) / 10,
     pago: pedido.envio,
   };
 }
@@ -55,6 +56,7 @@ const currency = new Intl.NumberFormat("es-CO", {
 
 export function DriverDashboard() {
   const [available, setAvailable] = useState(true);
+  const [aviso, setAviso] = useState<string | null>(null);
   const pedidos = usePedidos();
   const saldo = useSaldo();
   const perfil = usePerfilMensajero();
@@ -94,10 +96,17 @@ export function DriverDashboard() {
       hora: p.horaEntrega ?? p.horaCreacion,
     }));
 
-  function aceptarPedido(id: string) {
-    // La comisión se descuenta al aceptar; sin saldo no se puede aceptar.
-    if (!descontarComision()) return;
-    actualizarEstado(id, "preparando");
+  async function aceptarPedido(id: string) {
+    // El servidor verifica saldo, asigna el pedido y descuenta la comisión.
+    const resultado = await aceptarPedidoAccion(id);
+    if (!resultado.ok) setAviso(resultado.error ?? "No se pudo aceptar.");
+    void refrescarSaldo();
+    void refrescarPedidos();
+  }
+
+  async function recargar() {
+    await recargarSaldo();
+    void refrescarSaldo();
   }
 
   function avanzarEntrega() {
@@ -141,6 +150,8 @@ export function DriverDashboard() {
           </Button>
         </div>
       )}
+
+      {aviso && <Banner tone="error">{aviso}</Banner>}
 
       {activo && (
         <EntregaActiva

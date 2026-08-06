@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Banner } from "@/components/ui/banner";
 import { OtpInput } from "@/components/ui/otp-input";
 import { formatearTelefono } from "@/components/ui/phone-field";
+import { asegurarSesion, supabase } from "@/lib/supabase/cliente";
 import { verificarCodigo } from "./actions";
 import { leerDireccion } from "./direccion";
 import { useTelefono } from "./telefono";
@@ -38,6 +39,15 @@ export function Codigo() {
     setError(false);
     const resultado = await verificarCodigo(valor);
     if (resultado.ok) {
+      // Identidad real del dispositivo (sesión anónima) + perfil con el celular.
+      try {
+        const usuario = await asegurarSesion();
+        await supabase()
+          .from("perfiles")
+          .upsert({ id: usuario.id, celular: telefono || null });
+      } catch {
+        // Sin conexión: la sesión demo permite seguir; se reintenta luego.
+      }
       router.replace(leerDireccion() ? "/home" : "/mapa");
       return;
     }

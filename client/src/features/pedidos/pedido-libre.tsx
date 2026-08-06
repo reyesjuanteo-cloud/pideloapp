@@ -26,22 +26,25 @@ export function PedidoLibre() {
 
   if (!direccion) return null;
 
-  function pedir() {
+  async function pedir() {
     setPidiendo(true);
-    const pedido = crearPedido({
-      tipo: "libre",
-      comercio: "Pedido libre",
-      items: [],
-      descripcionLibre: descripcion.trim(),
-      subtotal: 0,
-      envio: TARIFA_ENVIO,
-      total: TARIFA_ENVIO,
-      direccion: `${direccion!.texto}${direccion!.detalle ? `, ${direccion!.detalle}` : ""}`,
-      barrio: direccion!.barrio,
-      lat: direccion!.lat,
-      lng: direccion!.lng,
-    });
-    router.replace(`/pedido/${pedido.id}`);
+    try {
+      const pedido = await crearPedido({
+        tipo: "libre",
+        items: [],
+        descripcionLibre: descripcion.trim(),
+        subtotal: 0,
+        envio: TARIFA_ENVIO,
+        total: TARIFA_ENVIO,
+        direccion: `${direccion!.texto}${direccion!.detalle ? `, ${direccion!.detalle}` : ""}`,
+        barrio: direccion!.barrio,
+        lat: direccion!.lat,
+        lng: direccion!.lng,
+      });
+      router.replace(`/pedido/${pedido.id}`);
+    } catch {
+      setPidiendo(false);
+    }
   }
 
   return (

@@ -5,14 +5,20 @@ import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-// ⚠️ TEMPORAL: clave fija hasta tener roles reales (Supabase Auth).
+// ⚠️ TEMPORAL: clave fija hasta tener roles reales (Supabase Auth). Las
+// server actions del admin la re-verifican en el servidor.
 const CLAVE_ADMIN = "admin123";
-const CLAVE_SESION = "pidelo-admin";
+const CLAVE_SESION = "pidelo-admin-clave";
 const EVENTO = "pidelo-admin-cambio";
+
+export function leerClaveAdmin(): string {
+  if (typeof window === "undefined") return "";
+  return window.sessionStorage.getItem(CLAVE_SESION) ?? "";
+}
 
 function getSnapshot(): boolean {
   if (typeof window === "undefined") return false;
-  return window.sessionStorage.getItem(CLAVE_SESION) === "1";
+  return window.sessionStorage.getItem(CLAVE_SESION) !== null;
 }
 
 function subscribe(callback: () => void): () => void {
@@ -32,7 +38,7 @@ export function GateAdmin({ children }: { children: ReactNode }) {
       setError("Clave incorrecta.");
       return;
     }
-    window.sessionStorage.setItem(CLAVE_SESION, "1");
+    window.sessionStorage.setItem(CLAVE_SESION, clave);
     window.dispatchEvent(new Event(EVENTO));
   }
 

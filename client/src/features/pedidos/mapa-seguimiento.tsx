@@ -14,7 +14,8 @@ import type { Pedido } from "./tipos";
 
 // Punto de partida determinista (el "comercio"), a ~1.8 km del destino.
 function origenDe(pedido: Pedido, destino: [number, number]): [number, number] {
-  const rumbo = ((Number(pedido.id) * 47) % 360) * (Math.PI / 180);
+  const semilla = parseInt(pedido.codigo.replace(/\D/g, ""), 10) || 7;
+  const rumbo = ((semilla * 47) % 360) * (Math.PI / 180);
   const dKm = 1.8;
   const dLat = (dKm * Math.cos(rumbo)) / 111;
   const dLng =
