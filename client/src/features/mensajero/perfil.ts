@@ -3,7 +3,12 @@
 // Perfil del mensajero desde Supabase: el registro crea la fila real y el
 // panel del equipo la aprueba. Este hook lee el registro del dispositivo
 // (la sesión anónima actual).
-import { asegurarSesion, supabase } from "@/lib/supabase/cliente";
+import {
+  asegurarSesion,
+  esSesionHuerfana,
+  reiniciarSesion,
+  supabase,
+} from "@/lib/supabase/cliente";
 import { crearRecursoRemoto } from "@/lib/recurso-remoto";
 import type { PerfilMensajero } from "./tipos";
 
@@ -62,16 +67,27 @@ export async function registrarMensajero(
   datos: Omit<PerfilMensajero, "estado" | "fechaRegistro">
 ): Promise<{ ok: boolean; error?: string }> {
   try {
-    const usuario = await asegurarSesion();
+    let usuario = await asegurarSesion();
     const sb = supabase();
 
-    const { error: errorPerfil } = await sb.from("perfiles").upsert({
+    let { error: errorPerfil } = await sb.from("perfiles").upsert({
       id: usuario.id,
       nombre: datos.nombre,
       celular: datos.celular,
       correo: datos.correo,
       rol: "mensajero",
     });
+    if (esSesionHuerfana(errorPerfil)) {
+      // Sesión huérfana (usuario borrado): se crea una nueva y se reintenta.
+      usuario = await reiniciarSesion();
+      ({ error: errorPerfil } = await sb.from("perfiles").upsert({
+        id: usuario.id,
+        nombre: datos.nombre,
+        celular: datos.celular,
+        correo: datos.correo,
+        rol: "mensajero",
+      }));
+    }
     if (errorPerfil) return { ok: false, error: errorPerfil.message };
 
     // upsert: quien fue rechazado corrige sus datos y vuelve a intentar

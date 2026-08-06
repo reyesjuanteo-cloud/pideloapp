@@ -4,7 +4,12 @@
 // en un celular aparece en el del mensajero al instante. RLS decide qué ve
 // cada quien (cliente: los suyos; mensajero aprobado: los disponibles y los
 // que tomó; admin: todos).
-import { asegurarSesion, supabase } from "@/lib/supabase/cliente";
+import {
+  asegurarSesion,
+  esSesionHuerfana,
+  reiniciarSesion,
+  supabase,
+} from "@/lib/supabase/cliente";
 import { crearRecursoRemoto } from "@/lib/recurso-remoto";
 import type { EstadoPedido, ItemPedido, Pedido } from "./tipos";
 
@@ -122,28 +127,39 @@ export async function crearPedido(datos: {
   lat?: number;
   lng?: number;
 }): Promise<{ id: string }> {
-  const usuario = await asegurarSesion();
+  let usuario = await asegurarSesion();
   const codigo = `PD-${Math.floor(1000 + Math.random() * 9000)}`;
-  const { data, error } = await supabase()
+  const fila = (uid: string) => ({
+    codigo,
+    tipo: datos.tipo,
+    cliente_id: uid,
+    comercio_id: datos.comercioId ?? null,
+    descripcion_libre: datos.descripcionLibre ?? null,
+    items: datos.items,
+    subtotal: datos.subtotal,
+    envio: datos.envio,
+    total: datos.total,
+    direccion: datos.direccion,
+    barrio: datos.barrio,
+    lat: datos.lat ?? null,
+    lng: datos.lng ?? null,
+  });
+  let { data, error } = await supabase()
     .from("pedidos")
-    .insert({
-      codigo,
-      tipo: datos.tipo,
-      cliente_id: usuario.id,
-      comercio_id: datos.comercioId ?? null,
-      descripcion_libre: datos.descripcionLibre ?? null,
-      items: datos.items,
-      subtotal: datos.subtotal,
-      envio: datos.envio,
-      total: datos.total,
-      direccion: datos.direccion,
-      barrio: datos.barrio,
-      lat: datos.lat ?? null,
-      lng: datos.lng ?? null,
-    })
+    .insert(fila(usuario.id))
     .select("id")
     .single();
-  if (error) throw error;
+  if (esSesionHuerfana(error)) {
+    // La sesión apuntaba a un usuario borrado: se crea otra y se reintenta.
+    usuario = await reiniciarSesion();
+    await supabase().from("perfiles").upsert({ id: usuario.id });
+    ({ data, error } = await supabase()
+      .from("pedidos")
+      .insert(fila(usuario.id))
+      .select("id")
+      .single());
+  }
+  if (error || !data) throw error ?? new Error("No se pudo crear el pedido");
   void recurso.refrescar();
   return { id: data.id as string };
 }

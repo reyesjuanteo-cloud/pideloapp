@@ -1,7 +1,12 @@
 "use client";
 
 // Datos personales del cliente (nombre y sexo), guardados en `perfiles`.
-import { asegurarSesion, supabase } from "@/lib/supabase/cliente";
+import {
+  asegurarSesion,
+  esSesionHuerfana,
+  reiniciarSesion,
+  supabase,
+} from "@/lib/supabase/cliente";
 import { crearRecursoRemoto } from "@/lib/recurso-remoto";
 
 export type Sexo = "masculino" | "femenino" | "otro";
@@ -39,10 +44,17 @@ export async function guardarPerfilCliente(datos: {
   sexo: Sexo;
 }): Promise<{ ok: boolean; error?: string }> {
   try {
-    const usuario = await asegurarSesion();
-    const { error } = await supabase()
+    let usuario = await asegurarSesion();
+    let { error } = await supabase()
       .from("perfiles")
       .upsert({ id: usuario.id, nombre: datos.nombre, sexo: datos.sexo });
+    if (esSesionHuerfana(error)) {
+      // La sesión guardada apuntaba a un usuario borrado: se crea otra.
+      usuario = await reiniciarSesion();
+      ({ error } = await supabase()
+        .from("perfiles")
+        .upsert({ id: usuario.id, nombre: datos.nombre, sexo: datos.sexo }));
+    }
     if (error) return { ok: false, error: error.message };
     void recurso.refrescar();
     return { ok: true };
