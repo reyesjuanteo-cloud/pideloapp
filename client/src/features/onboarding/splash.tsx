@@ -13,7 +13,7 @@ export function Splash({ tieneSesion }: { tieneSesion: boolean }) {
     // Mínimo 400 ms de marca; no se prolonga artificialmente más allá.
     const salida = setTimeout(() => {
       if (!tieneSesion) {
-        router.replace("/ubicacion");
+        router.replace("/bienvenida");
       } else if (leerDireccion()) {
         router.replace("/home");
       } else {

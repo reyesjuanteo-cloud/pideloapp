@@ -6,10 +6,9 @@ Estado al 2026-08-05. Leyenda: ✅ funcional · 🎭 funcional con datos/servici
 
 | Rol | Entrada | Pantallas |
 |---|---|---|
-| **Cliente** | `/splash` → onboarding | home, buscar, comercio, carrito, checkout, seguimiento, pedido libre, pedidos, perfil |
+| **Cliente** | `/` (splash) → `/bienvenida` → onboarding | home, buscar, comercio, carrito, checkout, seguimiento, pedido libre, pedidos, perfil |
 | **Mensajero** | `/mensajero/registro` | registro, estado, panel de trabajo |
 | **Equipo (admin)** | `/admin` (clave `admin123` 🎭) | resumen, comercios, mensajeros, pedidos |
-| **Legacy** | `/` landing | login/registro por email, dashboard viejo de cliente |
 
 ---
 
@@ -17,7 +16,9 @@ Estado al 2026-08-05. Leyenda: ✅ funcional · 🎭 funcional con datos/servici
 
 ```mermaid
 flowchart TD
-    S["/splash 🎭\nresuelve sesión"] -->|sin sesión| U["/ubicacion ✅\npermiso GPS propio"]
+    S["/ 🎭\nsplash: resuelve sesión"] -->|sin sesión| BV["/bienvenida ✅\nlanding con beneficios"]
+    BV --> U["/ubicacion ✅\npermiso GPS propio"]
+    BV -->|Ya tengo cuenta| I
     S -->|sesión sin dirección| M
     S -->|sesión + dirección| H["/home ✅"]
     U --> I["/ingreso ✅\nteléfono +57, sin contraseñas"]
@@ -84,20 +85,17 @@ flowchart LR
 
 ---
 
-## Pantallas legacy (previas al spec — decidir su futuro)
+## Reorganización de duplicados (hecha el 2026-08-05)
 
-| Ruta | Qué es | Situación |
-|---|---|---|
-| `/` | Landing con beneficios y CTA | No conecta con el flujo nuevo (`/splash`) |
-| `/login`, `/register`, `/forgot-password` | Auth por email + contraseña (Supabase sin configurar; demo `cliente@pidelo.app` / `domi@pidelo.app` / `pidelo123`) | Convive con el ingreso por teléfono — hay **dos sistemas de login** |
-| `/customer/dashboard` | Primer dashboard del cliente | Superado por `/home` |
+- **`/` ahora es el splash** (como pide el spec): resuelve la sesión y ramifica. Usuarios nuevos ven la **landing en `/bienvenida`** (reutilizada del diseño original) cuyos botones entran al onboarding por teléfono.
+- **Eliminado el login por email** (`/login`, `/register`, `/forgot-password`): había dos sistemas de autenticación; queda solo el ingreso por teléfono. El cliente de Supabase (`lib/supabase/server.ts`) se conserva para la integración real.
+- **Eliminado `/customer/dashboard`** y sus componentes: superado por `/home`. Se conservan `types.ts` y `mock-comercios.ts` (semilla del almacén de comercios).
 
 ## Decisiones pendientes del equipo
 
-1. **Unificar la entrada**: ¿`/` pasa a ser el splash? ¿El login por email se elimina o queda para el equipo?
-2. **Supabase**: todo el estado es localStorage de un solo navegador. Es el gran siguiente paso — el esquema ya está definido por los tipos (`mensajeros`, `comercios`, `productos`, `pedidos`, `direcciones`, `saldos`).
-3. **SMS real** para el OTP (Supabase Auth + Twilio) y **fotos** (documentos del mensajero, productos) con Supabase Storage.
-4. **Pagos**: solo efectivo; tarjeta y la recarga real del mensajero necesitan pasarela.
-5. **Seguridad real**: los candados de driver/admin son del lado del cliente; con Supabase serán roles de verdad.
-6. **Modo oscuro** (el spec lo exige; el STYLE_GUIDE aún no define tokens oscuros).
-7. Notificaciones push y contacto cliente ↔ mensajero (llamada/chat), no diseñados.
+1. **Supabase**: todo el estado es localStorage de un solo navegador. Es el gran siguiente paso — el esquema ya está definido por los tipos (`mensajeros`, `comercios`, `productos`, `pedidos`, `direcciones`, `saldos`).
+2. **SMS real** para el OTP (Supabase Auth + Twilio) y **fotos** (documentos del mensajero, productos) con Supabase Storage.
+3. **Pagos**: solo efectivo; tarjeta y la recarga real del mensajero necesitan pasarela.
+4. **Seguridad real**: los candados de driver/admin son del lado del cliente; con Supabase serán roles de verdad.
+5. **Modo oscuro** (el spec lo exige; el STYLE_GUIDE aún no define tokens oscuros).
+6. Notificaciones push y contacto cliente ↔ mensajero (llamada/chat), no diseñados.

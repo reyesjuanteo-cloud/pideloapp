@@ -72,13 +72,13 @@ export function Landing() {
 
         <div className="mt-6 flex flex-col gap-3">
           <Link
-            href="/register"
+            href="/ubicacion"
             className="rounded-sm bg-accent py-3 text-center text-body font-body font-semibold text-white shadow-[0_10px_25px_rgba(255,106,57,0.35)] transition-transform duration-300 ease-in-out hover:-translate-y-0.5 hover:brightness-95"
           >
             Crear cuenta
           </Link>
           <Link
-            href="/login"
+            href="/ingreso"
             className="text-center text-body font-body text-primary transition-colors duration-300 ease-in-out hover:text-primary-dark"
           >
             Ya tengo cuenta · Iniciar sesión

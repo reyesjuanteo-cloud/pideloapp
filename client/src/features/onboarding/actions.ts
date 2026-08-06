@@ -10,7 +10,7 @@ const CODIGO_DEMO = "1234";
 export async function cerrarSesion(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(DEMO_SESSION_COOKIE);
-  redirect("/splash");
+  redirect("/");
 }
 
 export async function verificarCodigo(codigo: string): Promise<{ ok: boolean }> {

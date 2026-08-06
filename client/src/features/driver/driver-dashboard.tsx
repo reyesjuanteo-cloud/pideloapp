@@ -4,7 +4,7 @@ import { useState } from "react";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Banner } from "@/components/ui/banner";
-import { logout } from "@/features/auth/actions";
+import { cerrarSesion } from "@/features/onboarding/actions";
 import { actualizarEstado, usePedidos } from "@/features/pedidos/almacen";
 import { COMISION_PEDIDO, RECARGA_PEDIDOS, RECARGA_VALOR } from "@/features/pedidos/tarifas";
 import type { Pedido } from "@/features/pedidos/tipos";
@@ -114,7 +114,7 @@ export function DriverDashboard() {
         <h1 className="font-display text-h2 font-semibold text-ink">Domiciliario</h1>
         <div className="flex items-center gap-3">
           <AvailabilityToggle available={available} onToggle={() => setAvailable((v) => !v)} />
-          <form action={logout}>
+          <form action={cerrarSesion}>
             <button
               type="submit"
               title="Cerrar sesión"
