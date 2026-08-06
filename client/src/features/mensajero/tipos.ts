@@ -13,6 +13,8 @@ export type ResultadoVerificacion = {
   vivacidad: number | null; // probabilidad de video en vivo
   rostroEnCedula: boolean;
   fecha: string;
+  // El aspirante no pudo completar los gestos: el equipo revisa a mano.
+  revisionManual?: boolean;
 };
 
 export type PerfilMensajero = {

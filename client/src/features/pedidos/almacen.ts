@@ -95,6 +95,11 @@ export function usePedidos(): Pedido[] {
   return recurso.useRecurso();
 }
 
+export function useEstadoPedidos() {
+  iniciarRealtime();
+  return recurso.useEstado();
+}
+
 export const refrescarPedidos = recurso.refrescar;
 
 export async function crearPedido(datos: {

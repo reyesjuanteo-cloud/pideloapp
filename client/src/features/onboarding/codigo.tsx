@@ -37,7 +37,17 @@ export function Codigo() {
     verificandoRef.current = true;
     setVerificando(true);
     setError(false);
-    const resultado = await verificarCodigo(valor);
+    let resultado: { ok: boolean };
+    try {
+      resultado = await verificarCodigo(valor);
+    } catch {
+      // Sin conexión: liberar el formulario para que pueda reintentar.
+      verificandoRef.current = false;
+      setVerificando(false);
+      setError(true);
+      setCodigo("");
+      return;
+    }
     if (resultado.ok) {
       // Identidad real del dispositivo (sesión anónima) + perfil con el celular.
       try {

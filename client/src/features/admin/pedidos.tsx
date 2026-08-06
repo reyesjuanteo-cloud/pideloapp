@@ -1,9 +1,10 @@
 "use client";
 
 import { Bike, ClipboardList } from "lucide-react";
-import { usePedidos } from "@/features/pedidos/almacen";
+import { crearRecursoRemoto } from "@/lib/recurso-remoto";
 import { COMISION_PEDIDO } from "@/features/pedidos/tarifas";
-import type { EstadoPedido } from "@/features/pedidos/tipos";
+import { listarPedidos, type PedidoAdmin } from "./acciones";
+import { leerClaveAdmin } from "./gate";
 
 const currency = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -11,7 +12,17 @@ const currency = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-const etiquetaEstado: Record<EstadoPedido, { texto: string; clase: string }> = {
+// El panel lee con la llave del equipo: la sesión del navegador es un
+// usuario anónimo y RLS solo le mostraría sus propios pedidos.
+const recurso = crearRecursoRemoto<PedidoAdmin[]>([], () =>
+  listarPedidos(leerClaveAdmin())
+);
+
+export function usePedidosAdmin(): PedidoAdmin[] {
+  return recurso.useRecurso();
+}
+
+const etiquetaEstado: Record<string, { texto: string; clase: string }> = {
   buscando: { texto: "Buscando mensajero", clase: "bg-accent/10 text-accent-deep" },
   preparando: { texto: "Preparando", clase: "bg-primary/10 text-primary" },
   en_camino: { texto: "En camino", clase: "bg-accent/10 text-accent-deep" },
@@ -31,12 +42,12 @@ function Tile({ label, value }: { label: string; value: string }) {
 }
 
 export function AdminPedidos() {
-  const pedidos = usePedidos();
+  const pedidos = usePedidosAdmin();
   const activos = pedidos.filter((p) => p.estado !== "entregado");
   const entregados = pedidos.filter((p) => p.estado === "entregado");
   // El ingreso de Pídelo es la comisión de cada pedido tomado por un mensajero.
-  const tomados = pedidos.filter((p) => p.estado !== "buscando").length;
-  const ingresos = tomados * COMISION_PEDIDO;
+  const ingresos =
+    pedidos.filter((p) => p.estado !== "buscando").length * COMISION_PEDIDO;
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col gap-4 p-4">
@@ -57,31 +68,38 @@ export function AdminPedidos() {
         </p>
       ) : (
         <div className="flex flex-col rounded-lg border border-border bg-surface">
-          {[...pedidos].reverse().map((pedido, i) => (
-            <div
-              key={pedido.id}
-              className={`flex items-center gap-3 p-3 ${i > 0 ? "border-t border-border" : ""}`}
-            >
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary/10">
-                <Bike className="size-4.5 text-primary" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-body font-semibold font-body text-ink">
-                  {pedido.comercio}
-                </p>
-                <p className="text-caption font-body text-muted">
-                  {pedido.horaCreacion} ·{" "}
-                  <span className="font-mono text-mono">{pedido.codigo}</span> ·{" "}
-                  {pedido.barrio} · {currency.format(pedido.total)}
-                </p>
-              </div>
-              <span
-                className={`shrink-0 rounded-full px-2.5 py-1 text-caption font-semibold font-body ${etiquetaEstado[pedido.estado].clase}`}
+          {pedidos.map((pedido, i) => {
+            const etiqueta = etiquetaEstado[pedido.estado] ?? {
+              texto: pedido.estado,
+              clase: "bg-bg text-muted",
+            };
+            return (
+              <div
+                key={pedido.id}
+                className={`flex items-center gap-3 p-3 ${i > 0 ? "border-t border-border" : ""}`}
               >
-                {etiquetaEstado[pedido.estado].texto}
-              </span>
-            </div>
-          ))}
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                  <Bike className="size-4.5 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-body font-semibold font-body text-ink">
+                    {pedido.comercio}
+                  </p>
+                  <p className="text-caption font-body text-muted">
+                    {pedido.hora} ·{" "}
+                    <span className="font-mono text-mono">{pedido.codigo}</span>
+                    {pedido.barrio ? ` · ${pedido.barrio}` : ""} ·{" "}
+                    {currency.format(pedido.total)}
+                  </p>
+                </div>
+                <span
+                  className={`shrink-0 rounded-full px-2.5 py-1 text-caption font-semibold font-body ${etiqueta.clase}`}
+                >
+                  {etiqueta.texto}
+                </span>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

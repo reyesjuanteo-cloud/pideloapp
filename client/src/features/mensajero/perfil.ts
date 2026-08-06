@@ -55,6 +55,10 @@ export function usePerfilMensajero(): PerfilMensajero | null {
   return recurso.useRecurso();
 }
 
+export function useEstadoPerfilMensajero() {
+  return recurso.useEstado();
+}
+
 export const refrescarPerfilMensajero = recurso.refrescar;
 
 export async function registrarMensajero(
@@ -72,7 +76,9 @@ export async function registrarMensajero(
     });
     if (errorPerfil) return { ok: false, error: errorPerfil.message };
 
-    const { error } = await sb.from("mensajeros").insert({
+    // upsert: quien fue rechazado corrige sus datos y vuelve a intentar
+    // (el trigger de la base devuelve el estado a "en revisión").
+    const { error } = await sb.from("mensajeros").upsert({
       id: usuario.id,
       documento: datos.documento,
       municipio: datos.municipio,

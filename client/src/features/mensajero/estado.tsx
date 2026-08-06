@@ -82,6 +82,10 @@ export function EstadoMensajero() {
           <Button fullWidth onClick={() => router.push("/driver/dashboard")}>
             Ir a mi panel
           </Button>
+        ) : perfil.estado === "rechazado" ? (
+          <Button fullWidth onClick={() => router.push("/mensajero/registro")}>
+            Corregir mis datos y volver a enviar
+          </Button>
         ) : (
           <Link
             href="/home"

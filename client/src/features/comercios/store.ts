@@ -43,4 +43,8 @@ export function useComercios(): ComercioApp[] {
   return recurso.useRecurso();
 }
 
+export function useEstadoComercios() {
+  return recurso.useEstado();
+}
+
 export const refrescarComercios = recurso.refrescar;

@@ -153,6 +153,41 @@ export async function listarMensajeros(
   );
 }
 
+export type PedidoAdmin = {
+  id: string;
+  codigo: string;
+  comercio: string;
+  barrio: string | null;
+  total: number;
+  estado: string;
+  hora: string;
+};
+
+// El panel lee los pedidos con la llave del equipo: la sesión del navegador
+// es un usuario anónimo y RLS solo le mostraría los suyos.
+export async function listarPedidos(clave: string): Promise<PedidoAdmin[]> {
+  if (!claveAdminValida(clave)) return [];
+  const { data, error } = await clienteAdmin()
+    .from("pedidos")
+    .select("id, codigo, barrio, total, estado, creado_en, comercios(nombre)")
+    .order("creado_en", { ascending: false });
+  if (error || !data) return [];
+  return data.map((p) => ({
+    id: p.id as string,
+    codigo: p.codigo as string,
+    comercio:
+      (p.comercios as unknown as { nombre: string } | null)?.nombre ?? "Pedido libre",
+    barrio: p.barrio as string | null,
+    total: p.total as number,
+    estado: p.estado as string,
+    hora: new Date(p.creado_en as string).toLocaleTimeString("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }),
+  }));
+}
+
 export async function cambiarEstadoMensajero(
   clave: string,
   id: string,

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Bike } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Banner } from "@/components/ui/banner";
 import { useDireccion } from "@/features/onboarding/direccion";
 import { crearPedido } from "./almacen";
 import { TARIFA_ENVIO } from "./tarifas";
@@ -19,6 +20,7 @@ export function PedidoLibre() {
   const direccion = useDireccion();
   const [descripcion, setDescripcion] = useState("");
   const [pidiendo, setPidiendo] = useState(false);
+  const [errorPedido, setErrorPedido] = useState<string | null>(null);
 
   useEffect(() => {
     if (direccion === null) router.replace("/mapa");
@@ -43,6 +45,7 @@ export function PedidoLibre() {
       });
       router.replace(`/pedido/${pedido.id}`);
     } catch {
+      setErrorPedido("No pudimos crear tu pedido. Revisa tu conexión e inténtalo de nuevo.");
       setPidiendo(false);
     }
   }
@@ -96,7 +99,8 @@ export function PedidoLibre() {
         </div>
       </div>
 
-      <div className="mt-auto">
+      <div className="mt-auto flex flex-col gap-2">
+        {errorPedido && <Banner tone="error">{errorPedido}</Banner>}
         <Button
           fullWidth
           pending={pidiendo}

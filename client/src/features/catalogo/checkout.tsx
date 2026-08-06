@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Banknote, CreditCard, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Banner } from "@/components/ui/banner";
 import { useDireccion } from "@/features/onboarding/direccion";
 import { useComercios } from "@/features/comercios/store";
 import { useProductos } from "@/features/comercios/productos-store";
@@ -21,6 +22,7 @@ export function Checkout() {
   const direccion = useDireccion();
   const carrito = useCarrito();
   const [confirmando, setConfirmando] = useState(false);
+  const [errorPedido, setErrorPedido] = useState<string | null>(null);
 
   const comercios = useComercios();
   const todosProductos = useProductos();
@@ -48,6 +50,7 @@ export function Checkout() {
       return;
     }
     setConfirmando(true);
+    setErrorPedido(null);
     try {
       const pedido = await crearPedido({
         tipo: "catalogo",
@@ -69,6 +72,7 @@ export function Checkout() {
       vaciarCarrito();
       router.replace(`/pedido/${pedido.id}`);
     } catch {
+      setErrorPedido("No pudimos crear tu pedido. Revisa tu conexión e inténtalo de nuevo.");
       setConfirmando(false);
     }
   }
@@ -153,7 +157,8 @@ export function Checkout() {
         </div>
       </div>
 
-      <div className="mt-auto">
+      <div className="mt-auto flex flex-col gap-2">
+        {errorPedido && <Banner tone="error">{errorPedido}</Banner>}
         <Button fullWidth pending={confirmando} onClick={hacerPedido}>
           Hacer pedido · {currency.format(subtotal + envio)}
         </Button>

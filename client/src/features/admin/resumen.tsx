@@ -8,10 +8,10 @@ import {
   Store,
   UserCheck,
 } from "lucide-react";
-import { usePedidos } from "@/features/pedidos/almacen";
 import { COMISION_PEDIDO } from "@/features/pedidos/tarifas";
 import { useComercios } from "@/features/comercios/store";
 import { useMensajerosAdmin } from "./mensajeros";
+import { usePedidosAdmin } from "./pedidos";
 
 const currency = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -20,7 +20,7 @@ const currency = new Intl.NumberFormat("es-CO", {
 });
 
 export function AdminResumen() {
-  const pedidos = usePedidos();
+  const pedidos = usePedidosAdmin();
   const comercios = useComercios();
   const mensajeros = useMensajerosAdmin();
 

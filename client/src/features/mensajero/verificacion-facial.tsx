@@ -35,7 +35,16 @@ export function VerificacionFacial({
   const [paso, setPaso] = useState<Paso>("cargando");
   const [detalleError, setDetalleError] = useState("");
   const [resultado, setResultado] = useState<ResultadoVerificacion | null>(null);
+  const [atascado, setAtascado] = useState(false);
   const capturaRef = useRef<Blob | null>(null);
+
+  // Si los gestos no se detectan (poca luz, cámara de gama baja), no dejar al
+  // aspirante encerrado: a los 40 s se ofrece continuar con revisión manual.
+  useEffect(() => {
+    if (paso === "listo" || paso === "error") return;
+    const t = setTimeout(() => setAtascado(true), 40000);
+    return () => clearTimeout(t);
+  }, [paso]);
 
   useEffect(() => {
     let activo = true;
@@ -245,10 +254,31 @@ export function VerificacionFacial({
         </div>
       )}
 
-      {paso === "error" && (
-        <Button variant="secondary" onClick={onCerrar}>
-          Volver
-        </Button>
+      {(paso === "error" || (atascado && paso !== "listo")) && (
+        <div className="flex w-full max-w-xs flex-col gap-2">
+          <Button
+            variant="secondary"
+            fullWidth
+            onClick={() =>
+              onCompletar(
+                {
+                  similitud: null,
+                  antispoof: null,
+                  vivacidad: null,
+                  rostroEnCedula: false,
+                  fecha: new Date().toISOString(),
+                  revisionManual: true,
+                },
+                capturaRef.current ?? new Blob()
+              )
+            }
+          >
+            Continuar y que el equipo revise mis fotos
+          </Button>
+          <button onClick={onCerrar} className="text-caption font-body text-white/70">
+            Volver e intentar de nuevo
+          </button>
+        </div>
       )}
     </div>
   );

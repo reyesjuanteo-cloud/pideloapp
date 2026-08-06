@@ -56,8 +56,9 @@ export function RegistroMensajero() {
   const [enviando, setEnviando] = useState(false);
   const [errores, setErrores] = useState<Record<string, string>>({});
 
-  if (existente) {
-    // Ya hay un registro en este dispositivo: mostrar su estado, no otro formulario.
+  // Con un registro en revisión o aprobado se muestra su estado; si fue
+  // rechazado, puede corregir sus datos y volver a enviar.
+  if (existente && existente.estado !== "rechazado") {
     router.replace("/mensajero/estado");
     return null;
   }
