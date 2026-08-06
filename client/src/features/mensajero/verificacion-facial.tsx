@@ -227,28 +227,15 @@ export function VerificacionFacial({
       </div>
 
       {paso === "listo" && resultado && (
-        <div className="flex w-full max-w-xs flex-col gap-2 rounded-lg bg-white/10 p-4 text-body font-body text-white">
-          <p className="flex items-center gap-2 font-semibold">
-            <ShieldCheck className="size-4 text-success" />
-            Resultado
+        <div className="flex w-full max-w-xs flex-col gap-3 rounded-lg bg-white/10 p-4 text-center">
+          <p className="flex items-center justify-center gap-2 text-body font-semibold font-body text-white">
+            <ShieldCheck className="size-5 text-success" />
+            Verificación completada
           </p>
-          <p className="flex justify-between">
-            <span>Similitud con cédula</span>
-            <span className="font-semibold">
-              {resultado.similitud !== null ? `${Math.round(resultado.similitud * 100)}%` : "—"}
-            </span>
+          <p className="text-caption font-body text-white/70">
+            El equipo revisará tu registro y te avisará por correo.
           </p>
-          <p className="flex justify-between">
-            <span>Anti-spoofing</span>
-            <span className="font-semibold">
-              {resultado.antispoof !== null ? `${Math.round(resultado.antispoof * 100)}%` : "—"}
-            </span>
-          </p>
-          <Button
-            fullWidth
-            onClick={() => onCompletar(resultado, capturaRef.current!)}
-            className="mt-2"
-          >
+          <Button fullWidth onClick={() => onCompletar(resultado, capturaRef.current!)}>
             Continuar
           </Button>
         </div>

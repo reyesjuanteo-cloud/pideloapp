@@ -73,19 +73,15 @@ type FilaMensajero = {
   municipio: PerfilMensajero["municipio"];
   vehiculo: PerfilMensajero["vehiculo"];
   placa: string | null;
-  licencia: string | null;
-  soat_vigente: boolean | null;
   estado: EstadoMensajero;
   saldo: number;
   registrado_en: string;
-  perfiles: { nombre: string | null; celular: string | null } | null;
+  perfiles: { nombre: string | null; celular: string | null; correo: string | null } | null;
 };
 
 export type FotosMensajero = {
   cedula: string | null;
   selfie: string | null;
-  licencia: string | null;
-  soat: string | null;
   rostro: string | null;
 };
 
@@ -96,7 +92,7 @@ export type MensajeroAdmin = PerfilMensajero & {
   verificacion: ResultadoVerificacion | null;
 };
 
-const NOMBRES_FOTOS = ["cedula", "selfie", "licencia", "soat", "rostro"] as const;
+const NOMBRES_FOTOS = ["cedula", "rostro"] as const;
 
 export async function listarMensajeros(
   clave: string
@@ -105,7 +101,7 @@ export async function listarMensajeros(
   const admin = clienteAdmin();
   const { data, error } = await admin
     .from("mensajeros")
-    .select("*, perfiles(nombre, celular)")
+    .select("*, perfiles(nombre, celular, correo)")
     .order("registrado_en", { ascending: false });
   if (error || !data) return [];
 
@@ -137,12 +133,11 @@ export async function listarMensajeros(
         id: f.id,
         nombre: f.perfiles?.nombre ?? "Sin nombre",
         celular: f.perfiles?.celular ?? "",
+        correo: f.perfiles?.correo ?? "",
         documento: f.documento,
         municipio: f.municipio,
         vehiculo: f.vehiculo,
         placa: f.placa ?? undefined,
-        licencia: f.licencia ?? undefined,
-        soatVigente: f.soat_vigente ?? undefined,
         estado: f.estado,
         saldo: f.saldo,
         fotos,

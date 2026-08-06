@@ -13,12 +13,10 @@ type FilaMensajero = {
   municipio: PerfilMensajero["municipio"];
   vehiculo: PerfilMensajero["vehiculo"];
   placa: string | null;
-  licencia: string | null;
-  soat_vigente: boolean | null;
   estado: PerfilMensajero["estado"];
   saldo: number;
   registrado_en: string;
-  perfiles: { nombre: string | null; celular: string | null } | null;
+  perfiles: { nombre: string | null; celular: string | null; correo: string | null } | null;
 };
 
 async function cargarPerfil(): Promise<PerfilMensajero | null> {
@@ -30,7 +28,7 @@ async function cargarPerfil(): Promise<PerfilMensajero | null> {
 
   const { data, error } = await sb
     .from("mensajeros")
-    .select("*, perfiles(nombre, celular)")
+    .select("*, perfiles(nombre, celular, correo)")
     .eq("id", session.user.id)
     .maybeSingle();
   if (error || !data) return null;
@@ -38,12 +36,11 @@ async function cargarPerfil(): Promise<PerfilMensajero | null> {
   return {
     nombre: f.perfiles?.nombre ?? "Sin nombre",
     celular: f.perfiles?.celular ?? "",
+    correo: f.perfiles?.correo ?? "",
     documento: f.documento,
     municipio: f.municipio,
     vehiculo: f.vehiculo,
     placa: f.placa ?? undefined,
-    licencia: f.licencia ?? undefined,
-    soatVigente: f.soat_vigente ?? undefined,
     estado: f.estado,
     fechaRegistro: new Date(f.registrado_en).toLocaleDateString("es-CO"),
   };
@@ -72,6 +69,7 @@ export async function registrarMensajero(
       id: usuario.id,
       nombre: datos.nombre,
       celular: datos.celular,
+      correo: datos.correo,
       rol: "mensajero",
     });
     if (errorPerfil) return { ok: false, error: errorPerfil.message };
@@ -84,8 +82,6 @@ export async function registrarMensajero(
       municipio: datos.municipio,
       vehiculo: datos.vehiculo,
       placa: datos.placa ?? null,
-      licencia: datos.licencia ?? null,
-      soat_vigente: datos.soatVigente ?? null,
     });
     if (error) return { ok: false, error: error.message };
 

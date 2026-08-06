@@ -71,13 +71,15 @@ export function AdminMensajeros() {
               <div>
                 <p className="text-body font-semibold font-body text-ink">{perfil.nombre}</p>
                 <p className="text-caption font-body text-muted">
-                  CC {perfil.documento} · +57 {perfil.celular} · {perfil.municipio}
+                  CC {perfil.documento} · +57 {perfil.celular}
+                </p>
+                <p className="truncate text-caption font-body text-muted">
+                  {perfil.correo} ·{" "}
+                  {perfil.municipio === "Todos" ? "Los tres municipios" : perfil.municipio}
                 </p>
                 <p className="flex items-center gap-1 text-caption font-body text-muted">
                   <Bike className="size-3.5" />
-                  {perfil.vehiculo === "moto"
-                    ? `Moto ${perfil.placa} · Lic. ${perfil.licencia} · SOAT ${perfil.soatVigente ? "declarado" : "sin declarar"}`
-                    : "Bicicleta"}
+                  {perfil.vehiculo === "moto" ? `Moto · Placa ${perfil.placa}` : "Bicicleta"}
                   {" · "}Registrado {perfil.fechaRegistro} · Saldo $
                   {perfil.saldo.toLocaleString("es-CO")}
                 </p>
@@ -95,9 +97,6 @@ export function AdminMensajeros() {
               {(
                 [
                   ["cedula", "Cédula"],
-                  ["selfie", "Selfie"],
-                  ["licencia", "Licencia"],
-                  ["soat", "SOAT"],
                   ["rostro", "Rostro en vivo"],
                 ] as const
               ).map(([nombre, etiqueta]) =>
@@ -160,15 +159,6 @@ export function AdminMensajeros() {
               </p>
             )}
 
-            <a
-              href="https://www.runt.gov.co/consultaCiudadana/"
-              target="_blank"
-              rel="noreferrer"
-              className="text-caption font-body text-primary hover:text-primary-dark"
-            >
-              Verificar SOAT y licencia en el RUNT ↗ (cédula {perfil.documento}
-              {perfil.placa ? ` · placa ${perfil.placa}` : ""})
-            </a>
 
             {perfil.estado === "en_revision" ? (
               <div className="flex gap-2">

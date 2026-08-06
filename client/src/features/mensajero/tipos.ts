@@ -4,9 +4,11 @@ export type Vehiculo = "moto" | "bicicleta";
 
 export type EstadoMensajero = "en_revision" | "aprobado" | "rechazado";
 
-export type Municipio = "Girardot" | "Ricaurte" | "Flandes";
+// "Todos" = trabaja en los tres municipios de la zona piloto.
+export type Municipio = "Girardot" | "Ricaurte" | "Flandes" | "Todos";
 
 // Resultado de la verificación facial hecha en el dispositivo del aspirante.
+// Solo lo ve el equipo en el panel: al aspirante no se le muestran puntajes.
 export type ResultadoVerificacion = {
   similitud: number | null; // rostro en vivo vs foto de la cédula (0-1)
   antispoof: number | null; // probabilidad de rostro real (no foto/pantalla)
@@ -20,13 +22,11 @@ export type ResultadoVerificacion = {
 export type PerfilMensajero = {
   nombre: string;
   celular: string; // 10 dígitos
+  correo: string; // para enviarle la confirmación de aprobación
   documento: string; // cédula
   municipio: Municipio;
   vehiculo: Vehiculo;
-  // Solo para moto:
-  placa?: string;
-  licencia?: string;
-  soatVigente?: boolean;
+  placa?: string; // solo moto
   estado: EstadoMensajero;
   fechaRegistro: string;
 };
