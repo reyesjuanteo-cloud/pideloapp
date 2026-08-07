@@ -1,6 +1,7 @@
 import { MapPin, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DetallePedido } from "./detalle-pedido";
+import { RutasPedido } from "./rutas";
 import type { PedidoDisponible } from "./types";
 
 const currency = new Intl.NumberFormat("es-CO", {
@@ -32,6 +33,8 @@ export function PedidoCard({
       </div>
 
       <DetallePedido pedido={pedido} />
+
+      <RutasPedido pedido={pedido} />
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 text-caption font-body text-muted">

@@ -177,6 +177,58 @@ export async function acreditarRecarga(
   return { ok: true };
 }
 
+export type NegocioAdmin = {
+  id: string;
+  nombre: string;
+  categoria: string;
+  zona: string;
+  direccion: string | null;
+  documento: string | null;
+  celular: string | null;
+  correo: string | null;
+  estado: "en_revision" | "aprobado" | "rechazado";
+  abierto: boolean;
+  productos: number;
+  registradoEn: string;
+};
+
+export async function listarNegocios(clave: string): Promise<NegocioAdmin[]> {
+  if (!claveAdminValida(clave)) return [];
+  const admin = clienteAdmin();
+  const { data, error } = await admin
+    .from("comercios")
+    .select("*, productos(id)")
+    .order("registrado_en", { ascending: false });
+  if (error || !data) return [];
+  return data.map((c) => ({
+    id: c.id as string,
+    nombre: c.nombre as string,
+    categoria: c.categoria as string,
+    zona: c.zona as string,
+    direccion: c.direccion as string | null,
+    documento: c.documento as string | null,
+    celular: c.celular as string | null,
+    correo: c.correo as string | null,
+    estado: c.estado as NegocioAdmin["estado"],
+    abierto: c.abierto as boolean,
+    productos: ((c.productos ?? []) as unknown[]).length,
+    registradoEn: new Date(c.registrado_en as string).toLocaleDateString("es-CO"),
+  }));
+}
+
+export async function cambiarEstadoNegocio(
+  clave: string,
+  id: string,
+  estado: NegocioAdmin["estado"]
+): Promise<{ ok: boolean }> {
+  if (!claveAdminValida(clave)) return { ok: false };
+  const { error } = await clienteAdmin()
+    .from("comercios")
+    .update({ estado, ...(estado === "aprobado" ? { abierto: true } : {}) })
+    .eq("id", id);
+  return { ok: !error };
+}
+
 export type PedidoAdmin = {
   id: string;
   codigo: string;

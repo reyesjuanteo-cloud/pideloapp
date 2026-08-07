@@ -11,6 +11,13 @@ export type PedidoDisponible = {
   items: { nombre: string; cantidad: number }[];
   descripcionLibre?: string;
   totalPedido: number;
+  // Cómo encontrar al cliente y dónde recoger
+  indicaciones?: string;
+  lat?: number;
+  lng?: number;
+  recogerEn?: string;
+  recogerLat?: number;
+  recogerLng?: number;
 };
 
 export type EstadoEntrega = "recogiendo" | "en_ruta" | "llegue" | "entregado";

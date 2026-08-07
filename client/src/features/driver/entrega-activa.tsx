@@ -1,6 +1,7 @@
 import { Hourglass, MapPin, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DetallePedido } from "./detalle-pedido";
+import { RutasPedido } from "./rutas";
 import type { EntregaActiva as EntregaActivaType, EstadoEntrega } from "./types";
 
 const currency = new Intl.NumberFormat("es-CO", {
@@ -54,6 +55,8 @@ export function EntregaActiva({
         </div>
         <span className="font-mono text-mono text-muted">{pedido.codigo}</span>
       </div>
+
+      <RutasPedido pedido={pedido} />
 
       <DetallePedido pedido={pedido} />
 

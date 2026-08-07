@@ -40,6 +40,7 @@ export function PedidoLibre() {
         total: TARIFA_ENVIO,
         direccion: `${direccion!.texto}${direccion!.detalle ? `, ${direccion!.detalle}` : ""}`,
         barrio: direccion!.barrio,
+        indicaciones: direccion!.indicaciones,
         lat: direccion!.lat,
         lng: direccion!.lng,
       });

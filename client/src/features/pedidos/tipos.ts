@@ -32,6 +32,8 @@ export type Pedido = {
   total: number;
   direccion: string;
   barrio: string;
+  // Cómo encontrar la casa: portería, timbre, referencias del cliente
+  indicaciones?: string;
   // Coordenadas del punto de entrega (el pin del mapa es la fuente de verdad).
   lat?: number;
   lng?: number;
@@ -45,4 +47,8 @@ export type Pedido = {
   // Nombre del cliente (visible para el mensajero de la entrega). El teléfono
   // NO se expone a propósito: se hablan por el chat y la llamada de la app.
   clienteNombre?: string;
+  // Dónde recoger (comercio del pedido)
+  comercioDireccion?: string;
+  comercioLat?: number;
+  comercioLng?: number;
 };

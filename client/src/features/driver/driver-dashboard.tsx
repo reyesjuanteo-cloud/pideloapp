@@ -46,6 +46,12 @@ function comoDisponible(pedido: Pedido): PedidoDisponible {
     items: pedido.items.map((i) => ({ nombre: i.nombre, cantidad: i.cantidad })),
     descripcionLibre: pedido.descripcionLibre,
     totalPedido: pedido.total,
+    indicaciones: pedido.indicaciones,
+    lat: pedido.lat,
+    lng: pedido.lng,
+    recogerEn: pedido.comercioDireccion,
+    recogerLat: pedido.comercioLat,
+    recogerLng: pedido.comercioLng,
   };
 }
 

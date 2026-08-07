@@ -66,6 +66,7 @@ export function Checkout() {
         total: subtotal + envio,
         direccion: `${direccion.texto}${direccion.detalle ? `, ${direccion.detalle}` : ""}`,
         barrio: direccion.barrio,
+        indicaciones: direccion.indicaciones,
         lat: direccion.lat,
         lng: direccion.lng,
       });

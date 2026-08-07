@@ -30,7 +30,8 @@ type FilaPedido = {
   creado_en: string;
   entregado_en: string | null;
   comercio_nombre: string | null;
-  comercios: { nombre: string } | null;
+  indicaciones: string | null;
+  comercios: { nombre: string; direccion: string | null; lat: number | null; lng: number | null } | null;
   mensajeros: {
     vehiculo: "moto" | "bicicleta";
     placa: string | null;
@@ -64,6 +65,7 @@ function aPedido(fila: FilaPedido): Pedido {
     total: fila.total,
     direccion: fila.direccion,
     barrio: fila.barrio ?? "",
+    indicaciones: fila.indicaciones ?? undefined,
     lat: fila.lat ?? undefined,
     lng: fila.lng ?? undefined,
     estado: fila.estado,
@@ -73,13 +75,16 @@ function aPedido(fila: FilaPedido): Pedido {
     mensajeroVehiculo: fila.mensajeros?.vehiculo,
     mensajeroPlaca: fila.mensajeros?.placa ?? undefined,
     clienteNombre: fila.perfiles?.nombre ?? undefined,
+    comercioDireccion: fila.comercios?.direccion ?? undefined,
+    comercioLat: fila.comercios?.lat ?? undefined,
+    comercioLng: fila.comercios?.lng ?? undefined,
   };
 }
 
 async function cargarPedidos(): Promise<Pedido[]> {
   const { data, error } = await supabase()
     .from("pedidos")
-    .select("*, comercios(nombre), perfiles!pedidos_cliente_id_fkey(nombre), mensajeros(vehiculo, placa, perfiles(nombre))")
+    .select("*, comercios(nombre, direccion, lat, lng), perfiles!pedidos_cliente_id_fkey(nombre), mensajeros(vehiculo, placa, perfiles(nombre))")
     .order("creado_en", { ascending: true });
   if (error) throw error;
   return (data as FilaPedido[]).map(aPedido);
@@ -158,6 +163,7 @@ export async function crearPedido(datos: {
   total: number;
   direccion: string;
   barrio: string;
+  indicaciones?: string;
   lat?: number;
   lng?: number;
 }): Promise<{ id: string }> {
@@ -175,6 +181,7 @@ export async function crearPedido(datos: {
     total: datos.total,
     direccion: datos.direccion,
     barrio: datos.barrio,
+    indicaciones: datos.indicaciones ?? null,
     lat: datos.lat ?? null,
     lng: datos.lng ?? null,
   });

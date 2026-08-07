@@ -5,14 +5,18 @@ import { ChevronDown, ChevronUp, Plus, Store, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Chip } from "@/components/ui/chip";
-import { refrescarComercios, useComercios } from "@/features/comercios/store";
+import { crearRecursoRemoto } from "@/lib/recurso-remoto";
+import { refrescarComercios } from "@/features/comercios/store";
 import { refrescarProductos, useProductos } from "@/features/comercios/productos-store";
 import {
   alternarComercio,
+  cambiarEstadoNegocio,
   crearComercio,
   crearProducto,
   eliminarComercio,
   eliminarProducto,
+  listarNegocios,
+  type NegocioAdmin,
 } from "./acciones";
 import { leerClaveAdmin } from "./gate";
 
@@ -42,6 +46,7 @@ function FormularioNuevoComercio({ alCrear }: { alCrear: () => void }) {
       zona,
     });
     void refrescarComercios();
+    void recursoNegocios.refrescar();
     setNombre("");
     alCrear();
   }
@@ -147,8 +152,18 @@ function ProductosDeComercio({ comercioId }: { comercioId: string }) {
   );
 }
 
+// Los comercios del panel se leen con la llave del equipo: así se ven también
+// los que están en revisión, que la app pública no muestra.
+const recursoNegocios = crearRecursoRemoto<NegocioAdmin[]>([], () =>
+  listarNegocios(leerClaveAdmin())
+);
+
+export function useNegociosAdmin(): NegocioAdmin[] {
+  return recursoNegocios.useRecurso();
+}
+
 export function AdminComercios() {
-  const comercios = useComercios();
+  const comercios = useNegociosAdmin();
   const [mostrandoNuevo, setMostrandoNuevo] = useState(false);
   const [abiertoId, setAbiertoId] = useState<string | null>(null);
 
@@ -181,12 +196,31 @@ export function AdminComercios() {
                   </p>
                   <p className="text-caption font-body text-muted">
                     {comercio.categoria} · {comercio.zona}
+                    {comercio.direccion ? ` · ${comercio.direccion}` : ""}
                   </p>
+                  {comercio.celular && (
+                    <p className="text-caption font-body text-muted">
+                      {comercio.celular} · {comercio.correo} · {comercio.productos}{" "}
+                      productos
+                    </p>
+                  )}
                 </div>
+                {comercio.estado !== "aprobado" && (
+                  <span
+                    className={`shrink-0 rounded-full px-2.5 py-1 text-caption font-semibold font-body ${
+                      comercio.estado === "en_revision"
+                        ? "bg-accent/10 text-accent-deep"
+                        : "bg-error/10 text-error"
+                    }`}
+                  >
+                    {comercio.estado === "en_revision" ? "En revisión" : "Rechazado"}
+                  </span>
+                )}
                 <button
                   onClick={async () => {
                     await alternarComercio(leerClaveAdmin(), comercio.id, !comercio.abierto);
                     void refrescarComercios();
+                    void recursoNegocios.refrescar();
                   }}
                   className={`rounded-full border px-2.5 py-1 text-caption font-semibold font-body transition-colors duration-300 ease-in-out ${
                     comercio.abierto
@@ -200,6 +234,7 @@ export function AdminComercios() {
                   onClick={async () => {
                     await eliminarComercio(leerClaveAdmin(), comercio.id);
                     void refrescarComercios();
+                    void recursoNegocios.refrescar();
                   }}
                   aria-label={`Eliminar ${comercio.nombre}`}
                   className="text-muted transition-colors duration-300 ease-in-out hover:text-error"
@@ -218,6 +253,32 @@ export function AdminComercios() {
                   )}
                 </button>
               </div>
+              {comercio.estado === "en_revision" && (
+                <div className="flex gap-2 border-t border-border pt-2">
+                  <Button
+                    fullWidth
+                    onClick={async () => {
+                      await cambiarEstadoNegocio(leerClaveAdmin(), comercio.id, "aprobado");
+                      void recursoNegocios.refrescar();
+                      void refrescarComercios();
+                    }}
+                  >
+                    Aprobar negocio
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="secondary"
+                    className="text-error"
+                    onClick={async () => {
+                      await cambiarEstadoNegocio(leerClaveAdmin(), comercio.id, "rechazado");
+                      void recursoNegocios.refrescar();
+                    }}
+                  >
+                    Rechazar
+                  </Button>
+                </div>
+              )}
+
               {expandido && <ProductosDeComercio comercioId={comercio.id} />}
             </div>
           );
