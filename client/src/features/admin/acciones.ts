@@ -333,13 +333,18 @@ export type ProveedorAdmin = {
   nombre: string;
   documento: string;
   celular: string;
+  correo: string;
   municipio: string;
   descripcion: string | null;
   categorias: string[];
+  vehiculo: string | null;
+  placa: string | null;
   estado: "en_revision" | "aprobado" | "rechazado" | "suspendido";
   serviciosCompletados: number;
   intentosContacto: number;
   registradoEn: string;
+  fotos: FotosMensajero;
+  verificacion: ResultadoVerificacion | null;
 };
 
 export async function listarProveedores(clave: string): Promise<ProveedorAdmin[]> {
@@ -348,7 +353,7 @@ export async function listarProveedores(clave: string): Promise<ProveedorAdmin[]
   const { data } = await admin
     .from("proveedores")
     .select(
-      "id, documento, municipio, descripcion, estado, servicios_completados, creado_en, perfiles(nombre, celular), proveedor_categorias(categorias_servicio(nombre))"
+      "id, documento, municipio, descripcion, vehiculo, placa, estado, servicios_completados, creado_en, perfiles(nombre, celular, correo), proveedor_categorias(categorias_servicio(nombre))"
     )
     .order("creado_en", { ascending: false });
   if (!data) return [];
@@ -360,25 +365,57 @@ export async function listarProveedores(clave: string): Promise<ProveedorAdmin[]
   for (const r of riesgos ?? []) {
     intentos.set(r.usuario_id as string, (intentos.get(r.usuario_id as string) ?? 0) + 1);
   }
-  return data.map((p) => {
-    const perfil = p.perfiles as unknown as { nombre: string; celular: string } | null;
-    const cats = (p.proveedor_categorias as unknown as {
-      categorias_servicio: { nombre: string } | null;
-    }[]) ?? [];
-    return {
-      id: p.id as string,
-      nombre: perfil?.nombre ?? "Sin nombre",
-      documento: p.documento as string,
-      celular: perfil?.celular ?? "",
-      municipio: p.municipio as string,
-      descripcion: p.descripcion as string | null,
-      categorias: cats.map((c) => c.categorias_servicio?.nombre ?? "").filter(Boolean),
-      estado: p.estado as ProveedorAdmin["estado"],
-      serviciosCompletados: p.servicios_completados as number,
-      intentosContacto: intentos.get(p.id as string) ?? 0,
-      registradoEn: new Date(p.creado_en as string).toLocaleDateString("es-CO"),
-    };
-  });
+  return Promise.all(
+    data.map(async (p) => {
+      const perfil = p.perfiles as unknown as {
+        nombre: string;
+        celular: string;
+        correo: string | null;
+      } | null;
+      const cats = (p.proveedor_categorias as unknown as {
+        categorias_servicio: { nombre: string } | null;
+      }[]) ?? [];
+
+      // Documentos y verificación facial: mismas rutas que los mensajeros
+      const rutas = NOMBRES_FOTOS.map((n) => `${p.id}/${n}.jpg`);
+      const { data: firmas } = await admin.storage
+        .from("documentos")
+        .createSignedUrls(rutas, 3600);
+      const fotos = Object.fromEntries(
+        NOMBRES_FOTOS.map((n, i) => [n, firmas?.[i]?.signedUrl ?? null])
+      ) as FotosMensajero;
+      let verificacion: ResultadoVerificacion | null = null;
+      const { data: archivoV } = await admin.storage
+        .from("documentos")
+        .download(`${p.id}/verificacion.json`);
+      if (archivoV) {
+        try {
+          verificacion = JSON.parse(await archivoV.text()) as ResultadoVerificacion;
+        } catch {
+          verificacion = null;
+        }
+      }
+
+      return {
+        id: p.id as string,
+        nombre: perfil?.nombre ?? "Sin nombre",
+        documento: p.documento as string,
+        celular: perfil?.celular ?? "",
+        correo: perfil?.correo ?? "",
+        municipio: p.municipio as string,
+        descripcion: p.descripcion as string | null,
+        categorias: cats.map((c) => c.categorias_servicio?.nombre ?? "").filter(Boolean),
+        vehiculo: p.vehiculo as string | null,
+        placa: p.placa as string | null,
+        estado: p.estado as ProveedorAdmin["estado"],
+        serviciosCompletados: p.servicios_completados as number,
+        intentosContacto: intentos.get(p.id as string) ?? 0,
+        registradoEn: new Date(p.creado_en as string).toLocaleDateString("es-CO"),
+        fotos,
+        verificacion,
+      };
+    })
+  );
 }
 
 export async function cambiarEstadoProveedor(

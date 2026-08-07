@@ -181,3 +181,7 @@ begin
 
   raise exception 'sin_permiso';
 end $$;
+
+-- Vehículo del trabajador que hace domicilios o acarreos
+alter table public.proveedores add column if not exists vehiculo text;
+alter table public.proveedores add column if not exists placa text;

@@ -124,8 +124,16 @@ export function AdminServicios() {
             </span>
           </div>
           <p className="text-caption font-body text-muted">
-            CC {p.documento} · {p.celular} · {p.municipio} · desde {p.registradoEn}
+            CC {p.documento} · {p.celular} ·{" "}
+            {p.municipio === "Todos" ? "Los tres municipios" : p.municipio} · desde{" "}
+            {p.registradoEn}
           </p>
+          {p.vehiculo && (
+            <p className="text-caption font-body text-muted">
+              {p.vehiculo}
+              {p.placa ? ` · placa ${p.placa}` : ""}
+            </p>
+          )}
           <p className="text-caption font-body text-muted">
             {p.categorias.join(", ") || "Sin categorías"} · {p.serviciosCompletados}{" "}
             completados
@@ -141,6 +149,73 @@ export function AdminServicios() {
                 ? "intento de compartir contacto"
                 : "intentos de compartir contacto"}{" "}
               por fuera de la app
+            </p>
+          )}
+
+          {/* Documentos del aspirante (URLs firmadas) */}
+          <div className="flex flex-wrap gap-2">
+            {(
+              [
+                ["cedula", "Cédula"],
+                ["rostro", "Rostro en vivo"],
+              ] as const
+            ).map(([nombre, etiqueta]) =>
+              p.fotos[nombre] ? (
+                <a
+                  key={nombre}
+                  href={p.fotos[nombre]!}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex flex-col items-center gap-1"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element -- URL firmada temporal de Storage */}
+                  <img
+                    src={p.fotos[nombre]!}
+                    alt={etiqueta}
+                    className="size-16 rounded-md border border-border object-cover"
+                  />
+                  <span className="text-caption font-body text-muted">{etiqueta}</span>
+                </a>
+              ) : (
+                <div key={nombre} className="flex flex-col items-center gap-1 opacity-40">
+                  <div className="flex size-16 items-center justify-center rounded-md border border-dashed border-border text-caption font-body text-muted">
+                    Sin foto
+                  </div>
+                  <span className="text-caption font-body text-muted">{etiqueta}</span>
+                </div>
+              )
+            )}
+          </div>
+
+          {/* Puntajes de la verificación facial (solo el equipo los ve) */}
+          {p.verificacion ? (
+            <div className="flex flex-wrap gap-2 text-caption font-semibold font-body">
+              {(
+                [
+                  ["Similitud con cédula", p.verificacion.similitud, 0.5, 0.35],
+                  ["Anti-spoofing", p.verificacion.antispoof, 0.7, 0.5],
+                  ["Vivacidad", p.verificacion.vivacidad, 0.7, 0.5],
+                ] as const
+              ).map(([etiqueta, valor, bueno, medio]) => (
+                <span
+                  key={etiqueta}
+                  className={`rounded-full px-2.5 py-1 ${
+                    valor === null
+                      ? "bg-bg text-muted"
+                      : valor >= bueno
+                        ? "bg-success/10 text-success"
+                        : valor >= medio
+                          ? "bg-accent/10 text-accent-deep"
+                          : "bg-error/10 text-error"
+                  }`}
+                >
+                  {etiqueta}: {valor === null ? "—" : `${Math.round(valor * 100)}%`}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="text-caption font-body text-muted">
+              Sin verificación facial: revisar documentos a mano.
             </p>
           )}
 
