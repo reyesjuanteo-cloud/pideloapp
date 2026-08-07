@@ -9,6 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Chip } from "@/components/ui/chip";
 import { PhoneField, telefonoValido } from "@/components/ui/phone-field";
 import { supabase } from "@/lib/supabase/cliente";
+import {
+  SelectorUbicacion,
+  type UbicacionElegida,
+} from "@/components/ui/selector-ubicacion";
 import { correoInternoNegocio, crearCuentaNegocio } from "./cuenta";
 import { registrarNegocio } from "./mi-negocio";
 
@@ -21,7 +25,7 @@ export function RegistroNegocio() {
   const [nombre, setNombre] = useState("");
   const [categoria, setCategoria] = useState("Comida");
   const [municipio, setMunicipio] = useState("Girardot");
-  const [direccion, setDireccion] = useState("");
+  const [ubicacion, setUbicacion] = useState<UbicacionElegida | null>(null);
   const [documento, setDocumento] = useState("");
   const [celular, setCelular] = useState("");
   const [correo, setCorreo] = useState("");
@@ -33,7 +37,7 @@ export function RegistroNegocio() {
   async function enviar() {
     const e: Record<string, string> = {};
     if (nombre.trim().length < 3) e.nombre = "Escribe el nombre de tu negocio.";
-    if (direccion.trim().length < 5) e.direccion = "Escribe la dirección de tu local.";
+    if (!ubicacion) e.direccion = "Ubica tu local: escribe la dirección o mueve el pin.";
     if (!/^\d{6,15}$/.test(documento)) e.documento = "NIT o cédula, sin puntos ni guiones.";
     if (!telefonoValido(celular)) e.celular = "Celular de 10 dígitos que empiece por 3.";
     if (!CORREO.test(correo.trim())) e.correo = "Escribe un correo válido.";
@@ -59,29 +63,13 @@ export function RegistroNegocio() {
         return;
       }
 
-      // Ubicar el local en el mapa a partir de su dirección
-      let lat: number | null = null;
-      let lng: number | null = null;
-      try {
-        const r = await fetch(
-          `/api/direcciones?q=${encodeURIComponent(`${direccion}, ${municipio}`)}`
-        );
-        const lugares = r.ok ? await r.json() : [];
-        if (Array.isArray(lugares) && lugares[0]) {
-          lat = lugares[0].lat;
-          lng = lugares[0].lng;
-        }
-      } catch {
-        // Sin coordenadas: el equipo las puede ajustar después.
-      }
-
       const resultado = await registrarNegocio({
         nombre: nombre.trim(),
         categoria,
         zona: municipio,
-        direccion: direccion.trim(),
-        lat,
-        lng,
+        direccion: ubicacion!.direccion,
+        lat: ubicacion!.lat,
+        lng: ubicacion!.lng,
         documento,
         celular,
         correo: correo.trim().toLowerCase(),
@@ -156,18 +144,14 @@ export function RegistroNegocio() {
           </div>
         </div>
 
-        <Input
-          label="Dirección del local"
-          name="direccion"
-          placeholder="Carrera 10 #15-20"
-          icon={<MapPin className="size-4" />}
-          value={direccion}
-          onChange={(e) => setDireccion(e.target.value)}
-          error={errores.direccion}
+        <SelectorUbicacion
+          etiqueta="Dirección del local"
+          ayuda="Es donde el mensajero recoge los pedidos. Ajusta el pin hasta que quede sobre tu local."
+          onElegir={setUbicacion}
         />
-        <p className="-mt-2 text-caption font-body text-muted">
-          Es la dirección donde el mensajero recoge los pedidos.
-        </p>
+        {errores.direccion && (
+          <p className="-mt-2 text-caption text-error font-body">{errores.direccion}</p>
+        )}
 
         <Input
           label="NIT o cédula"

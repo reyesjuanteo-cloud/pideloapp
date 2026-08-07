@@ -19,6 +19,7 @@ import { BottomNav } from "./bottom-nav";
 import { ComercioRow } from "./comercio-row";
 import { PedidoEnCurso } from "./pedido-en-curso";
 import { MandadoCard } from "./mandado-card";
+import { Wrench } from "lucide-react";
 
 const categorias = [
   { icono: UtensilsCrossed, label: "Comida", tinte: "bg-accent/10 text-accent-deep" },
@@ -76,6 +77,24 @@ export function HomeCliente() {
 
       {/* Diferenciador del producto: va antes de las categorías */}
       <MandadoCard />
+
+      {/* Servicios a domicilio: plomería, belleza, acarreos… a toda hora */}
+      <Link
+        href="/servicios"
+        className="flex items-center gap-3 rounded-lg border border-border bg-surface p-3 shadow-[0_8px_24px_rgba(36,26,20,0.06)] transition-transform duration-300 ease-in-out hover:-translate-y-0.5"
+      >
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-accent/10">
+          <Wrench className="size-5 text-accent-deep" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-display text-h3 font-semibold text-ink">
+            Pide un servicio
+          </span>
+          <span className="block text-caption font-body text-muted">
+            Plomería, belleza, acarreos… tú ofreces, ellos contraofertan
+          </span>
+        </span>
+      </Link>
 
       {/* Categorías */}
       <div className="flex flex-col gap-2">

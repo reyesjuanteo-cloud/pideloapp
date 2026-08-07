@@ -23,14 +23,19 @@ export async function eliminarMiCuenta(): Promise<ResultadoEliminacion> {
   const admin = clienteAdmin();
   const uid = user.id;
 
-  // 1. No se puede borrar con un pedido en curso: quedaría un cliente o un
-  //    mensajero sin contraparte a mitad de una entrega.
+  // 1. No se puede borrar con un pedido o servicio en curso: quedaría la
+  //    contraparte a mitad de un trabajo.
   const { data: enCurso } = await admin
     .from("pedidos")
     .select("id")
     .or(`cliente_id.eq.${uid},mensajero_id.eq.${uid}`)
     .in("estado", ["buscando", "preparando", "en_camino", "llegue"]);
-  if ((enCurso ?? []).length > 0) {
+  const { data: serviciosEnCurso } = await admin
+    .from("solicitudes_servicio")
+    .select("id")
+    .or(`cliente_id.eq.${uid},proveedor_id.eq.${uid}`)
+    .in("estado", ["contratada", "en_camino", "llegue", "en_progreso", "terminada_proveedor"]);
+  if ((enCurso ?? []).length > 0 || (serviciosEnCurso ?? []).length > 0) {
     return {
       ok: false,
       error:
@@ -60,6 +65,13 @@ export async function eliminarMiCuenta(): Promise<ResultadoEliminacion> {
 
   // 4. Datos personales y de trabajo
   await admin.from("mensajes").delete().eq("autor_id", uid);
+  await admin.from("mensajes_servicio").delete().eq("autor_id", uid);
+  await admin
+    .from("solicitudes_servicio")
+    .update({ estado: "cancelada" })
+    .eq("cliente_id", uid)
+    .eq("estado", "publicada");
+  await admin.from("proveedores").delete().eq("id", uid);
   await admin.from("posiciones_mensajero").delete().eq("mensajero_id", uid);
   await admin.from("direcciones").delete().eq("usuario_id", uid);
   await admin.from("comercios").update({ dueno_id: null }).eq("dueno_id", uid);

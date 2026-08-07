@@ -7,6 +7,7 @@ import {
   ClipboardList,
   Store,
   UserCheck,
+  Wrench,
 } from "lucide-react";
 import { COMISION_PEDIDO } from "@/features/pedidos/tarifas";
 import { useComercios } from "@/features/comercios/store";
@@ -44,6 +45,12 @@ export function AdminResumen() {
         ? `${pendientes} ${pendientes === 1 ? "registro" : "registros"} por revisar`
         : "Sin registros pendientes",
       alerta: pendientes > 0,
+    },
+    {
+      href: "/admin/servicios",
+      icono: Wrench,
+      titulo: "Servicios",
+      detalle: "Proveedores, comisión y riesgo",
     },
     {
       href: "/admin/pedidos",

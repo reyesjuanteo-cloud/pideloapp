@@ -326,3 +326,108 @@ export async function cambiarEstadoMensajero(
   }
   return { ok: true, correoEnviado: false };
 }
+
+// ------------------------- Servicios: proveedores, riesgo, comisión -------------------------
+export type ProveedorAdmin = {
+  id: string;
+  nombre: string;
+  documento: string;
+  celular: string;
+  municipio: string;
+  descripcion: string | null;
+  categorias: string[];
+  estado: "en_revision" | "aprobado" | "rechazado" | "suspendido";
+  serviciosCompletados: number;
+  intentosContacto: number;
+  registradoEn: string;
+};
+
+export async function listarProveedores(clave: string): Promise<ProveedorAdmin[]> {
+  if (!claveAdminValida(clave)) return [];
+  const admin = clienteAdmin();
+  const { data } = await admin
+    .from("proveedores")
+    .select(
+      "id, documento, municipio, descripcion, estado, servicios_completados, creado_en, perfiles(nombre, celular), proveedor_categorias(categorias_servicio(nombre))"
+    )
+    .order("creado_en", { ascending: false });
+  if (!data) return [];
+  const { data: riesgos } = await admin
+    .from("eventos_riesgo")
+    .select("usuario_id")
+    .eq("tipo", "CONTACT_INFO_ATTEMPT");
+  const intentos = new Map<string, number>();
+  for (const r of riesgos ?? []) {
+    intentos.set(r.usuario_id as string, (intentos.get(r.usuario_id as string) ?? 0) + 1);
+  }
+  return data.map((p) => {
+    const perfil = p.perfiles as unknown as { nombre: string; celular: string } | null;
+    const cats = (p.proveedor_categorias as unknown as {
+      categorias_servicio: { nombre: string } | null;
+    }[]) ?? [];
+    return {
+      id: p.id as string,
+      nombre: perfil?.nombre ?? "Sin nombre",
+      documento: p.documento as string,
+      celular: perfil?.celular ?? "",
+      municipio: p.municipio as string,
+      descripcion: p.descripcion as string | null,
+      categorias: cats.map((c) => c.categorias_servicio?.nombre ?? "").filter(Boolean),
+      estado: p.estado as ProveedorAdmin["estado"],
+      serviciosCompletados: p.servicios_completados as number,
+      intentosContacto: intentos.get(p.id as string) ?? 0,
+      registradoEn: new Date(p.creado_en as string).toLocaleDateString("es-CO"),
+    };
+  });
+}
+
+export async function cambiarEstadoProveedor(
+  clave: string,
+  id: string,
+  estado: ProveedorAdmin["estado"]
+): Promise<{ ok: boolean }> {
+  if (!claveAdminValida(clave)) return { ok: false };
+  const { error } = await clienteAdmin()
+    .from("proveedores")
+    .update({ estado })
+    .eq("id", id);
+  return { ok: !error };
+}
+
+export type ConfigServicios = { comisionPct: number; solicitudes: number; completadas: number; comisiones: number };
+
+export async function leerConfigServicios(clave: string): Promise<ConfigServicios | null> {
+  if (!claveAdminValida(clave)) return null;
+  const admin = clienteAdmin();
+  const { data: cfg } = await admin
+    .from("config")
+    .select("valor")
+    .eq("llave", "comision_servicios_pct")
+    .single();
+  const { count: solicitudes } = await admin
+    .from("solicitudes_servicio")
+    .select("*", { count: "exact", head: true });
+  const { data: hechas } = await admin
+    .from("solicitudes_servicio")
+    .select("comision_valor")
+    .eq("estado", "completada");
+  return {
+    comisionPct: Number(cfg?.valor ?? 12),
+    solicitudes: solicitudes ?? 0,
+    completadas: (hechas ?? []).length,
+    comisiones: (hechas ?? []).reduce((t, s) => t + ((s.comision_valor as number) ?? 0), 0),
+  };
+}
+
+export async function guardarComisionServicios(
+  clave: string,
+  pct: number
+): Promise<{ ok: boolean }> {
+  if (!claveAdminValida(clave)) return { ok: false };
+  if (!(pct >= 0 && pct <= 30)) return { ok: false };
+  const { error } = await clienteAdmin()
+    .from("config")
+    .update({ valor: String(pct) })
+    .eq("llave", "comision_servicios_pct");
+  return { ok: !error };
+}
