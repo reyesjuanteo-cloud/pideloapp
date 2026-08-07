@@ -33,6 +33,7 @@ export type Solicitud = {
   proveedorId: string | null;
   proveedorNombre?: string;
   precioFinal: number | null;
+  motivoCancelacion: string | null;
   creadoEn: string;
   esMia: boolean;
 };
@@ -115,6 +116,7 @@ type FilaSolicitud = {
   proveedor_id: string | null;
   cliente_id: string | null;
   precio_final: number | null;
+  motivo_cancelacion: string | null;
   creado_en: string;
   categorias_servicio: { nombre: string } | null;
 };
@@ -133,6 +135,7 @@ function aSolicitud(fila: FilaSolicitud, uid: string | undefined): Solicitud {
     estado: fila.estado,
     proveedorId: fila.proveedor_id,
     precioFinal: fila.precio_final,
+    motivoCancelacion: fila.motivo_cancelacion,
     creadoEn: fila.creado_en,
     esMia: fila.cliente_id === uid,
   };
@@ -149,7 +152,7 @@ const recursoSolicitudes = crearRecursoRemoto<Solicitud[]>([], async () => {
   const { data } = await sb
     .from("solicitudes_servicio")
     .select(
-      "id, codigo, descripcion, oferta_cliente, barrio, ciudad, lat_aprox, lng_aprox, estado, proveedor_id, cliente_id, precio_final, creado_en, categorias_servicio(nombre)"
+      "id, codigo, descripcion, oferta_cliente, barrio, ciudad, lat_aprox, lng_aprox, estado, proveedor_id, cliente_id, precio_final, motivo_cancelacion, creado_en, categorias_servicio(nombre)"
     )
     .order("creado_en", { ascending: false })
     .limit(60);
@@ -162,15 +165,19 @@ export const useEstadoSolicitudes = recursoSolicitudes.useEstado;
 export const refrescarSolicitudes = recursoSolicitudes.refrescar;
 
 let canalSolicitudes: ReturnType<ReturnType<typeof supabase>["channel"]> | null = null;
+let escuchasGlobales = false;
 
-export async function iniciarRealtimeServicios(): Promise<void> {
-  if (canalSolicitudes) return;
+async function conectarCanalServicios(): Promise<void> {
   const sb = supabase();
   const {
     data: { session },
   } = await sb.auth.getSession();
   if (!session) return;
   sb.realtime.setAuth(session.access_token);
+  if (canalSolicitudes) {
+    await sb.removeChannel(canalSolicitudes);
+    canalSolicitudes = null;
+  }
   canalSolicitudes = sb
     .channel("servicios")
     .on("postgres_changes", { event: "*", schema: "public", table: "solicitudes_servicio" }, () => {
@@ -182,6 +189,24 @@ export async function iniciarRealtimeServicios(): Promise<void> {
     .subscribe((estado) => {
       if (estado === "SUBSCRIBED") void recursoSolicitudes.refrescar();
     });
+}
+
+export async function iniciarRealtimeServicios(): Promise<void> {
+  if (!canalSolicitudes) await conectarCanalServicios();
+  if (escuchasGlobales || typeof window === "undefined") return;
+  escuchasGlobales = true;
+
+  // Al volver la red o traer la app al frente: reconectar y re-sincronizar,
+  // porque el canal puede haberse quedado frío con el celular suspendido.
+  const revivir = () => {
+    void recursoSolicitudes.refrescar();
+    void recursoMiProveedor.refrescar();
+    if (canalSolicitudes?.state !== "joined") void conectarCanalServicios();
+  };
+  window.addEventListener("online", revivir);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") revivir();
+  });
 }
 
 // ------------------------------------------------------------------ acciones
@@ -276,11 +301,15 @@ export async function contratar(
 
 export async function cambiarEstadoServicio(
   solicitudId: string,
-  estado: EstadoServicio
+  estado: EstadoServicio,
+  motivo?: string
 ): Promise<{ ok: boolean }> {
   const { error } = await supabase()
     .from("solicitudes_servicio")
-    .update({ estado })
+    .update({
+      estado,
+      ...(motivo ? { motivo_cancelacion: motivo } : {}),
+    })
     .eq("id", solicitudId);
   void recursoSolicitudes.refrescar();
   return { ok: !error };

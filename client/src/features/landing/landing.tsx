@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bike, Store, Wrench } from "lucide-react";
+import { Store, Wrench } from "lucide-react";
 import { Rayo } from "@/components/ui/rayo";
 
 // Promesas que van rotando bajo la marca.
@@ -65,13 +65,13 @@ export function Landing() {
           Iniciar sesión
         </Link>
 
-        {/* Acceso para quienes quieren trabajar repartiendo */}
+        {/* Una sola puerta para trabajar: domicilios, mandados y servicios */}
         <Link
-          href="/mensajero/registro"
+          href="/proveedor/registro"
           className="mt-2 flex items-center justify-center gap-2 rounded-md border border-dashed border-primary/40 bg-primary/5 py-3 text-center text-body font-body font-semibold text-primary transition-colors duration-300 ease-in-out hover:bg-primary/10"
         >
-          <Bike className="size-4" />
-          Quiero ser domiciliario
+          <Wrench className="size-4" />
+          Trabaja con Pídelo — domicilios y servicios
         </Link>
         <Link
           href="/negocio/registro"
@@ -79,13 +79,6 @@ export function Landing() {
         >
           <Store className="size-4" />
           Tengo un negocio
-        </Link>
-        <Link
-          href="/proveedor/registro"
-          className="flex items-center justify-center gap-2 rounded-md border border-dashed border-primary/40 bg-primary/5 py-3 text-center text-body font-body font-semibold text-primary transition-colors duration-300 ease-in-out hover:bg-primary/10"
-        >
-          <Wrench className="size-4" />
-          Ofrezco servicios (plomería, belleza…)
         </Link>
 
         <Link

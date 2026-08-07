@@ -10,6 +10,7 @@ import { eliminarMiCuenta } from "@/features/onboarding/eliminar-cuenta";
 import { formatearTelefono } from "@/components/ui/phone-field";
 import { useDireccion } from "@/features/onboarding/direccion";
 import { useTelefono } from "@/features/onboarding/telefono";
+import { usePerfilCliente } from "@/features/onboarding/perfil-cliente";
 import { cerrarSesion } from "@/features/onboarding/actions";
 import { BottomNav } from "./bottom-nav";
 
@@ -18,6 +19,7 @@ export function Perfil() {
   const [eliminando, setEliminando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const telefono = useTelefono();
+  const perfil = usePerfilCliente();
   const direccion = useDireccion();
 
   const textoDireccion = direccion
@@ -33,10 +35,16 @@ export function Perfil() {
           <User className="size-5" />
         </div>
         <div>
-          <p className="text-body font-semibold font-body text-ink">Cliente Pídelo</p>
+          <p className="text-body font-semibold font-body text-ink">
+            {perfil?.nombre ?? "Cliente Pídelo"}
+          </p>
           <p className="flex items-center gap-1 text-caption font-body text-muted">
             <Phone className="size-3.5" />
-            {telefono ? `+57 ${formatearTelefono(telefono)}` : "Sin número registrado"}
+            {perfil?.celular
+              ? `+57 ${formatearTelefono(perfil.celular)}`
+              : telefono
+                ? `+57 ${formatearTelefono(telefono)}`
+                : "Sin número registrado"}
           </p>
         </div>
       </div>

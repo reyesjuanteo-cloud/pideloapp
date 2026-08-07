@@ -165,13 +165,20 @@ export function PanelProveedor() {
       s.proveedorId === proveedor.id &&
       !["completada", "cancelada", "publicada"].includes(s.estado)
   );
+  // Dentro del radio elegido; sin zona propia registrada se muestran todas
   const disponibles = solicitudes
     .filter((s) => s.estado === "publicada" && !s.esMia)
     .map((s) => ({
       solicitud: s,
       distancia: distanciaASolicitud(s, proveedor.lat, proveedor.lng),
     }))
+    .filter(({ distancia }) => distancia === null || distancia <= proveedor.radioKm)
     .sort((a, b) => (a.distancia ?? 99) - (b.distancia ?? 99));
+
+  // Trabajos que el cliente canceló después de contratarlo: avisarle el porqué
+  const cancelados = solicitudes
+    .filter((s) => s.proveedorId === proveedor.id && s.estado === "cancelada")
+    .slice(0, 3);
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col gap-4 p-4">
@@ -227,6 +234,7 @@ export function PanelProveedor() {
                 .update({ disponible: !proveedor.disponible })
                 .eq("id", proveedor.id);
               await refrescarMiProveedor();
+              await refrescarSolicitudes();
               setCambiando(false);
             }}
             className={`shrink-0 rounded-full border px-3 py-2 text-caption font-semibold font-body ${
@@ -239,6 +247,15 @@ export function PanelProveedor() {
           </button>
         </div>
       )}
+
+      {/* El cliente canceló: decirle el porqué, no desaparecerle el trabajo */}
+      {cancelados.map((c) => (
+        <Banner key={c.id} tone="advertencia">
+          El cliente canceló «{c.categoria} · {c.codigo}»
+          {c.motivoCancelacion ? `: “${c.motivoCancelacion}”` : "."} No te
+          preocupes: no afecta tu reputación.
+        </Banner>
+      ))}
 
       {/* Trabajos contratados en curso */}
       {misTrabajos.map((trabajo) => (
@@ -287,10 +304,16 @@ export function PanelProveedor() {
       <h2 className="font-display text-h3 font-semibold text-ink">
         Solicitudes cerca de ti {disponibles.length > 0 && `· ${disponibles.length}`}
       </h2>
-      {proveedor.estado === "aprobado" && disponibles.length === 0 && (
+      {proveedor.estado === "aprobado" && !proveedor.disponible && (
         <p className="rounded-lg border border-border bg-surface p-4 text-body font-body text-muted">
-          No hay solicitudes abiertas en tus categorías ahora mismo. Te aparecerán
-          aquí al instante cuando alguien publique.
+          Estás apagado: mientras tanto no recibes solicitudes. Enciende
+          «Disponible» arriba cuando quieras trabajar.
+        </p>
+      )}
+      {proveedor.estado === "aprobado" && proveedor.disponible && disponibles.length === 0 && (
+        <p className="rounded-lg border border-border bg-surface p-4 text-body font-body text-muted">
+          No hay solicitudes abiertas en tus categorías (o quedan fuera de tu
+          radio de {proveedor.radioKm} km). Te aparecerán aquí al instante.
         </p>
       )}
       {disponibles.map(({ solicitud, distancia }) => (

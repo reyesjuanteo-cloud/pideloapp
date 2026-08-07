@@ -7,9 +7,8 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PhoneField, telefonoValido } from "@/components/ui/phone-field";
 import { guardarTelefono } from "./telefono";
-import { IngresoMensajero } from "./ingreso-mensajero";
 import { IngresoNegocio } from "./ingreso-negocio";
-import { IngresoProveedor } from "./ingreso-proveedor";
+import { IngresoTrabajo } from "./ingreso-trabajo";
 
 export function Ingreso() {
   const router = useRouter();
@@ -17,9 +16,9 @@ export function Ingreso() {
   const [error, setError] = useState<string | undefined>();
   const [enviando, setEnviando] = useState(false);
   // Por defecto entra el cliente; el mensajero cambia de pestaña.
-  const [pestana, setPestana] = useState<
-    "cliente" | "mensajero" | "negocio" | "proveedor"
-  >("cliente");
+  const [pestana, setPestana] = useState<"cliente" | "trabajo" | "negocio">(
+    "cliente"
+  );
 
   function continuar() {
     if (!telefonoValido(digitos)) {
@@ -46,7 +45,7 @@ export function Ingreso() {
 
       {/* Dos formas de entrar: cliente (por defecto) o mensajero */}
       <div className="mt-2 flex gap-2 rounded-full bg-bg p-1">
-        {(["cliente", "mensajero", "negocio", "proveedor"] as const).map((valor) => (
+        {(["cliente", "trabajo", "negocio"] as const).map((valor) => (
           <button
             key={valor}
             onClick={() => setPestana(valor)}
@@ -56,11 +55,9 @@ export function Ingreso() {
           >
             {valor === "cliente"
               ? "Cliente"
-              : valor === "mensajero"
-                ? "Domicilios"
-                : valor === "negocio"
-                  ? "Negocio"
-                  : "Servicios"}
+              : valor === "trabajo"
+                ? "Trabaja"
+                : "Negocio"}
           </button>
         ))}
       </div>
@@ -68,11 +65,9 @@ export function Ingreso() {
       <h1 className="mt-5 font-display text-h2 font-semibold text-ink">
         {pestana === "cliente"
           ? "Ingresa o crea tu cuenta"
-          : pestana === "mensajero"
-            ? "Entra a tu panel"
-            : pestana === "negocio"
-              ? "Entra a tu negocio"
-              : "Entra a tus servicios"}
+          : pestana === "trabajo"
+            ? "Entra a tu panel de trabajo"
+            : "Entra a tu negocio"}
       </h1>
       {pestana === "cliente" && (
         <p className="mt-1 text-body font-body text-muted">
@@ -80,17 +75,13 @@ export function Ingreso() {
         </p>
       )}
 
-      {pestana === "mensajero" ? (
+      {pestana === "trabajo" ? (
         <div className="mt-6">
-          <IngresoMensajero />
+          <IngresoTrabajo />
         </div>
       ) : pestana === "negocio" ? (
         <div className="mt-6">
           <IngresoNegocio />
-        </div>
-      ) : pestana === "proveedor" ? (
-        <div className="mt-6">
-          <IngresoProveedor />
         </div>
       ) : (
       <>

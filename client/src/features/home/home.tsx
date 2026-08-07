@@ -1,41 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ChevronDown,
-  MapPin,
-  Package,
-  Pill,
-  Search,
-  ShoppingCart,
-  User,
-  UtensilsCrossed,
-} from "lucide-react";
+import { ChevronDown, ChevronRight, MapPin, Store, User } from "lucide-react";
 import { Rayo } from "@/components/ui/rayo";
 import { useEstadoComercios } from "@/features/comercios/store";
 import { useDireccion } from "@/features/onboarding/direccion";
 import { primerNombre, usePerfilCliente } from "@/features/onboarding/perfil-cliente";
+import { useCategoriasServicio } from "@/features/servicios/datos";
 import { BottomNav } from "./bottom-nav";
 import { ComercioRow } from "./comercio-row";
 import { PedidoEnCurso } from "./pedido-en-curso";
-import { MandadoCard } from "./mandado-card";
-import { Wrench } from "lucide-react";
-
-const categorias = [
-  { icono: UtensilsCrossed, label: "Comida", tinte: "bg-accent/10 text-accent-deep" },
-  { icono: ShoppingCart, label: "Mercado", tinte: "bg-primary/10 text-primary" },
-  { icono: Pill, label: "Farmacia", tinte: "bg-success/10 text-success" },
-  { icono: Package, label: "Envíos", tinte: "bg-primary/10 text-primary-dark" },
-];
 
 export function HomeCliente() {
   const direccion = useDireccion();
-  const { datos: comercios, cargado, error } = useEstadoComercios();
+  const { datos: comercios } = useEstadoComercios();
+  const categorias = useCategoriasServicio();
   const nombre = primerNombre(usePerfilCliente()?.nombre);
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col gap-4 bg-white px-4 pb-20">
-      {/* Cabecera blanca con el rayo de la marca */}
+      {/* Cabecera con el rayo de la marca */}
       <div className="relative pt-5">
         <Rayo className="pointer-events-none absolute -right-2 top-6 size-20 rotate-12 opacity-10" />
         <div className="relative flex items-center justify-between gap-3">
@@ -61,83 +45,67 @@ export function HomeCliente() {
           </Link>
         </div>
         <p className="relative mt-4 flex items-center gap-1.5 font-display text-h2 font-bold text-ink">
-          {nombre ? `Hola ${nombre}, ¿qué vas a pedir hoy?` : "¿Qué necesitas hoy?"}
+          {nombre ? `Hola ${nombre}, ¿qué necesitas hoy?` : "¿Qué necesitas hoy?"}
           <Rayo className="size-5 shrink-0" />
         </p>
       </div>
 
-      {/* Buscador */}
-      <Link
-        href="/buscar"
-        className="flex min-h-12 items-center gap-2 rounded-lg border border-border bg-white px-3 text-body font-body text-muted shadow-[0_8px_24px_rgba(36,26,20,0.08)]"
-      >
-        <Search className="size-4 text-primary" />
-        Busca tiendas o productos
-      </Link>
-
-      {/* Diferenciador del producto: va antes de las categorías */}
-      <MandadoCard />
-
-      {/* Servicios a domicilio: plomería, belleza, acarreos… a toda hora */}
+      {/* EL corazón de Pídelo: la subasta */}
       <Link
         href="/servicios"
-        className="flex items-center gap-3 rounded-lg border border-border bg-surface p-3 shadow-[0_8px_24px_rgba(36,26,20,0.06)] transition-transform duration-300 ease-in-out hover:-translate-y-0.5"
+        className="flex flex-col gap-1 rounded-lg bg-primary p-4 text-white shadow-[0_12px_28px_rgba(232,56,13,0.35)] transition-transform duration-300 ease-in-out hover:-translate-y-0.5"
       >
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-accent/10">
-          <Wrench className="size-5 text-accent-deep" />
+        <span className="flex items-center gap-2 font-display text-h2 font-bold">
+          Pide lo que sea
+          <Rayo className="size-5" />
         </span>
-        <span className="min-w-0 flex-1">
-          <span className="block font-display text-h3 font-semibold text-ink">
-            Pide un servicio
-          </span>
-          <span className="block text-caption font-body text-muted">
-            Plomería, belleza, acarreos… tú ofreces, ellos contraofertan
-          </span>
+        <span className="text-body font-body text-white/90">
+          Un mandado, un domicilio, un arreglo… Tú dices cuánto ofreces y los que
+          saben se postulan con su precio. Tú comparas y eliges.
         </span>
       </Link>
 
-      {/* Categorías */}
+      {/* Categorías reales de la subasta */}
       <div className="flex flex-col gap-2">
-        <h2 className="font-display text-h3 font-semibold text-ink">Categorías</h2>
-        <div className="grid grid-cols-4 gap-2">
-          {categorias.map(({ icono: Icono, label, tinte }) => (
+        <h2 className="font-display text-h3 font-semibold text-ink">
+          ¿Con qué te ayudamos?
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          {categorias.map((categoria) => (
             <Link
-              key={label}
-              href={`/buscar?categoria=${label}`}
-              className="flex flex-col items-center gap-1.5"
+              key={categoria.id}
+              href={`/servicios?categoria=${encodeURIComponent(categoria.nombre)}`}
+              className="rounded-full border border-border bg-surface px-3.5 py-2 text-caption font-semibold font-body text-ink transition-colors duration-300 ease-in-out hover:border-primary hover:text-primary"
             >
-              <span
-                className={`flex h-14 w-full items-center justify-center rounded-lg transition-transform duration-300 ease-in-out hover:-translate-y-0.5 ${tinte}`}
-              >
-                <Icono className="size-5" />
-              </span>
-              <span className="text-caption font-semibold font-body text-ink">{label}</span>
+              {categoria.nombre}
             </Link>
           ))}
         </div>
       </div>
 
-      {/* Cerca de ti */}
-      <div className="flex flex-col gap-2">
-        <h2 className="font-display text-h3 font-semibold text-ink">
-          Cerca de ti · llega en 15 min
-        </h2>
-        {comercios.length === 0 ? (
-          <p className="rounded-lg border border-border bg-surface p-4 text-body font-body text-muted">
-            {!cargado
-              ? "Buscando comercios cerca de ti…"
-              : error
-                ? "No pudimos conectarnos. Revisa tu internet y vuelve a entrar."
-                : "No hay tiendas cerca todavía. Escribe lo que necesitas en «Haz un mandado» y un mensajero lo consigue."}
-          </p>
-        ) : (
+      {/* Tiendas aliadas: catálogo directo, sin subasta */}
+      {comercios.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <h2 className="flex items-center gap-1.5 font-display text-h3 font-semibold text-ink">
+              <Store className="size-4 text-primary" />
+              Tiendas aliadas
+            </h2>
+            <Link
+              href="/buscar"
+              className="flex items-center text-caption font-body text-primary hover:text-primary-dark"
+            >
+              Ver todas
+              <ChevronRight className="size-3.5" />
+            </Link>
+          </div>
           <div className="flex flex-col gap-2">
-            {comercios.map((comercio) => (
+            {comercios.slice(0, 3).map((comercio) => (
               <ComercioRow key={comercio.id} comercio={comercio} />
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Pedido en curso: sticky sobre el nav inferior */}
       <PedidoEnCurso />

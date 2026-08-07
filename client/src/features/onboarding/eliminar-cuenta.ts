@@ -66,6 +66,16 @@ export async function eliminarMiCuenta(): Promise<ResultadoEliminacion> {
   // 4. Datos personales y de trabajo
   await admin.from("mensajes").delete().eq("autor_id", uid);
   await admin.from("mensajes_servicio").delete().eq("autor_id", uid);
+  const { data: misSolicitudes } = await admin
+    .from("solicitudes_servicio")
+    .select("id")
+    .eq("cliente_id", uid);
+  if (misSolicitudes?.length) {
+    await admin
+      .from("direcciones_solicitud")
+      .delete()
+      .in("solicitud_id", misSolicitudes.map((s) => s.id));
+  }
   await admin
     .from("solicitudes_servicio")
     .update({ estado: "cancelada" })

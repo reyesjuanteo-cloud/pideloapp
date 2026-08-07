@@ -1,12 +1,7 @@
-import { ExigirCliente } from "@/features/onboarding/exigir-cliente";
-import { Mandado } from "@/features/pedidos/mandado";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "Haz un mandado — Pídelo" };
-
+// El mandado de precio fijo se unificó con la subasta: ahora el cliente
+// propone y los domiciliarios se postulan con su precio.
 export default function MandadoPage() {
-  return (
-    <ExigirCliente>
-      <Mandado />
-    </ExigirCliente>
-  );
+  redirect("/servicios?categoria=Mandados y domicilios");
 }

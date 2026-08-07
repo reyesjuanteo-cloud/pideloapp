@@ -94,6 +94,74 @@ function useOfertas(solicitudId: string): Oferta[] {
   return ofertas;
 }
 
+const MOTIVOS_CANCELACION = [
+  "Ya no lo necesito",
+  "Me demoré mucho en recibir ofertas",
+  "Los precios están muy altos",
+  "Lo resolví de otra forma",
+  "Me equivoqué al pedirlo",
+];
+
+function CancelarConMotivo({
+  onCancelar,
+  ocupado,
+}: {
+  onCancelar: (motivo: string) => Promise<void>;
+  ocupado: boolean;
+}) {
+  const [abierto, setAbierto] = useState(false);
+  const [otro, setOtro] = useState("");
+
+  if (!abierto) {
+    return (
+      <button
+        onClick={() => setAbierto(true)}
+        className="text-body font-body text-muted underline hover:text-ink"
+      >
+        Cancelar
+      </button>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface p-3">
+      <p className="text-body font-semibold font-body text-ink">
+        ¿Por qué cancelas? Le avisamos a quien se postuló.
+      </p>
+      {MOTIVOS_CANCELACION.map((motivo) => (
+        <button
+          key={motivo}
+          disabled={ocupado}
+          onClick={() => void onCancelar(motivo)}
+          className="rounded-md border border-border bg-bg px-3 py-2.5 text-left text-body font-body text-ink hover:border-primary"
+        >
+          {motivo}
+        </button>
+      ))}
+      <div className="flex gap-2">
+        <input
+          placeholder="Otro motivo…"
+          value={otro}
+          onChange={(e) => setOtro(e.target.value.slice(0, 200))}
+          className="min-h-11 flex-1 rounded-md border border-border bg-bg px-3 text-body font-body text-ink placeholder:text-muted focus:outline-none focus:border-primary"
+        />
+        <Button
+          disabled={otro.trim().length < 3}
+          pending={ocupado}
+          onClick={() => void onCancelar(otro.trim())}
+        >
+          Cancelar
+        </Button>
+      </div>
+      <button
+        onClick={() => setAbierto(false)}
+        className="text-caption font-body text-muted underline"
+      >
+        Mejor no, seguir con mi solicitud
+      </button>
+    </div>
+  );
+}
+
 export function SeguimientoServicio({ solicitudId }: { solicitudId: string }) {
   const router = useRouter();
   const solicitudes = useSolicitudes();
@@ -207,18 +275,15 @@ export function SeguimientoServicio({ solicitudId }: { solicitudId: string }) {
             ))
           )}
 
-          <button
-            onClick={async () => {
-              if (ocupado) return;
+          <CancelarConMotivo
+            ocupado={ocupado}
+            onCancelar={async (motivo) => {
               setOcupado(true);
-              await cambiarEstadoServicio(solicitud.id, "cancelada");
+              await cambiarEstadoServicio(solicitud.id, "cancelada", motivo);
               setOcupado(false);
               router.push("/servicios");
             }}
-            className="text-body font-body text-muted underline hover:text-ink"
-          >
-            Cancelar mi solicitud
-          </button>
+          />
         </>
       )}
 
@@ -284,18 +349,15 @@ export function SeguimientoServicio({ solicitudId }: { solicitudId: string }) {
           )}
 
           {solicitud.estado === "contratada" && (
-            <button
-              onClick={async () => {
-                if (ocupado) return;
+            <CancelarConMotivo
+              ocupado={ocupado}
+              onCancelar={async (motivo) => {
                 setOcupado(true);
-                await cambiarEstadoServicio(solicitud.id, "cancelada");
+                await cambiarEstadoServicio(solicitud.id, "cancelada", motivo);
                 setOcupado(false);
                 router.push("/servicios");
               }}
-              className="text-body font-body text-muted underline hover:text-ink"
-            >
-              Cancelar el servicio
-            </button>
+            />
           )}
 
           <ChatServicio solicitudId={solicitud.id} />

@@ -36,11 +36,18 @@ const etiquetaEstado: Record<string, string> = {
   cancelada: "Cancelado",
 };
 
-export function PedirServicio() {
+export function PedirServicio({ categoriaInicial }: { categoriaInicial?: string }) {
   const router = useRouter();
   const categorias = useCategoriasServicio();
   const solicitudes = useSolicitudes();
-  const [categoriaId, setCategoriaId] = useState<string | null>(null);
+  const [categoriaElegida, setCategoriaElegida] = useState<string | null>(null);
+  // Con categoría en la URL (home o atajo del mandado) queda preseleccionada
+  const categoriaId =
+    categoriaElegida ??
+    categorias.find(
+      (c) => c.nombre.toLowerCase() === (categoriaInicial ?? "").toLowerCase()
+    )?.id ??
+    null;
   const [descripcion, setDescripcion] = useState("");
   const [oferta, setOferta] = useState("");
   const [indicaciones, setIndicaciones] = useState("");
@@ -52,6 +59,8 @@ export function PedirServicio() {
     void iniciarRealtimeServicios();
     void refrescarSolicitudes();
   }, []);
+
+
 
   const mias = solicitudes.filter(
     (s) => s.esMia && !["completada", "cancelada"].includes(s.estado)
@@ -144,7 +153,7 @@ export function PedirServicio() {
             <Chip
               key={c.id}
               active={categoriaId === c.id}
-              onClick={() => setCategoriaId(c.id)}
+              onClick={() => setCategoriaElegida(c.id)}
             >
               {c.nombre}
             </Chip>
