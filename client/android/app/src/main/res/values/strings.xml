@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PideloApp</string>
+    <string name="title_activity_main">PideloApp</string>
+    <string name="package_name">app.pidelo.pideloapp</string>
+    <string name="custom_url_scheme">app.pidelo.pideloapp</string>
+</resources>
