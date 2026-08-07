@@ -113,7 +113,7 @@ export function DriverDashboard() {
             : "Para trabajar con Pídelo, regístrate como mensajero"}
         </p>
         <Link
-          href={perfil ? "/mensajero/estado" : "/mensajero/registro"}
+          href={perfil ? "/mensajero/estado" : "/proveedor/registro"}
           className="rounded-md bg-primary px-5 py-3 text-body font-semibold font-body text-white transition-colors duration-300 ease-in-out hover:bg-primary-dark"
         >
           {perfil ? "Ver estado de mi registro" : "Registrarme"}

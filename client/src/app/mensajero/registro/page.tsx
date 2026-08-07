@@ -1,7 +1,7 @@
-import { RegistroMensajero } from "@/features/mensajero/registro";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "Trabaja con Pídelo — Registro de mensajero" };
-
+// El registro de mensajeros se unificó: una sola puerta para trabajar con
+// Pídelo (domicilios, mandados y servicios), con verificación de identidad.
 export default function RegistroMensajeroPage() {
-  return <RegistroMensajero />;
+  redirect("/proveedor/registro");
 }

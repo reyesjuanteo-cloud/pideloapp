@@ -58,8 +58,8 @@ export const DOCUMENTOS = [
   {
     ruta: "mensajeros",
     archivo: "terminos-repartidores",
-    titulo: "Términos para Mensajeros",
-    resumen: "Condiciones para quienes reparten con Pídelo.",
+    titulo: "Términos para Trabajadores",
+    resumen: "Domicilios, mandados y servicios: condiciones para quienes trabajan con Pídelo.",
   },
   {
     ruta: "cookies",

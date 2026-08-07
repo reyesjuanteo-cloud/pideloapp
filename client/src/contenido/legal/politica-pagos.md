@@ -11,18 +11,38 @@
 
 ## 2. Cuánto cuesta
 
+### Servicios y mandados (subasta)
+
+**El precio lo acuerdan cliente y trabajador**: tú publicas lo que necesitas y
+cuánto ofreces (opcional), los trabajadores de esa categoría contraofertan con
+su precio y tiempo de llegada, y tú eliges. **El precio final es el de la
+oferta que aceptas** — queda fijado por el sistema y nadie puede cambiarlo
+después. En los mandados, lo que el trabajador compre por ti se paga aparte,
+contra entrega.
+
+### Pedidos de tiendas aliadas (catálogo)
+
 | Concepto | Valor |
 |---|---|
 | Domicilio dentro de la zona | $5.000 |
 | Productos | El precio que publica cada comercio |
-| Mandado (traer algo que tú escribes) | $5.000 de servicio + el valor de lo que se compre |
 
 **No cobramos recargos ocultos.** El total que ves antes de confirmar es el
 que pagas.
 
-## 3. Cómo gana el mensajero
+## 3. Cómo ganan los trabajadores y qué cobra Pídelo
 
-- Recibe **$5.000 completos** por domicilio.
+### En la subasta (servicios y mandados)
+
+- El trabajador recibe **el precio de su oferta aceptada**, pagado por el
+  cliente al terminar.
+- Pídelo cobra una **comisión porcentual sobre el servicio contratado** (hoy
+  **12%**), calculada automáticamente al contratar y registrada con cada
+  servicio. Si el cliente cancela, no se cobra.
+
+### En pedidos de tiendas aliadas
+
+- El mensajero recibe **$5.000 completos** por domicilio.
 - Paga a Pídelo **$1.000 de comisión por pedido aceptado**, descontados de su
   saldo prepagado.
 - **El primer domicilio no paga comisión** (cortesía de bienvenida).

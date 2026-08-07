@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { clienteAdmin } from "@/lib/supabase/admin";
-import { COMISION_PEDIDO, RECARGA_VALOR } from "./tarifas";
+import { COMISION_PEDIDO } from "./tarifas";
 
 async function usuarioActual(): Promise<string | null> {
   const supabase = await createClient();
@@ -59,27 +59,3 @@ export async function aceptarPedido(
   return { ok: true };
 }
 
-// ⚠️ TEMPORAL: recarga simulada — irá a una pasarela de pagos real.
-export async function recargarSaldo(): Promise<{ ok: boolean }> {
-  const uid = await usuarioActual();
-  if (!uid) return { ok: false };
-
-  const admin = clienteAdmin();
-  const { data: mensajero } = await admin
-    .from("mensajeros")
-    .select("saldo")
-    .eq("id", uid)
-    .single();
-  if (!mensajero) return { ok: false };
-
-  await admin
-    .from("mensajeros")
-    .update({ saldo: mensajero.saldo + RECARGA_VALOR })
-    .eq("id", uid);
-  await admin.from("movimientos_saldo").insert({
-    mensajero_id: uid,
-    tipo: "recarga",
-    valor: RECARGA_VALOR,
-  });
-  return { ok: true };
-}

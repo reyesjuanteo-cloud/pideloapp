@@ -24,7 +24,7 @@ export function EstadoMensajero() {
           Aún no te has registrado como mensajero
         </p>
         <Link
-          href="/mensajero/registro"
+          href="/proveedor/registro"
           className="text-body font-body text-primary hover:text-primary-dark"
         >
           Ir al registro
@@ -83,7 +83,7 @@ export function EstadoMensajero() {
             Ir a mi panel
           </Button>
         ) : perfil.estado === "rechazado" ? (
-          <Button fullWidth onClick={() => router.push("/mensajero/registro")}>
+          <Button fullWidth onClick={() => router.push("/proveedor/registro")}>
             Corregir mis datos y volver a enviar
           </Button>
         ) : (

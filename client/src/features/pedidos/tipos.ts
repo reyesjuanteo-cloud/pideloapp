@@ -39,6 +39,7 @@ export type Pedido = {
   lng?: number;
   estado: EstadoPedido;
   horaCreacion: string;
+  creadoEn?: string;
   horaEntrega?: string;
   // Datos del mensajero asignado (visibles para el cliente de este pedido)
   mensajeroId?: string;

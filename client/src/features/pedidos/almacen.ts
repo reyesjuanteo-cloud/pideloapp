@@ -71,6 +71,7 @@ function aPedido(fila: FilaPedido): Pedido {
     lng: fila.lng ?? undefined,
     estado: fila.estado,
     horaCreacion: hora(fila.creado_en),
+    creadoEn: fila.creado_en,
     horaEntrega: fila.entregado_en ? hora(fila.entregado_en) : undefined,
     mensajeroId: fila.mensajero_id ?? undefined,
     mensajeroNombre: fila.mensajeros?.perfiles?.nombre ?? undefined,
