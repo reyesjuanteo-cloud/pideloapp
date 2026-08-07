@@ -80,6 +80,13 @@ export function Landing() {
           <Store className="size-4" />
           Tengo un negocio
         </Link>
+
+        <Link
+          href="/legal"
+          className="mt-1 text-center text-caption font-body text-muted hover:text-ink"
+        >
+          Términos, privacidad y tratamiento de datos
+        </Link>
       </div>
     </div>
   );

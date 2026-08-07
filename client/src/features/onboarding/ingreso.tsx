@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -104,7 +105,14 @@ export function Ingreso() {
 
       <div className="mt-auto flex flex-col gap-3 pb-4 pt-8 text-center">
         <p className="text-caption font-body text-muted">
-          Al continuar aceptas los términos y la política de tratamiento de datos
+          Al continuar aceptas los{" "}
+          <Link href="/legal/terminos" className="text-primary underline">
+            términos
+          </Link>{" "}
+          y autorizas el{" "}
+          <Link href="/legal/autorizacion-datos" className="text-primary underline">
+            tratamiento de tus datos
+          </Link>{" "}
           (Ley 1581 de 2012).
         </p>
       </div>

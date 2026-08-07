@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight, LogOut, MapPin, Phone, User } from "lucide-react";
+import { ChevronRight, LogOut, MapPin, Phone, ScrollText, User } from "lucide-react";
 import { formatearTelefono } from "@/components/ui/phone-field";
 import { useDireccion } from "@/features/onboarding/direccion";
 import { useTelefono } from "@/features/onboarding/telefono";
@@ -45,6 +45,22 @@ export function Perfil() {
           <ChevronRight className="size-4 shrink-0 text-muted" />
         </Link>
       </div>
+
+      <Link
+        href="/legal"
+        className="flex items-center gap-3 rounded-lg border border-border bg-surface p-3 hover:bg-bg"
+      >
+        <ScrollText className="size-4 shrink-0 text-primary" />
+        <span className="min-w-0 flex-1">
+          <span className="block text-body font-semibold font-body text-ink">
+            Términos y privacidad
+          </span>
+          <span className="block text-caption font-body text-muted">
+            Cómo funciona Pídelo y qué hacemos con tus datos
+          </span>
+        </span>
+        <ChevronRight className="size-4 shrink-0 text-muted" />
+      </Link>
 
       <form action={cerrarSesion} className="mt-auto pb-4">
         <button

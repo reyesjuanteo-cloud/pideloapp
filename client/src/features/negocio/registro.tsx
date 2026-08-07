@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, IdCard, Lock, Mail, MapPin, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -212,6 +213,13 @@ export function RegistroNegocio() {
         />
         <p className="-mt-2 text-caption font-body text-muted">
           Con tu NIT o cédula y esta clave entrarás a administrar tu negocio.
+        </p>
+        <p className="text-caption font-body text-muted">
+          Al registrarte aceptas los{" "}
+          <Link href="/legal/comercios" className="text-primary underline">
+            términos para comercios aliados
+          </Link>
+          .
         </p>
       </div>
 

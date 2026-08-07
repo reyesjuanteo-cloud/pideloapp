@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Bike, CheckCircle2, IdCard, Lock, Mail, MapPin, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -310,8 +311,16 @@ export function RegistroMensajero() {
         </div>
 
         <p className="text-caption font-body text-muted">
-          Tus datos y documentos se usan solo para verificar tu registro y se tratan
-          según la Ley 1581 de 2012. La verificación facial ocurre en tu celular.
+          Al registrarte aceptas los{" "}
+          <Link href="/legal/mensajeros" className="text-primary underline">
+            términos para mensajeros
+          </Link>{" "}
+          y el{" "}
+          <Link href="/legal/permisos" className="text-primary underline">
+            uso de tu cámara, ubicación y datos biométricos
+          </Link>
+          . La verificación facial ocurre en tu celular y puedes negarte a ella:
+          el equipo revisa tu registro a mano.
         </p>
       </div>
 
