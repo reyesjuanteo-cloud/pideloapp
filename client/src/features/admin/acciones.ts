@@ -254,7 +254,7 @@ export async function listarPedidos(clave: string): Promise<PedidoAdmin[]> {
     comercio:
       (p.comercios as unknown as { nombre: string } | null)?.nombre ??
       (p.comercio_nombre as string | null) ??
-      "Pedido libre",
+      "Mandado",
     barrio: p.barrio as string | null,
     total: p.total as number,
     estado: p.estado as string,

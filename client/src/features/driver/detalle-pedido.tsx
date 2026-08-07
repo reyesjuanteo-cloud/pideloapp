@@ -15,7 +15,7 @@ export function DetallePedido({ pedido }: { pedido: PedidoDisponible }) {
       <div className="flex flex-col gap-1 rounded-md border border-border bg-bg p-3">
         <p className="flex items-center gap-1.5 text-label font-semibold uppercase tracking-wide text-muted font-body">
           <Package className="size-3.5" />
-          Encargo del cliente
+          Mandado del cliente
         </p>
         <p className="text-body font-body text-ink">«{pedido.descripcionLibre}»</p>
         <p className="text-caption font-body text-muted">

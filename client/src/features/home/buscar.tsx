@@ -57,7 +57,7 @@ export function Buscar({ categoriaInicial }: { categoriaInicial?: string }) {
 
       {resultados.length === 0 ? (
         <p className="rounded-lg border border-border bg-surface p-4 text-body font-body text-muted">
-          No encontramos nada con ese nombre. Escríbelo en «Pide lo que sea» del inicio y
+          No encontramos nada con ese nombre. Escríbelo en «Haz un mandado» del inicio y
           un mensajero lo consigue.
         </p>
       ) : (

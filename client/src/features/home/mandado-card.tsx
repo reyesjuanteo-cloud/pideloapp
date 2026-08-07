@@ -11,7 +11,7 @@ const ejemplos = [
   "Un ramo de flores para hoy",
 ];
 
-export function PedidoLibreCard() {
+export function MandadoCard() {
   const [indice, setIndice] = useState(0);
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export function PedidoLibreCard() {
 
   return (
     <Link
-      href="/pedido-libre"
+      href="/mandado"
       className="relative block overflow-hidden rounded-lg bg-linear-to-br from-primary to-primary-dark p-4 transition-transform duration-300 ease-in-out hover:-translate-y-0.5"
     >
       <div
@@ -36,10 +36,10 @@ export function PedidoLibreCard() {
       />
       <p className="relative flex items-center gap-1.5 font-display text-h3 font-bold text-white">
         <Sparkles className="size-4 text-accent" />
-        Pide lo que sea
+        Haz un mandado
       </p>
       <p className="relative mt-0.5 text-caption font-body text-white/70">
-        Escríbelo y un mensajero lo consigue por ti
+        Escríbelo y un mensajero te hace la vuelta
       </p>
       <div className="relative mt-3 flex min-h-11 items-center justify-between gap-2 rounded-md bg-surface px-3">
         <span className="truncate text-body font-body text-muted">{ejemplos[indice]}</span>

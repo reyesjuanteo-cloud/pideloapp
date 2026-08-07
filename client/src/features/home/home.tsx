@@ -18,7 +18,7 @@ import { primerNombre, usePerfilCliente } from "@/features/onboarding/perfil-cli
 import { BottomNav } from "./bottom-nav";
 import { ComercioRow } from "./comercio-row";
 import { PedidoEnCurso } from "./pedido-en-curso";
-import { PedidoLibreCard } from "./pedido-libre-card";
+import { MandadoCard } from "./mandado-card";
 
 const categorias = [
   { icono: UtensilsCrossed, label: "Comida", tinte: "bg-accent/10 text-accent-deep" },
@@ -75,7 +75,7 @@ export function HomeCliente() {
       </Link>
 
       {/* Diferenciador del producto: va antes de las categorías */}
-      <PedidoLibreCard />
+      <MandadoCard />
 
       {/* Categorías */}
       <div className="flex flex-col gap-2">
@@ -109,7 +109,7 @@ export function HomeCliente() {
               ? "Buscando comercios cerca de ti…"
               : error
                 ? "No pudimos conectarnos. Revisa tu internet y vuelve a entrar."
-                : "No hay tiendas cerca todavía. Escribe lo que necesitas en «Pide lo que sea» y un mensajero lo consigue."}
+                : "No hay tiendas cerca todavía. Escribe lo que necesitas en «Haz un mandado» y un mensajero lo consigue."}
           </p>
         ) : (
           <div className="flex flex-col gap-2">

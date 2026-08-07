@@ -24,7 +24,7 @@ export type Pedido = {
   id: string;
   codigo: string;
   tipo: "catalogo" | "libre";
-  comercio: string; // nombre del comercio, o "Pedido libre"
+  comercio: string; // nombre del comercio, o "Mandado"
   items: ItemPedido[];
   descripcionLibre?: string;
   subtotal: number;

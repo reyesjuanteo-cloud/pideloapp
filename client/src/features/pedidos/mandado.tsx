@@ -15,7 +15,7 @@ const currency = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-export function PedidoLibre() {
+export function Mandado() {
   const router = useRouter();
   const direccion = useDireccion();
   const [descripcion, setDescripcion] = useState("");
@@ -61,12 +61,12 @@ export function PedidoLibre() {
         >
           <ArrowLeft className="size-4" />
         </button>
-        <h1 className="font-display text-h2 font-semibold text-ink">Pide lo que sea</h1>
+        <h1 className="font-display text-h2 font-semibold text-ink">Haz un mandado</h1>
       </div>
 
       <p className="text-body font-body text-muted">
-        Escribe qué necesitas y dónde conseguirlo si lo sabes. Un mensajero lo compra y te
-        lo lleva. El valor de lo que compre se paga aparte, contra entrega.
+        Escribe qué necesitas y dónde conseguirlo si lo sabes. Un mensajero te hace
+        la vuelta. Lo que compre se paga aparte, contra entrega.
       </p>
 
       <div className="flex flex-col gap-1.5">
@@ -74,7 +74,7 @@ export function PedidoLibre() {
           htmlFor="descripcion"
           className="text-label font-semibold uppercase tracking-wide text-muted font-body"
         >
-          ¿Qué necesitas?
+          ¿Qué mandado necesitas?
         </label>
         <textarea
           id="descripcion"
@@ -108,7 +108,7 @@ export function PedidoLibre() {
           disabled={descripcion.trim().length < 10}
           onClick={pedir}
         >
-          Pedir por {currency.format(TARIFA_ENVIO)}
+          Pedir mi mandado · {currency.format(TARIFA_ENVIO)}
         </Button>
       </div>
     </div>

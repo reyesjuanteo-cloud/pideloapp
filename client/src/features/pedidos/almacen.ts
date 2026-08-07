@@ -57,7 +57,7 @@ function aPedido(fila: FilaPedido): Pedido {
     comercio:
       fila.comercios?.nombre ??
       fila.comercio_nombre ??
-      (fila.tipo === "libre" ? "Pedido libre" : "Comercio"),
+      (fila.tipo === "libre" ? "Mandado" : "Comercio"),
     items: fila.items ?? [],
     descripcionLibre: fila.descripcion_libre ?? undefined,
     subtotal: fila.subtotal,
