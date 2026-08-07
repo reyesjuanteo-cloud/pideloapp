@@ -41,6 +41,7 @@ export type Pedido = {
   horaCreacion: string;
   horaEntrega?: string;
   // Datos del mensajero asignado (visibles para el cliente de este pedido)
+  mensajeroId?: string;
   mensajeroNombre?: string;
   mensajeroVehiculo?: "moto" | "bicicleta";
   mensajeroPlaca?: string;

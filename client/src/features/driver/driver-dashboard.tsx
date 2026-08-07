@@ -8,6 +8,7 @@ import { cerrarSesion } from "@/features/onboarding/actions";
 import { actualizarEstado, refrescarPedidos, usePedidos } from "@/features/pedidos/almacen";
 import { aceptarPedido as aceptarPedidoAccion } from "@/features/pedidos/acciones";
 import { conciliarRecargas, crearRecargaBold } from "@/features/pagos/bold";
+import { useReportarPosicion } from "@/features/pedidos/posicion";
 import {
   COMISION_PEDIDO,
   NEQUI_PIDELO,
@@ -95,6 +96,11 @@ export function DriverDashboard() {
   const pedidos = usePedidos();
   const { datos: saldo, cargado: saldoCargado } = useEstadoSaldo();
   const perfil = usePerfilMensajero();
+  const entregaEnCurso = pedidos.some((p) =>
+    ["preparando", "en_camino", "llegue"].includes(p.estado)
+  );
+  // Su GPS viaja al cliente solo mientras hay una entrega en curso.
+  useReportarPosicion(entregaEnCurso);
   const sinSaldo = saldoCargado && saldo < COMISION_PEDIDO;
 
   // Solo mensajeros aprobados pueden operar el panel.

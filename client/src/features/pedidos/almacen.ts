@@ -31,6 +31,7 @@ type FilaPedido = {
   entregado_en: string | null;
   comercio_nombre: string | null;
   indicaciones: string | null;
+  mensajero_id: string | null;
   comercios: { nombre: string; direccion: string | null; lat: number | null; lng: number | null } | null;
   mensajeros: {
     vehiculo: "moto" | "bicicleta";
@@ -71,6 +72,7 @@ function aPedido(fila: FilaPedido): Pedido {
     estado: fila.estado,
     horaCreacion: hora(fila.creado_en),
     horaEntrega: fila.entregado_en ? hora(fila.entregado_en) : undefined,
+    mensajeroId: fila.mensajero_id ?? undefined,
     mensajeroNombre: fila.mensajeros?.perfiles?.nombre ?? undefined,
     mensajeroVehiculo: fila.mensajeros?.vehiculo,
     mensajeroPlaca: fila.mensajeros?.placa ?? undefined,
