@@ -56,3 +56,31 @@ Apple rechaza los que no lo explican.
 - **Revisión de Apple**: una app que solo muestra un sitio web puede ser
   rechazada (regla 4.2). Las funciones nativas de arriba son justamente lo que
   la diferencia — conviene que estén activas antes de enviarla.
+
+## Probarla en tu iPhone sin esperar a Apple
+
+**No necesitas la cuenta de desarrollador activada** para instalarla en tu
+propio iPhone. Xcode lo permite con tu Apple ID normal (la app dura 7 días
+instalada y se renueva volviéndola a instalar).
+
+1. Conecta el iPhone al Mac con cable y desbloquéalo ("Confiar en este equipo").
+2. `npx cap open ios` desde `client/`
+3. En Xcode, panel izquierdo → **App** → pestaña **Signing & Capabilities**:
+   - Marca **Automatically manage signing**
+   - En **Team**, elige tu Apple ID (si no aparece: Xcode → Settings →
+     Accounts → **+** → Apple ID)
+4. Arriba, en el selector de dispositivo, elige **tu iPhone**.
+5. Botón ▶︎ (Run).
+6. La primera vez el iPhone bloquea la app: **Ajustes → General → VPN y
+   gestión de dispositivos → confía en tu certificado de desarrollador**.
+
+Ábrela y verás PideloApp como app nativa: pantalla completa, sin barra de
+navegador, con su ícono.
+
+### Si prefieres el simulador
+
+Falta descargar la plataforma de iOS (varios GB): **Xcode → Settings →
+Components → iOS** → instalar. Luego `npx cap run ios`.
+
+Para probar de verdad conviene el iPhone físico: el simulador **no tiene GPS
+real ni cámara**, que es justo lo que queremos verificar.
