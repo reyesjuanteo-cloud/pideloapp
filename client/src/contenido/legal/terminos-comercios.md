@@ -58,4 +58,4 @@ Puedes retirarte cuando quieras: cierra tu negocio en la app y escríbenos.
 Nosotros podemos terminar la relación avisándote, o de inmediato si hay
 incumplimientos graves, fraude o riesgo para los usuarios.
 
-**Contacto:** [CORREO DE CONTACTO] · [CELULAR DE CONTACTO]
+**Contacto:** info@scalexpertsdigital.com · +57 322 443 5468

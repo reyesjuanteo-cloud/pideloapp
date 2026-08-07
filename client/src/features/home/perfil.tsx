@@ -1,7 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight, LogOut, MapPin, Phone, ScrollText, User } from "lucide-react";
+import { useState } from "react";
+import { ChevronRight, LogOut, MapPin, Phone, ScrollText, Trash2, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Banner } from "@/components/ui/banner";
+import { supabase } from "@/lib/supabase/cliente";
+import { eliminarMiCuenta } from "@/features/onboarding/eliminar-cuenta";
 import { formatearTelefono } from "@/components/ui/phone-field";
 import { useDireccion } from "@/features/onboarding/direccion";
 import { useTelefono } from "@/features/onboarding/telefono";
@@ -9,6 +14,9 @@ import { cerrarSesion } from "@/features/onboarding/actions";
 import { BottomNav } from "./bottom-nav";
 
 export function Perfil() {
+  const [confirmando, setConfirmando] = useState(false);
+  const [eliminando, setEliminando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const telefono = useTelefono();
   const direccion = useDireccion();
 
@@ -62,15 +70,64 @@ export function Perfil() {
         <ChevronRight className="size-4 shrink-0 text-muted" />
       </Link>
 
-      <form action={cerrarSesion} className="mt-auto pb-4">
-        <button
-          type="submit"
-          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-md border border-border bg-surface text-body font-semibold font-body text-error transition-colors duration-300 ease-in-out hover:bg-bg"
-        >
-          <LogOut className="size-4" />
-          Cerrar sesión
-        </button>
-      </form>
+      <div className="mt-auto flex flex-col gap-3 pb-4">
+        <form action={cerrarSesion}>
+          <button
+            type="submit"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-md border border-border bg-surface text-body font-semibold font-body text-ink transition-colors duration-300 ease-in-out hover:bg-bg"
+          >
+            <LogOut className="size-4" />
+            Cerrar sesión
+          </button>
+        </form>
+
+        {error && <Banner tone="error">{error}</Banner>}
+
+        {confirmando ? (
+          <div className="flex flex-col gap-2 rounded-lg border border-error bg-error/5 p-3">
+            <p className="text-body font-semibold font-body text-ink">
+              ¿Seguro que quieres eliminar tu cuenta?
+            </p>
+            <p className="text-caption font-body text-muted">
+              Se borran tu perfil, tus direcciones y tus mensajes. Tu historial de
+              pedidos se conserva sin tus datos personales, como exige la ley
+              contable. Esto no se puede deshacer.
+            </p>
+            <div className="flex gap-2">
+              <Button
+                fullWidth
+                pending={eliminando}
+                className="bg-error hover:bg-error"
+                onClick={async () => {
+                  setEliminando(true);
+                  setError(null);
+                  const r = await eliminarMiCuenta();
+                  if (!r.ok) {
+                    setError(r.error ?? "No se pudo eliminar la cuenta.");
+                    setEliminando(false);
+                    return;
+                  }
+                  await supabase().auth.signOut();
+                  window.location.href = "/bienvenida";
+                }}
+              >
+                Sí, eliminar
+              </Button>
+              <Button fullWidth variant="secondary" onClick={() => setConfirmando(false)}>
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setConfirmando(true)}
+            className="flex min-h-12 w-full items-center justify-center gap-2 text-body font-body text-error hover:underline"
+          >
+            <Trash2 className="size-4" />
+            Eliminar mi cuenta
+          </button>
+        )}
+      </div>
 
       <BottomNav />
     </div>

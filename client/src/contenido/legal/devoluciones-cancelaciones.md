@@ -27,7 +27,7 @@ usado. En ese caso escríbenos dentro de los 5 días hábiles.
 
 ## 3. Si algo salió mal
 
-Escríbenos a [CORREO DE CONTACTO] o por WhatsApp a [CELULAR DE CONTACTO]
+Escríbenos a info@scalexpertsdigital.com o por WhatsApp a +57 322 443 5468
 **dentro de las 24 horas** siguientes a la entrega, con el código del pedido y
 fotos si aplica.
 

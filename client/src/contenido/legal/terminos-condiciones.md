@@ -4,7 +4,7 @@
 
 ## 1. Quiénes somos y qué hacemos
 
-PideloApp es una plataforma operada por [RAZÓN SOCIAL], [NIT O CÉDULA], que
+PideloApp es una plataforma operada por ScaleXperts Digital, 1003555232-6, que
 **conecta** a tres partes: personas que quieren pedir algo, comercios que lo
 venden, y mensajeros independientes que lo llevan.
 
@@ -89,7 +89,7 @@ avisar y restablecerla, pero no garantizamos disponibilidad ininterrumpida.
 ## 10. Propiedad intelectual
 
 La marca Pídelo, el logo, el diseño y el software son propiedad de
-[RAZÓN SOCIAL]. Puedes usar la app, no copiarla ni revenderla.
+ScaleXperts Digital. Puedes usar la app, no copiarla ni revenderla.
 
 ## 11. Cambios y ley aplicable
 
@@ -99,4 +99,4 @@ dirección. Si sigues usando la app después, se entiende que los aceptas.
 Estos términos se rigen por la **ley colombiana**. Cualquier controversia se
 resolverá ante los jueces de Girardot, Cundinamarca.
 
-**Contacto:** [CORREO DE CONTACTO] · [CELULAR DE CONTACTO]
+**Contacto:** info@scalexpertsdigital.com · +57 322 443 5468

@@ -1,15 +1,17 @@
-# Datos que faltan por completar
+# Datos de la empresa (ya aplicados)
 
-Estos documentos están listos salvo por los datos de la empresa. Búscalos como
-`[ENTRE CORCHETES]` y reemplázalos en todos los archivos:
+Estos valores están reemplazados en todos los documentos de esta carpeta:
 
-| Marcador | Qué poner |
+| Dato | Valor |
 |---|---|
-| `[RAZÓN SOCIAL]` | Nombre legal del responsable (persona natural o empresa) |
-| `[NIT O CÉDULA]` | NIT con dígito de verificación, o cédula |
-| `[DIRECCIÓN FÍSICA]` | Dirección de notificaciones judiciales |
-| `[CORREO DE CONTACTO]` | Correo para peticiones de datos (ej. datos@pidelo.app) |
-| `[CELULAR DE CONTACTO]` | WhatsApp o teléfono de atención |
+| Responsable | ScaleXperts Digital |
+| NIT | 1003555232-6 |
+| Dirección | Calle 19 #24-71, Condominio Montecarlo Casa 20 |
+| Correo | info@scalexpertsdigital.com |
+| WhatsApp | +57 322 443 5468 |
+
+Si alguno cambia, edítalo en todos los `.md` de esta carpeta (o pídemelo y lo
+hago de una vez).
 
 > **Antes de publicar en tiendas o salir con usuarios reales, que un abogado
 > colombiano revise estos textos.** Están redactados sobre lo que la app hace

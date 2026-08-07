@@ -6,9 +6,9 @@ Versión resumida, conforme al artículo 14 del Decreto 1377 de 2013.
 
 ---
 
-**Responsable:** [RAZÓN SOCIAL] · [NIT O CÉDULA]
-**Dirección:** [DIRECCIÓN FÍSICA], Girardot, Cundinamarca
-**Contacto:** [CORREO DE CONTACTO] · [CELULAR DE CONTACTO]
+**Responsable:** ScaleXperts Digital · 1003555232-6
+**Dirección:** Calle 19 #24-71, Condominio Montecarlo Casa 20, Girardot, Cundinamarca
+**Contacto:** info@scalexpertsdigital.com · +57 322 443 5468
 
 **Qué hacemos con tus datos.** Los usamos para crear tu cuenta, coordinar tus
 pedidos entre clientes, comercios y mensajeros, atender tus solicitudes y
@@ -20,7 +20,7 @@ puedes pedir revisión manual.
 
 **Tus derechos.** Puedes conocer, actualizar, rectificar y suprimir tus datos,
 pedir prueba de tu autorización y revocarla, escribiendo a
-[CORREO DE CONTACTO]. También puedes eliminar tu cuenta desde
+info@scalexpertsdigital.com. También puedes eliminar tu cuenta desde
 **Perfil → Eliminar mi cuenta**.
 
 **Política completa.** La *Política de Privacidad y Tratamiento de Datos

@@ -34,7 +34,7 @@ que pagas.
 - **Pago en línea** por la app (Nequi, PSE o tarjeta) a través de **Bold**,
   pasarela de pagos vigilada. El saldo se acredita automáticamente al
   confirmarse el pago.
-- **Transferencia manual** a Nequi [CELULAR DE CONTACTO]: envía el
+- **Transferencia manual** a Nequi +57 322 443 5468: envía el
   comprobante y el equipo acredita el saldo.
 - Sin saldo no se pueden aceptar pedidos.
 
@@ -55,6 +55,6 @@ sus servicios de intermediación y por las recargas de saldo.
 
 ## 7. Problemas con un pago
 
-Escríbenos a [CORREO DE CONTACTO] con el código del pedido o el comprobante de
+Escríbenos a info@scalexpertsdigital.com con el código del pedido o el comprobante de
 la recarga. Revisamos y respondemos en **máximo 10 días hábiles**. Ver la
 *Política de devoluciones, cancelaciones y reembolsos*.

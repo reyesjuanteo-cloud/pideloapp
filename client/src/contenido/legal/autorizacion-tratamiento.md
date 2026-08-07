@@ -10,7 +10,7 @@ la Ley 1581 de 2012 y el artículo 5 del Decreto 1377 de 2013.
 ## Autorización
 
 Autorizo de manera **previa, expresa, informada y voluntaria** a
-[RAZÓN SOCIAL], identificado con [NIT O CÉDULA] ("Pídelo"), para recolectar,
+ScaleXperts Digital, identificado con 1003555232-6 ("Pídelo"), para recolectar,
 almacenar, usar, circular y suprimir mis datos personales con las siguientes
 finalidades:
 
@@ -30,7 +30,7 @@ Declaro que:
   registro puede ser revisado manualmente por el equipo.
 - Conozco mis derechos a conocer, actualizar, rectificar y suprimir mis datos,
   a solicitar prueba de esta autorización y a revocarla, escribiendo a
-  [CORREO DE CONTACTO].
+  info@scalexpertsdigital.com.
 - Se me informó que la *Política de Privacidad y Tratamiento de Datos
   Personales* está disponible en la app y que puedo consultarla antes de
   aceptar.

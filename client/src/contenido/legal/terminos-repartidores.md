@@ -65,4 +65,4 @@ escucharemos, salvo casos de gravedad o riesgo inmediato.
 Puedes dejar de usar la app cuando quieras. Si eliminas tu cuenta, **pierdes
 el saldo que tengas**: úsalo antes.
 
-**Contacto:** [CORREO DE CONTACTO] · [CELULAR DE CONTACTO]
+**Contacto:** info@scalexpertsdigital.com · +57 322 443 5468

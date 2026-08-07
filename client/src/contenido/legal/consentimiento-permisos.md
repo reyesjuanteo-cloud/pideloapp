@@ -79,5 +79,5 @@ Puedes negar cualquiera de ellos: te decimos qué pasa si lo haces.
 
 Puedes quitarlos cuando quieras desde los ajustes de tu celular o navegador
 (Ajustes → Aplicaciones → PideloApp → Permisos). También puedes pedir la
-supresión de tus datos biométricos escribiendo a [CORREO DE CONTACTO], sin que
+supresión de tus datos biométricos escribiendo a info@scalexpertsdigital.com, sin que
 eso implique perder tu cuenta.

@@ -4,11 +4,11 @@
 
 ## 1. Quién responde por tus datos
 
-**Responsable del tratamiento:** [RAZÓN SOCIAL], identificado con
-[NIT O CÉDULA], con domicilio en [DIRECCIÓN FÍSICA], Girardot, Cundinamarca,
+**Responsable del tratamiento:** ScaleXperts Digital, identificado con
+1003555232-6, con domicilio en Calle 19 #24-71, Condominio Montecarlo Casa 20, Girardot, Cundinamarca,
 Colombia.
 
-**Canales de atención:** [CORREO DE CONTACTO] · [CELULAR DE CONTACTO]
+**Canales de atención:** info@scalexpertsdigital.com · +57 322 443 5468
 
 Esta política se rige por la Ley 1581 de 2012, el Decreto 1377 de 2013 y demás
 normas colombianas sobre protección de datos personales.
@@ -115,7 +115,7 @@ Como titular puedes, en cualquier momento y gratis:
 - **Revocar** la autorización y pedir la **supresión** de tus datos
 - **Presentar quejas** ante la Superintendencia de Industria y Comercio (SIC)
 
-**Cómo ejercerlos:** escribe a [CORREO DE CONTACTO] con tu nombre, documento y
+**Cómo ejercerlos:** escribe a info@scalexpertsdigital.com con tu nombre, documento y
 lo que solicitas. Respondemos **consultas en 10 días hábiles** y **reclamos en
 15 días hábiles**, prorrogables según la ley.
 

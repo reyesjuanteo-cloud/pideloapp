@@ -10,7 +10,7 @@ Puedes eliminar tu cuenta cuando quieras, sin dar explicaciones y sin costo.
 
 ## 2. Por correo
 
-Escribe a [CORREO DE CONTACTO] desde el correo o con el celular registrado,
+Escribe a info@scalexpertsdigital.com desde el correo o con el celular registrado,
 pidiendo la eliminación. Verificamos tu identidad y procedemos en **máximo 15
 días hábiles**.
 
