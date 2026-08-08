@@ -4,7 +4,7 @@
 // comparan en tarjetas y al contratar se abren la dirección y el chat.
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Clock3, ShieldCheck, Star } from "lucide-react";
+import { ArrowLeft, Bell, Clock3, ShieldCheck, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Banner } from "@/components/ui/banner";
 import { supabase } from "@/lib/supabase/cliente";
@@ -16,6 +16,10 @@ import {
   useSolicitudes,
   type Oferta,
 } from "./datos";
+import {
+  activarNotificaciones,
+  estadoNotificaciones,
+} from "./notificaciones";
 import { ChatServicio } from "./chat-servicio";
 
 const currency = new Intl.NumberFormat("es-CO", {
@@ -167,6 +171,9 @@ export function SeguimientoServicio({ solicitudId }: { solicitudId: string }) {
   const solicitudes = useSolicitudes();
   const ofertas = useOfertas(solicitudId);
   const [ocupado, setOcupado] = useState(false);
+  const [conAvisos, setConAvisos] = useState(() =>
+    typeof window === "undefined" ? true : estadoNotificaciones() !== "pendiente"
+  );
 
   useEffect(() => {
     void iniciarRealtimeServicios();
@@ -221,6 +228,19 @@ export function SeguimientoServicio({ solicitudId }: { solicitudId: string }) {
               </span>
             )}
           </div>
+
+          {!conAvisos && (
+            <button
+              onClick={async () => {
+                await activarNotificaciones();
+                setConAvisos(true);
+              }}
+              className="flex items-center justify-center gap-2 rounded-md border border-accent bg-accent/10 p-3 text-body font-semibold font-body text-accent-deep"
+            >
+              <Bell className="size-4" />
+              Avísame cuando lleguen ofertas
+            </button>
+          )}
 
           {activas.length === 0 ? (
             <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-surface p-6 text-center">

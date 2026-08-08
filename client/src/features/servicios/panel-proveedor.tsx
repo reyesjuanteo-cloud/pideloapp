@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Clock3, LogOut, MapPin, Send, Star, Wrench } from "lucide-react";
+import { Bell, Clock3, LogOut, MapPin, Send, Star, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Banner } from "@/components/ui/banner";
 import { supabase } from "@/lib/supabase/cliente";
@@ -17,6 +17,12 @@ import {
   useSolicitudes,
   type Solicitud,
 } from "./datos";
+import {
+  activarNotificaciones,
+  estadoNotificaciones,
+  sonarAviso,
+  type EstadoNotificaciones,
+} from "./notificaciones";
 import { ChatServicio } from "./chat-servicio";
 import { DireccionServicio } from "./direccion-servicio";
 
@@ -131,11 +137,28 @@ export function PanelProveedor() {
   const { datos: proveedor, cargado } = useEstadoMiProveedor();
   const solicitudes = useSolicitudes();
   const [cambiando, setCambiando] = useState(false);
+  const [notificaciones, setNotificaciones] = useState<EstadoNotificaciones>(() =>
+    typeof window === "undefined" ? "pendiente" : estadoNotificaciones()
+  );
+  const [avisoNotif, setAvisoNotif] = useState<string | null>(null);
+  const idsVistos = useRef<Set<string> | null>(null);
 
   useEffect(() => {
     void iniciarRealtimeServicios();
     void refrescarSolicitudes();
   }, []);
+
+  // Bip + vibración cuando aparece una solicitud nueva con el panel abierto
+  const abiertas = solicitudes.filter((s) => s.estado === "publicada" && !s.esMia);
+  useEffect(() => {
+    const ids = new Set(abiertas.map((s) => s.id));
+    if (idsVistos.current !== null) {
+      const hayNueva = [...ids].some((id) => !idsVistos.current!.has(id));
+      if (hayNueva) sonarAviso();
+    }
+    idsVistos.current = ids;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [abiertas.map((s) => s.id).join(",")]);
 
   if (!cargado) {
     return (
@@ -213,6 +236,33 @@ export function PanelProveedor() {
       )}
       {proveedor.estado === "suspendido" && (
         <Banner tone="error">Tu cuenta está suspendida. Escríbenos.</Banner>
+      )}
+
+      {/* Avisos con la app cerrada */}
+      {proveedor.estado === "aprobado" && notificaciones !== "activas" && (
+        <div className="flex flex-col gap-2 rounded-lg border border-accent bg-accent/10 p-3">
+          <p className="text-body font-semibold font-body text-ink">
+            <Bell className="mr-1.5 inline size-4 text-accent-deep" />
+            Entérate de las solicitudes al instante
+          </p>
+          <p className="text-caption font-body text-muted">
+            Te avisamos cuando alguien publique en tus categorías, aunque tengas
+            la app cerrada.
+          </p>
+          <Button
+            fullWidth
+            onClick={async () => {
+              const r = await activarNotificaciones();
+              setNotificaciones(estadoNotificaciones());
+              setAvisoNotif(r.ok ? null : (r.error ?? null));
+            }}
+          >
+            Activar notificaciones
+          </Button>
+          {avisoNotif && (
+            <p className="text-caption font-body text-error">{avisoNotif}</p>
+          )}
+        </div>
       )}
 
       {proveedor.estado === "aprobado" && (
